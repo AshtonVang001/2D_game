@@ -30,8 +30,9 @@ void _Scene::initGL() {
     glDepthFunc(GL_LESS);
 
     glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT2);
 
     //---- Room Light ----
     glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION,  1.0f);
@@ -42,6 +43,11 @@ void _Scene::initGL() {
     glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION,  0.6f);
     glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION,    0.15f);
     glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.05f);
+    //white part
+    glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION,  1.2f);
+    glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION,    0.0f);
+    glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.0f);
+
 
     //---- Room Light Material ----
     const GLfloat room_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -51,9 +57,11 @@ void _Scene::initGL() {
 
     //---- Torch Light Material ----
     const GLfloat torch_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
-    const GLfloat torch_diffuse[]  = { 10.0f, 6.0f, 6.0f, 10.0f };
-    const GLfloat torch_specular[] = { 6.0f, 4.0f, 2.0f, 6.0f };
+    //const GLfloat torch_diffuse[]  = {10,10,10,10};//{ 10.0f, 6.0f, 6.0f, 10.0f };
+    //const GLfloat torch_specular[] = {10,10,10,10};//{ 6.0f, 4.0f, 2.0f, 6.0f };
     const GLfloat torch_position[] = { 0.0f, -0.4f, -2.8f, 1.0f };
+    const GLfloat torchWhiteDiffuse[] = {1,1,1,1};
+    const GLfloat torchWhitePosition[] = { 0.0f, -0.4f, -2.8f, 1.0f };
 
     //---- Room Light Parameters ----
     glLightfv(GL_LIGHT0, GL_AMBIENT,  room_ambient);
@@ -63,9 +71,11 @@ void _Scene::initGL() {
 
     //---- Torch Light Parameters ----
     glLightfv(GL_LIGHT1, GL_AMBIENT,  torch_ambient);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE,  torch_diffuse);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, torch_specular);
+    //glLightfv(GL_LIGHT1, GL_DIFFUSE,  torch_diffuse);
+    //glLightfv(GL_LIGHT1, GL_SPECULAR, torch_specular);
     glLightfv(GL_LIGHT1, GL_POSITION, torch_position);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, torchWhiteDiffuse);
+    glLightfv(GL_LIGHT2, GL_POSITION, torchWhitePosition);
 
 
     const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
@@ -144,16 +154,16 @@ void _Scene::drawScene() {
         glColor3f(1,1,1);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, 0.0f, 1.0f);
-            glTexCoord2f(0,0); glVertex3f(-5, -5, -3.1);
-            glTexCoord2f(1,0); glVertex3f( 5, -5, -3.1);
-            glTexCoord2f(1,1); glVertex3f( 5,  5, -3.1);
-            glTexCoord2f(0,1); glVertex3f(-5,  5, -3.1);
+            glTexCoord2f(0,0); glVertex3f(-5, -5, -10);
+            glTexCoord2f(1,0); glVertex3f( 5, -5, -10);
+            glTexCoord2f(1,1); glVertex3f( 5,  5, -10);
+            glTexCoord2f(0,1); glVertex3f(-5,  5, -10);
         glEnd();
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 
 
-    /*
+/*
     //---- Other shapes ----
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
@@ -199,7 +209,7 @@ void _Scene::drawScene() {
         glRotated(a,0,0,1);
         glutWireTorus(0.2,0.8,slices/2,stacks/2);
     glPopMatrix();
-    */
+*/
 
 
 
