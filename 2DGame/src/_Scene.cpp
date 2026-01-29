@@ -62,7 +62,7 @@ void _Scene::initGL() {
     glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
 
     myTex->loadTexture("images/map.png");
-    mySprite->spriteInit("images/circle.png", 15, 2);
+    mySprite->spriteInit("images/CharacterRotate.png", 7, 4);
 }
 
 void _Scene::drawScene() {
@@ -96,7 +96,7 @@ void _Scene::drawScene() {
 
         mySprite->drawSprite(0, -0.4, -3);
         mySprite->actionTrigger = mySprite->IDLE;
-        if (myTime->getTicks() > 50) {
+        if (myTime->getTicks() > 100) {
             mySprite->spriteActions();
             myTime->reset();
         }
