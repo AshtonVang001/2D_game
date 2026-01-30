@@ -67,74 +67,31 @@ void _sprite::drawSprite(float x, float y, float z)
 void _sprite::spriteActions()
 {
 
-    switch(actionTrigger){
+    int row = 0;
+    float frameW = 1.0f / frames.x;
+    float frameH = 1.0f / frames.y;
 
-        case STAND:
+    switch (actionTrigger)
+    {
+        case IDLE_F: row = 1; break;
+        case IDLE_B: row = 3; break;
+        case IDLE_L: row = 0; break;
+        case IDLE_R: row = 2; break;
+        default:     return;
+    }
 
-            xMin = 0;
-            yMin = 0;
+    // lock Y
+    yMin = row * frameH;
+    yMax = yMin + frameH;
 
-            xMax = 1.0 / frames.x;
-            yMax = 1.0 / frames.y;
+    // advance X
+    xMin += frameW;
+    xMax = xMin + frameW;
 
-        break;
-
-        case WALKLEFT:
-
-            xMin += 1.0 / frames.x;
-            xMax += 1.0 / frames.x;
-
-            if (xMax >= 1) {
-                yMin += 1.0 / frames.y;
-                yMax += 1.0 / frames.y;
-
-                xMin = 1.0 / frames.x;
-                xMax = 0;
-            }
-
-        break;
-
-        case WALKRIGHT:
-
-            xMin += 1.0 / frames.x;
-            xMax += 1.0 / frames.x;
-
-            if (xMax >= 1) {
-                yMin += 1.0 / frames.y;
-                yMax += 1.0 / frames.y;
-
-                xMin = 0;
-                xMax = 1.0 / frames.x;
-            }
-
-        break;
-
-        case IDLE:
-            xMin += 1.0f / frames.x;
-            xMax += 1.0f / frames.x;
-
-            if (xMax >= 1.0f) {
-                xMin = 0.0f;
-                xMax = 1.0f / frames.x;
-
-                yMin += 1.0f / frames.y;
-                yMax += 1.0f / frames.y;
-
-                if (yMax > 1.0f) {
-                    yMin = 0.0f;
-                    yMax = 1.0f / frames.y;
-                }
-            }
-        break;
-
-        case WALKFRONT:
-        break;
-
-        case WALKBACK:
-        break;
-
-        default:
-            IDLE;
+    // wrap X
+    if (xMin >= 1.0f) {
+        xMin = 0.0f;
+        xMax = frameW;
     }
 }
 

@@ -68,24 +68,43 @@ void _inputs::keyPressed(_skyBox* sky)
 
 void _inputs::keyPressed(_sprite* mySprite, float deltaTime)
 {
-    float moveSpeed = 25.0f * deltaTime;
+    float moveSpeed = 0.005f;// * deltaTime;
+    float dx = 0.0f;
+    float dy = 0.0f;
 
     // ---- Sprint ----
     if (keys[16])
-        moveSpeed *= 1.5;
+        moveSpeed *= 1.2;
 
     // ---- Forward / Back ----
-    if (keys['W'])
-        //mySprite->pos.y += 1;
-        cout << "W Pressed\n";
-    if (keys['S'])
-        mySprite->pos.y -= 1;
+    if (keys['W']) {
+        dy += 1;
+        mySprite->actionTrigger = mySprite->IDLE_B;
+    }
+    if (keys['S']) {
+        dy -= 1;
+        mySprite->actionTrigger = mySprite->IDLE_F;
+    }
 
     // ---- Left / Right ----
-    if (keys['A'])
-        mySprite->pos.x -= 1;
-    if (keys['D'])
-        mySprite->pos.x += 1;
+    if (keys['A']) {
+        dx -= 1;
+        mySprite->actionTrigger = mySprite->IDLE_L;
+    }
+    if (keys['D']) {
+        dx += 1;
+        mySprite->actionTrigger = mySprite->IDLE_R;
+    }
+
+    // ---- Normalize ----
+    float length = sqrtf(dx * dx + dy * dy);
+    if (length > 0.0f) {
+        dx /= length;
+        dy /= length;
+    }
+
+    mySprite->pos.x += dx * moveSpeed;
+    mySprite->pos.y += dy * moveSpeed;
 }
 
 
@@ -100,7 +119,7 @@ void _inputs::keyUp()
 }
 
 void _inputs::keyUp(_sprite* mySprite) {
-        mySprite->actionTrigger = mySprite->IDLE;
+        mySprite->actionTrigger = mySprite->IDLE_F;
 }
 
 

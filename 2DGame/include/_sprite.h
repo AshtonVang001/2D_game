@@ -24,10 +24,12 @@ class _sprite
         void drawSprite(float, float, float);
         void spriteActions();
 
+        int prevAction = -1;
+
         //To do
         //add actions
 
-        enum{STAND, WALKLEFT, WALKRIGHT, IDLE, WALKFRONT, WALKBACK};
+        enum{WALKLEFT, WALKRIGHT, WALKFRONT, WALKBACK, IDLE_F, IDLE_B, IDLE_L, IDLE_R};
 
         int actionTrigger;
 

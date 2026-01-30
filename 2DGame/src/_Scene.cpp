@@ -74,7 +74,7 @@ void _Scene::drawScene() {
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
-    myInput->keyPressed(mySprite8, smoothDT);
+    myInput->keyPressed(mySprite, smoothDT);
 
 
     // --- Textured background quad ---
@@ -100,8 +100,7 @@ void _Scene::drawScene() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        mySprite->drawSprite(0, -0.4, -3);
-        mySprite->actionTrigger = mySprite->IDLE;
+        mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, -3);
         if (myTime->getTicks() > 100) {
             mySprite->spriteActions();
             myTime->reset();
@@ -119,9 +118,11 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
     case WM_KEYDOWN:
         myInput->wParam = wParam;
+        myInput->keys[wParam] = true;
         break;
     case WM_KEYUP:
         myInput->wParam = wParam;
+        myInput->keys[wParam] = false;
         break;
     }
     return 0;
