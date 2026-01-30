@@ -13,7 +13,7 @@ _camera::~_camera()
 void _camera::camInit()
 {
     eye.x = eye.y = 0;
-    eye.z = 10;
+    eye.z = 5;
 
     des.x = des.y = des.z = 0;
 

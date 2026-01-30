@@ -8,73 +8,21 @@ _inputs::_inputs()
     //isScalingActive = false;
 }
 
-
-
-
-
-
 _inputs::~_inputs()
 {
     //dtor
 }
 
 
-void _inputs::keyPressed(_parallax* prlx) {
-    switch(wParam) {
-    case VK_LEFT:
-        prlx->prlxScrollAuto("right", 0.005);
-        break;
-    case VK_RIGHT:
-        prlx->prlxScrollAuto("left", 0.005);
-        break;
-    case VK_UP:
-        //prlx->
-        break;
-    case VK_DOWN:
-        //prlx->
-        break;
-    case VK_ADD:
-        //prlx->
-        break;
-    case VK_SUBTRACT:
-        //prlx->
-        break;
-    }
-}
-
-void _inputs::keyPressed(_skyBox* sky)
-{
-    switch(wParam) {
-    case VK_LEFT:
-        sky->rotation.y -= 1.0;
-        break;
-    case VK_RIGHT:
-        sky->rotation.y += 1.0;
-        break;
-    case VK_UP:
-        sky->rotation.x += 1.0;
-        break;
-    case VK_DOWN:
-        sky->rotation.x -= 1.0;
-        break;
-    case VK_ADD:
-        //prlx->
-        break;
-    case VK_SUBTRACT:
-        //prlx->
-        break;
-    }
-}
-
 void _inputs::keyPressed(_sprite* mySprite, float deltaTime)
 {
-    float moveSpeed = 0.005f;// * deltaTime;
-    float dx = 0.0f;
-    float dy = 0.0f;
+    moveSpeed = 3.5f;
+    dx = 0.0f;
+    dy = 0.0f;
 
     // ---- Sprint ----
     if (keys[16])
-        moveSpeed *= 1.2;
+        moveSpeed *= 3;
 
     // ---- Forward / Back ----
     if (keys['W']) {
@@ -103,8 +51,19 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime)
         dy /= length;
     }
 
-    mySprite->pos.x += dx * moveSpeed;
-    mySprite->pos.y += dy * moveSpeed;
+    playerPos.x = mySprite->pos.x += dx * moveSpeed * deltaTime;
+    playerPos.y = mySprite->pos.y += dy * moveSpeed * deltaTime;
+}
+
+void _inputs::keyPressed(_camera* myCam, float deltaTime)
+{
+    followSpeed = 1.0;
+
+    myCam->eye.y += (playerPos.y - myCam->eye.y) * followSpeed * (0.5 * moveSpeed) * deltaTime;
+    myCam->des.y += (playerPos.y - myCam->des.y) * followSpeed * (0.5 * moveSpeed) * deltaTime;
+
+    myCam->eye.x += (playerPos.x - myCam->eye.x) * followSpeed * (0.5 * moveSpeed) * deltaTime;
+    myCam->des.x += (playerPos.x - myCam->des.x) * followSpeed * (0.5 * moveSpeed) * deltaTime;
 }
 
 
@@ -120,21 +79,4 @@ void _inputs::keyUp()
 
 void _inputs::keyUp(_sprite* mySprite) {
         mySprite->actionTrigger = mySprite->IDLE_F;
-}
-
-
-void _inputs::mouseEventUp()
-{
-    isRotationActive = false;                               //deactivate flags
-    isTranslationActive = false;
-}
-
-
-void _inputs::mouseMove(_camera* myCamera, double x, double y)
-{
-
-    myCamera->rotAngle.y = (y / 10.0);
-    myCamera->rotAngle.x = (x / 10.0);
-    //myCamera->rotateXY();
-
 }

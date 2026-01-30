@@ -14,7 +14,27 @@ void _Scene::reSizeScene(int width, int height) {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-aspectRatio, aspectRatio, -1.0, 1.0, 2.0, 100.0);
+    //glFrustum(-aspectRatio, aspectRatio, -1.0, 1.0, 2.0, 100.0);
+
+
+    float size = 5.0f; // zoom level
+
+    if (aspectRatio >= 1.0f)
+    {
+        glOrtho(
+            -size * aspectRatio, size * aspectRatio,
+            -size, size,
+            -100.0f, 100.0f
+        );
+    }
+    else
+    {
+        glOrtho(
+            -size, size,
+            -size / aspectRatio, size / aspectRatio,
+            -100.0f, 100.0f
+        );
+    }
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -63,6 +83,8 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/map.png");
     mySprite->spriteInit("images/CharacterRotate.png", 7, 4);
+
+    myCam->camInit();
 }
 
 void _Scene::drawScene() {
@@ -70,11 +92,15 @@ void _Scene::drawScene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    myTime->updateDeltaTime();
+
 
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
     myInput->keyPressed(mySprite, smoothDT);
+    myInput->keyPressed(myCam, smoothDT);
+    myCam->setUpCamera();
 
 
     // --- Textured background quad ---

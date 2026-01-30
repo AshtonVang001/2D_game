@@ -27,6 +27,7 @@ class _Scene
         _skyBox *mySkyBox = new _skyBox();
         _sprite *mySprite = new _sprite();
         _timer *myTime = new _timer();
+        _camera *myCam = new _camera();
 
         void reSizeScene(int width, int height);
         void initGL();

@@ -21,7 +21,7 @@ class _inputs
         void keyPressed(_parallax *);
         void keyPressed(_skyBox *);
         void keyPressed(_sprite *, float);
-        void keyPressed(_camera *);
+        void keyPressed(_camera *, float);
 
         void keyUp(_sprite *);
 
@@ -34,6 +34,13 @@ class _inputs
 
         bool isRotationActive;                              //performing rotation
         bool isTranslationActive;                           //performing translation
+
+        float moveSpeed;
+        float dx;
+        float dy;
+
+        vec2 playerPos;
+        float followSpeed;
 
         WPARAM wParam;
         LPARAM lParam;
