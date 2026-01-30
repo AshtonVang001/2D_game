@@ -16,6 +16,11 @@ class _timer
         void pauseTime();               //for you to implement
         void resumeTime();
 
+        clock_t lastFrameTime;
+        float deltaTime;
+        void updateDeltaTime();
+
+
     protected:
 
     private:

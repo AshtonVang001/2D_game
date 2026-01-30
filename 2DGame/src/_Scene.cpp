@@ -71,6 +71,12 @@ void _Scene::drawScene() {
     glLoadIdentity();
 
 
+    static float smoothDT = 0.16f;
+    smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
+
+    myInput->keyPressed(mySprite8, smoothDT);
+
+
     // --- Textured background quad ---
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
@@ -109,9 +115,14 @@ void _Scene::drawScene() {
 
 int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    switch(uMsg) {
-        default:
-            break;
+    switch(uMsg)
+    {
+    case WM_KEYDOWN:
+        myInput->wParam = wParam;
+        break;
+    case WM_KEYUP:
+        myInput->wParam = wParam;
+        break;
     }
     return 0;
 }

@@ -6,6 +6,7 @@
 #include <_skyBox.h>
 #include <_sprite.h>
 #include <_camera.h>
+#include <_timer.h>
 
 class _inputs
 {
@@ -13,11 +14,13 @@ class _inputs
         _inputs();
         virtual ~_inputs();
 
+        bool keys[256] = {false};
+
         void keyUp();                                       //key released              (blank because not in use)
 
         void keyPressed(_parallax *);
         void keyPressed(_skyBox *);
-        void keyPressed(_sprite *);
+        void keyPressed(_sprite *, float);
         void keyPressed(_camera *);
 
         void keyUp(_sprite *);

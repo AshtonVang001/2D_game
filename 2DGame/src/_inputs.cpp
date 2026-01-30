@@ -66,16 +66,26 @@ void _inputs::keyPressed(_skyBox* sky)
     }
 }
 
-void _inputs::keyPressed(_sprite* mySprite)
+void _inputs::keyPressed(_sprite* mySprite, float deltaTime)
 {
-    switch(wParam) {
-    case VK_RIGHT:
-        mySprite->actionTrigger = mySprite->WALKRIGHT;
-        break;
-    case VK_LEFT:
-        mySprite->actionTrigger = mySprite->WALKLEFT;
-        break;
-    }
+    float moveSpeed = 25.0f * deltaTime;
+
+    // ---- Sprint ----
+    if (keys[16])
+        moveSpeed *= 1.5;
+
+    // ---- Forward / Back ----
+    if (keys['W'])
+        //mySprite->pos.y += 1;
+        cout << "W Pressed\n";
+    if (keys['S'])
+        mySprite->pos.y -= 1;
+
+    // ---- Left / Right ----
+    if (keys['A'])
+        mySprite->pos.x -= 1;
+    if (keys['D'])
+        mySprite->pos.x += 1;
 }
 
 
@@ -90,7 +100,7 @@ void _inputs::keyUp()
 }
 
 void _inputs::keyUp(_sprite* mySprite) {
-        mySprite->actionTrigger = mySprite->STAND;
+        mySprite->actionTrigger = mySprite->IDLE;
 }
 
 
