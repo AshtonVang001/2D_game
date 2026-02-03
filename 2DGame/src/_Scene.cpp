@@ -83,6 +83,7 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/map.png");
     mySprite->spriteInit("images/CharacterRotate.png", 7, 4);
+    enemySprite->spriteInit("images/CharacterRotate.png", 4, 7);
 
     myCam->camInit();
 }
@@ -127,6 +128,7 @@ void _Scene::drawScene() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, -3);
+        enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, -6);
         if (myTime->getTicks() > 100) {
             mySprite->spriteActions();
             myTime->reset();

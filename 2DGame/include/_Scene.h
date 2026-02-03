@@ -26,6 +26,7 @@ class _Scene
         _parallax *myPrlx = new _parallax();
         _skyBox *mySkyBox = new _skyBox();
         _sprite *mySprite = new _sprite();
+        _sprite *enemySprite = new _sprite();
         _timer *myTime = new _timer();
         _camera *myCam = new _camera();
 
