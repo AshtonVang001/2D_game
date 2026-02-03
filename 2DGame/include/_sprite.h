@@ -24,6 +24,10 @@ class _sprite
         void drawSprite(float, float, float);
         void spriteActions();
 
+        void enemySpriteInit(char *, int, int);                  //filename, number of x and y frames
+        void drawEnemySprite(float, float, float);
+        void enemySpriteActions();
+
         int prevAction = -1;
 
         //To do

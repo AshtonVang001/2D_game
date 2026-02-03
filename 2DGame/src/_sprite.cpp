@@ -95,3 +95,19 @@ void _sprite::spriteActions()
     }
 }
 
+void _sprite::enemySpriteInit(char*, int, int)
+{
+
+}
+
+void _sprite::drawEnemySprite(float, float, float)
+{
+
+}
+
+void _sprite::enemySpriteActions()
+{
+
+}
+
+
