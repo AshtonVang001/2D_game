@@ -34,7 +34,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="C:/Users/team4/Desktop/2Dgames26/common/include" />
+			<Add directory="../common/include" />
 		</Compiler>
 		<Linker>
 			<Add library="../common/lib/libSoil.a" />
@@ -44,13 +44,14 @@
 			<Add library="glu32" />
 			<Add library="winmm" />
 			<Add library="gdi32" />
-			<Add directory="C:/Users/team4/Desktop/2Dgames26/common/lib" />
+			<Add directory="../common/lib" />
 		</Linker>
 		<Unit filename="include/Anorms.h" />
 		<Unit filename="include/_Scene.h" />
 		<Unit filename="include/_camera.h" />
 		<Unit filename="include/_collisionCheck.h" />
 		<Unit filename="include/_common.h" />
+		<Unit filename="include/_enemies.h" />
 		<Unit filename="include/_inputs.h" />
 		<Unit filename="include/_light.h" />
 		<Unit filename="include/_parallax.h" />
@@ -64,6 +65,7 @@
 		<Unit filename="src/_Scene.cpp" />
 		<Unit filename="src/_camera.cpp" />
 		<Unit filename="src/_collisionCheck.cpp" />
+		<Unit filename="src/_enemies.cpp" />
 		<Unit filename="src/_inputs.cpp" />
 		<Unit filename="src/_light.cpp" />
 		<Unit filename="src/_parallax.cpp" />

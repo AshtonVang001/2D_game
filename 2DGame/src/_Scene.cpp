@@ -83,7 +83,7 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/map.png");
     mySprite->spriteInit("images/CharacterRotate.png", 7, 4);
-    enemySprite->spriteInit("images/CharacterRotate.png", 4, 7);
+    enemySprite->spriteInit("images/CharacterRotate.png", 7, 4);
 
     myCam->camInit();
 }
