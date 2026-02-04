@@ -128,7 +128,7 @@ void _Scene::drawScene() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, -3);
-        enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, -6);
+        enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, -3);
         if (myTime->getTicks() > 100) {
             mySprite->spriteActions();
             myTime->reset();

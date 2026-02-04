@@ -2,11 +2,15 @@
 #define _ENEMIES_H
 
 
-class _enemies
+class _enemies : public _sprite
 {
     public:
         _enemies();
         virtual ~_enemies();
+
+        void enemyMovement();
+        void enemyHealth();
+
 
     protected:
 
