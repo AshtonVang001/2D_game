@@ -81,7 +81,7 @@ void _Scene::initGL() {
     glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
 
-    myTex->loadTexture("images/map.png");
+    myTex->loadTexture("images/map2.png");
     mySprite->spriteInit("images/CharacterRotate.png", 7, 4);
 
     myCam->camInit();
@@ -109,6 +109,7 @@ void _Scene::drawScene() {
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
         myTex->bindTexture();
         glColor3f(1,1,1);
+        glScalef(3,-3,1);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, 0.0f, 1.0f);
             glTexCoord2f(0,0); glVertex3f(-8, -3.2, -8);
