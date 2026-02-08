@@ -1,6 +1,8 @@
 #ifndef _ENEMIES_H
 #define _ENEMIES_H
 
+#include<_sprite.h>
+
 
 class _enemies : public _sprite
 {
@@ -8,9 +10,10 @@ class _enemies : public _sprite
         _enemies();
         virtual ~_enemies();
 
-        void enemyMovement();
+        void enemyMovement(vec3 playerPos, float deltaTime);
         void enemyHealth();
 
+        float moveSpeed;
 
     protected:
 

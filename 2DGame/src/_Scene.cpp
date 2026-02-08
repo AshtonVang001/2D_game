@@ -84,6 +84,8 @@ void _Scene::initGL() {
     myTex->loadTexture("images/map.png");
     mySprite->spriteInit("images/CharacterRotate.png", 7, 4);
     enemySprite->spriteInit("images/CharacterRotate.png", 7, 4);
+    enemySprite->pos.x = 3.0f;
+    enemySprite->pos.y = 2.0f;
 
     myCam->camInit();
 }
@@ -102,6 +104,8 @@ void _Scene::drawScene() {
     myInput->keyPressed(mySprite, smoothDT);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
+
+    enemySprite->enemyMovement(mySprite->pos, smoothDT);
 
 
     // --- Textured background quad ---
@@ -131,6 +135,7 @@ void _Scene::drawScene() {
         enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, -3);
         if (myTime->getTicks() > 100) {
             mySprite->spriteActions();
+            enemySprite->spriteActions();
             myTime->reset();
         }
 
