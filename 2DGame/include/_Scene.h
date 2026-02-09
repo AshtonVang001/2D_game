@@ -40,6 +40,7 @@ class _Scene
         int slices = 64;
         int stacks = 64;
         _textureLoader *myTex = new _textureLoader();
+        _textureLoader *myTex2 = new _textureLoader();
 
     private:
 };

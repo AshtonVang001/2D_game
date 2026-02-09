@@ -42,6 +42,11 @@ class _inputs
         vec2 playerPos;
         float followSpeed;
 
+        bool isDashing = false;
+        float dashRemaining = 0.0f;
+        float dashSpeed = 25.0f;
+        vec2 dashDir;
+
         WPARAM wParam;
         LPARAM lParam;
 

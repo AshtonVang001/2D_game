@@ -20,9 +20,19 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime)
     dx = 0.0f;
     dy = 0.0f;
 
+    // ---- Normalize ----
+    float length = sqrtf(dx * dx + dy * dy);
+    if (length > 0.0f) {
+        dx /= length;
+        dy /= length;
+    }
+
+
     // ---- Sprint ----
-    if (keys[16])
-        moveSpeed *= 3;
+    //if (keys[16])
+    //    moveSpeed *= 3;
+
+
 
     // ---- Forward / Back ----
     if (keys['W']) {
@@ -42,13 +52,6 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime)
     if (keys['D']) {
         dx += 1;
         mySprite->actionTrigger = mySprite->IDLE_R;
-    }
-
-    // ---- Normalize ----
-    float length = sqrtf(dx * dx + dy * dy);
-    if (length > 0.0f) {
-        dx /= length;
-        dy /= length;
     }
 
     playerPos.x = mySprite->pos.x += dx * moveSpeed * deltaTime;
