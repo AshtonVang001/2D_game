@@ -1,23 +1,26 @@
-#ifndef _COLLISIONCHECK_H
-#define _COLLISIONCHECK_H
+#pragma once
+#include <vector>
 
-#include <_common.h>
+class _collisionCheck {
+public:
+    _collisionCheck();
+    ~_collisionCheck();
 
-class _collisionCheck
-{
-    public:
-        _collisionCheck();
-        virtual ~_collisionCheck();
+    bool loadFromTexture(
+        const unsigned char* pixels,
+        int width,
+        int height,
+        int channels
+    );
 
-        bool isLinearCol(vec3, vec3);
-        bool isRadialCol(vec2, vec2, float, float, float);  //positions x, y, radius, A, radius B, threshold
-        bool isSphereCol(vec3, vec3, float, float, float);  //positions x, y, radius, A, radius B, threshold
-        bool isPlanoCol(vec2, vec2);
-        bool isCubicCol(vec3, vec3);
+    bool isSolidUV(float u, float v) const;
+    bool isSolidPixel(int x, int y) const;
 
-    protected:
+    int getWidth() const { return width; }
+    int getHeight() const { return height; }
 
-    private:
+private:
+    int width = 0;
+    int height = 0;
+    std::vector<bool> solid;
 };
-
-#endif // _COLLISIONCHECK_H

@@ -10,11 +10,12 @@ class _textureLoader
         _textureLoader();
         virtual ~_textureLoader();
 
-        GLuint loadTexture(char *);               //to read img file
+        GLuint loadTexture(char *);              //to read img file
         void bindTexture();                     //to bind img to a model
 
         unsigned char *image;                   //to handle img data
         int width, height;                      //img width and height
+        int channels = 4;                       //RGBA
 
         GLuint textID;                          //img data buffer handler
 

@@ -7,6 +7,7 @@
 #include <_sprite.h>
 #include <_camera.h>
 #include <_timer.h>
+#include <_collisionCheck.h>
 
 class _inputs
 {
@@ -20,7 +21,7 @@ class _inputs
 
         void keyPressed(_parallax *);
         void keyPressed(_skyBox *);
-        void keyPressed(_sprite *, float);
+        void keyPressed(_sprite *, float deltaTime, _collisionCheck *);
         void keyPressed(_camera *, float);
 
         void keyUp(_sprite *);

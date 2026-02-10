@@ -13,6 +13,7 @@
 #include <_shader.h>
 #include <GL/glut.h>
 #include <math.h>
+#include <_collisionCheck.h>
 
 class _Scene
 {
@@ -28,6 +29,7 @@ class _Scene
         _sprite *mySprite = new _sprite();
         _timer *myTime = new _timer();
         _camera *myCam = new _camera();
+        _collisionCheck *myCollider = new _collisionCheck();
 
         void reSizeScene(int width, int height);
         void initGL();

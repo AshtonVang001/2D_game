@@ -14,48 +14,64 @@ _inputs::~_inputs()
 }
 
 
-void _inputs::keyPressed(_sprite* mySprite, float deltaTime)
+void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* myCollider)
 {
     moveSpeed = 3.5f;
     dx = 0.0f;
     dy = 0.0f;
 
-    // ---- Normalize ----
-    float length = sqrtf(dx * dx + dy * dy);
-    if (length > 0.0f) {
-        dx /= length;
-        dy /= length;
-    }
+    // ---- Input ----
+    if (keys['W']) { dy += 1; mySprite->actionTrigger = mySprite->IDLE_B; }
+    if (keys['S']) { dy -= 1; mySprite->actionTrigger = mySprite->IDLE_F; }
+    if (keys['A']) { dx -= 1; mySprite->actionTrigger = mySprite->IDLE_L; }
+    if (keys['D']) { dx += 1; mySprite->actionTrigger = mySprite->IDLE_R; }
 
+    // ---- Normalize ----
+    float len = sqrtf(dx * dx + dy * dy);
+    if (len > 0.0f) {
+        dx /= len;
+        dy /= len;
+    }
 
     // ---- Sprint ----
-    //if (keys[16])
-    //    moveSpeed *= 3;
+    if (keys[16])
+        moveSpeed *= 3.0f;
 
+    float nextX = mySprite->pos.x + dx * moveSpeed * deltaTime;
+    float nextY = mySprite->pos.y + dy * moveSpeed * deltaTime;
 
+    // ---- player size ----
+    float halfW = 0.25f;
+    float halfH = 0.35f;
 
-    // ---- Forward / Back ----
-    if (keys['W']) {
-        dy += 1;
-        mySprite->actionTrigger = mySprite->IDLE_B;
-    }
-    if (keys['S']) {
-        dy -= 1;
-        mySprite->actionTrigger = mySprite->IDLE_F;
-    }
+    // ---- Y Axis Collision ----
+    if (dx != 0.0f)
+    {
+        float testX = nextX + (dx > 0 ? halfW : -halfW);
 
-    // ---- Left / Right ----
-    if (keys['A']) {
-        dx -= 1;
-        mySprite->actionTrigger = mySprite->IDLE_L;
-    }
-    if (keys['D']) {
-        dx += 1;
-        mySprite->actionTrigger = mySprite->IDLE_R;
+        float u = (testX + 8.0f) / 16.0f;
+        float v = (mySprite->pos.y + 3.2f) / 6.4f;
+        v = 1.0f - v;
+
+        if (!myCollider->isSolidUV(u, v))
+            mySprite->pos.x = nextX;
     }
 
-    playerPos.x = mySprite->pos.x += dx * moveSpeed * deltaTime;
-    playerPos.y = mySprite->pos.y += dy * moveSpeed * deltaTime;
+    // ---- Y Axis Collision ----
+    if (dy != 0.0f)
+    {
+        float testY = nextY + (dy > 0 ? halfH : -halfH);
+
+        float u = (mySprite->pos.x + 8.0f) / 16.0f;
+        float v = (testY + 3.2f) / 6.4f;
+        v = 1.0f - v;
+
+        if (!myCollider->isSolidUV(u, v))
+            mySprite->pos.y = nextY;
+    }
+
+    playerPos.x = mySprite->pos.x;
+    playerPos.y = mySprite->pos.y;
 }
 
 void _inputs::keyPressed(_camera* myCam, float deltaTime)

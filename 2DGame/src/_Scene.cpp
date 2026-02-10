@@ -17,6 +17,8 @@ void _Scene::reSizeScene(int width, int height) {
     //glFrustum(-aspectRatio, aspectRatio, -1.0, 1.0, 2.0, 100.0);
 
 
+    // ---- Orthographic projection ----
+
     float size = 5.0f; // zoom level
 
     if (aspectRatio >= 1.0f)
@@ -85,6 +87,16 @@ void _Scene::initGL() {
     myTex2->loadTexture("images/map Layer 2.png");
     mySprite->spriteInit("images/CharacterRotate.png", 7, 4);
 
+    myCollider->loadFromTexture(
+        myTex2->image,
+        myTex2->width,
+        myTex2->height,
+        myTex2->channels
+    );
+
+    SOIL_free_image_data(myTex2->image);
+    myTex2->image = nullptr;
+
     myCam->camInit();
 }
 
@@ -99,13 +111,13 @@ void _Scene::drawScene() {
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
-    myInput->keyPressed(mySprite, smoothDT);
+    myInput->keyPressed(mySprite, smoothDT, myCollider);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
 
 
-    // --- Textured background quad ---
-    /*
+    // ---- World Textures ----
+    // ---- Layer 1 (floor) ----
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -121,25 +133,37 @@ void _Scene::drawScene() {
         glEnd();
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
-    */
 
+    // ---- Layer 2 (walls) ----
     glPushMatrix();
+        glEnable(GL_ALPHA_TEST);
+        glAlphaFunc(GL_GREATER, 0.5f);
+
         glEnable(GL_TEXTURE_2D);
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glDepthMask(GL_TRUE); // important
+        glEnable(GL_DEPTH_TEST);
+
         myTex2->bindTexture();
         glColor3f(1,1,1);
-        glScalef(3,-3,1);
+        glScalef(1,-1,1);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, 0.0f, 1.0f);
-            glTexCoord2f(0,0); glVertex3f(-8, -3.2, -8);
-            glTexCoord2f(1,0); glVertex3f( 8, -3.2, -8);
-            glTexCoord2f(1,1); glVertex3f( 8,  3.2, -8);
-            glTexCoord2f(0,1); glVertex3f(-8,  3.2, -8);
+            glTexCoord2f(0,0); glVertex3f(-8, -3.2, -7.99);
+            glTexCoord2f(1,0); glVertex3f( 8, -3.2, -7.99);
+            glTexCoord2f(1,1); glVertex3f( 8,  3.2, -7.99);
+            glTexCoord2f(0,1); glVertex3f(-8,  3.2, -7.99);
         glEnd();
+
+        glDisable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
+        glDisable(GL_ALPHA_TEST);
     glPopMatrix();
 
 
+    // ---- Player ----
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
