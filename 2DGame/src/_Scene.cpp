@@ -97,6 +97,8 @@ void _Scene::initGL() {
     SOIL_free_image_data(myTex2->image);
     myTex2->image = nullptr;
 
+    menu->init(width, height);
+
     myCam->camInit();
 }
 
@@ -107,7 +109,28 @@ void _Scene::drawScene() {
 
     myTime->updateDeltaTime();
 
+    if (currentScene == MENU_SCENE)
+    {
+        // ---- DRAW MENU ----
+        ShowCursor(TRUE);
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, width, height, 0);
 
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        menu->update();
+        menu->draw();
+
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+    }
+    else if (currentScene == GAME_SCENE)
+    {
+        // ---- DRAW GAME ----
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
@@ -178,6 +201,7 @@ void _Scene::drawScene() {
         glDisable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
+    }
 
 }
 
@@ -192,6 +216,31 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_KEYUP:
         myInput->wParam = wParam;
         myInput->keys[wParam] = false;
+        break;
+    case WM_LBUTTONDOWN:
+        {
+        int mouseX = LOWORD(lParam);
+        int mouseY = HIWORD(lParam);
+
+        ButtonAction action = menu->mouseClick(mouseX, mouseY);
+
+        if (action == ACTION_PLAY)
+        {
+            currentScene = GAME_SCENE;   // switch to parallax scene
+        }
+        else if (action == ACTION_QUIT)
+        {
+            PostQuitMessage(0);
+        }
+        }
+        break;
+    case WM_MOUSEMOVE:
+        {
+        int mouseX = LOWORD(lParam);
+        int mouseY = HIWORD(lParam);
+
+        menu->mouseMove(mouseX, mouseY);
+        }
         break;
     }
     return 0;
