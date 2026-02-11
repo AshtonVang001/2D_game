@@ -9,7 +9,8 @@ enum ButtonAction
     ACTION_NONE,
     ACTION_PLAY,
     ACTION_QUIT,
-    ACTION_HELP
+    ACTION_HELP,
+    ACTION_SETTINGS
 };
 
 class _button

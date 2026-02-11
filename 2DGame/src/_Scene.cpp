@@ -108,6 +108,7 @@ void _Scene::drawScene() {
     glLoadIdentity();
 
     myTime->updateDeltaTime();
+    ShowCursor(FALSE);
 
     if (currentScene == MENU_SCENE)
     {
@@ -136,6 +137,7 @@ void _Scene::drawScene() {
     else if (currentScene == GAME_SCENE)
     {
         // ---- DRAW GAME ----
+        ShowCursor(FALSE);
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
