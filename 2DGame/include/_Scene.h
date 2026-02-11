@@ -19,7 +19,8 @@
 enum SceneState
 {
     MENU_SCENE,
-    GAME_SCENE
+    GAME_SCENE,
+    HELP_SCENE
 };
 class _Scene
 {

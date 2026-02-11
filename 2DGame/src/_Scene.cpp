@@ -112,6 +112,7 @@ void _Scene::drawScene() {
     if (currentScene == MENU_SCENE)
     {
         // ---- DRAW MENU ----
+        glDisable(GL_DEPTH_TEST);
         ShowCursor(TRUE);
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -127,6 +128,10 @@ void _Scene::drawScene() {
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
+        glEnable(GL_DEPTH_TEST);
+    }
+    else if (currentScene == HELP_SCENE){
+
     }
     else if (currentScene == GAME_SCENE)
     {

@@ -8,7 +8,8 @@ enum ButtonAction
 {
     ACTION_NONE,
     ACTION_PLAY,
-    ACTION_QUIT
+    ACTION_QUIT,
+    ACTION_HELP
 };
 
 class _button

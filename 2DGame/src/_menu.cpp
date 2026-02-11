@@ -11,26 +11,46 @@ _menu::~_menu()
 }
 void _menu::init(int screenWidth, int screenHeight)
 {
+    this->screenWidth = screenWidth;
+    this->screenHeight = screenHeight;
+
     float buttonWidth = 300;
     float buttonHeight = 80;
+
+    bg->loadTexture("images/prlx.jpg");
 
     float centerX = (screenWidth - buttonWidth) / 2;
     float centerY = screenHeight / 2;
 
     _button play;
-    play.setButton(centerX, centerY - 20, buttonWidth, buttonHeight,
+    play.setButton(centerX - 480, centerY - 110, buttonWidth, buttonHeight,
                    "images/tex2.jpg", ACTION_PLAY);
 
     _button quit;
-    quit.setButton(centerX, centerY + 100, buttonWidth, buttonHeight,
+    quit.setButton(centerX - 480, centerY + 110, buttonWidth, buttonHeight,
                    "images/tex2.jpg", ACTION_QUIT);
+
+    _button help;
+    help.setButton(centerX - 480, centerY , buttonWidth, buttonHeight,
+                   "images/tex2.jpg", ACTION_HELP);
 
     buttons.push_back(play);
     buttons.push_back(quit);
+    buttons.push_back(help);
 }
 
 void _menu::draw()
 {
+    // ---- DRAW BACKGROUND ----
+    bg->bindTexture();
+
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex2f(0, 0);
+        glTexCoord2f(1, 0); glVertex2f(screenWidth, 0);
+        glTexCoord2f(1, 1); glVertex2f(screenWidth, screenHeight);
+        glTexCoord2f(0, 1); glVertex2f(0, screenHeight);
+    glEnd();
+
     for (auto& b : buttons)
         b.draw();
 }

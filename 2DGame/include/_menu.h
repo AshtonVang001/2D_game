@@ -3,6 +3,7 @@
 
 #include <_button.h>
 #include <vector>
+#include <_textureLoader.h>
 
 class _menu
 {
@@ -15,6 +16,10 @@ class _menu
         void update();
         void mouseMove(int x, int y);
         ButtonAction mouseClick(int x, int y);
+
+        _textureLoader *bg = new _textureLoader();
+        int screenWidth;
+        int screenHeight;
 
     protected:
 
