@@ -34,9 +34,14 @@ void _menu::init(int screenWidth, int screenHeight)
     help.setButton(centerX - 480, centerY , buttonWidth, buttonHeight,
                    "images/tex2.jpg", ACTION_HELP);
 
+    _button settings;
+    settings.setButton(centerX + 700, centerY - 350, buttonWidth - 260, buttonHeight - 50,
+                   "images/settings.png", ACTION_SETTINGS);
+
     buttons.push_back(play);
     buttons.push_back(quit);
     buttons.push_back(help);
+    buttons.push_back(settings);
 }
 
 void _menu::draw()
