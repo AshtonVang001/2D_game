@@ -98,6 +98,8 @@ void _Scene::initGL() {
     myTex2->image = nullptr;
 
     menu->init(width, height);
+    help->init(width, height, "images/prlx.jpg");
+    settings->init(width, height, "images/tex2.jpg");
 
     myCam->camInit();
 }
@@ -132,7 +134,42 @@ void _Scene::drawScene() {
         glEnable(GL_DEPTH_TEST);
     }
     else if (currentScene == HELP_SCENE){
+        glDisable(GL_DEPTH_TEST);
 
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, width, height, 0);
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        help->draw();
+
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+
+        glEnable(GL_DEPTH_TEST);
+    }
+    else if (currentScene == SETTINGS_SCENE){
+        glDisable(GL_DEPTH_TEST);
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, width, height, 0);
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        settings->draw();
+
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+
+        glEnable(GL_DEPTH_TEST);
     }
     else if (currentScene == GAME_SCENE)
     {
@@ -234,6 +271,14 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         if (action == ACTION_PLAY)
         {
             currentScene = GAME_SCENE;   // switch to parallax scene
+        }
+        else if (action == ACTION_HELP)
+        {
+            currentScene = HELP_SCENE;   // switch to help scene
+        }
+        else if (action == ACTION_SETTINGS)
+        {
+            currentScene = SETTINGS_SCENE;  //switch to settings
         }
         else if (action == ACTION_QUIT)
         {

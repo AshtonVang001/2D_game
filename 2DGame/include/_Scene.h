@@ -15,12 +15,14 @@
 #include <math.h>
 #include <_collisionCheck.h>
 #include <_menu.h>
+#include <_page.h>
 
 enum SceneState
 {
     MENU_SCENE,
     GAME_SCENE,
-    HELP_SCENE
+    HELP_SCENE,
+    SETTINGS_SCENE
 };
 class _Scene
 {
@@ -38,6 +40,8 @@ class _Scene
         _camera *myCam = new _camera();
         _collisionCheck *myCollider = new _collisionCheck();
         _menu *menu = new _menu();
+        _page *help = new _page();
+        _page *settings = new _page();
 
         void reSizeScene(int width, int height);
         void initGL();
