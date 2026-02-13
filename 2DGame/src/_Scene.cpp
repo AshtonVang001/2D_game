@@ -208,6 +208,40 @@ void _Scene::drawScene() {
     glPopMatrix();
     }
 
+    // ---- Draw Game Text ----
+    if (currentScene == GAME_SCENE) {
+        glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+
+        gluOrtho2D(0, width, 0, height);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glDisable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
+
+        // ---- Color & Position ----
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glRasterPos2i(20, height - 40);
+
+        // ---- Draw Text ----
+        const char* text = "TEST";
+        for (const char* c = text; *c; ++c)
+        {
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+        }
+
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+        glPopAttrib();
+    }
 }
 
 int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
