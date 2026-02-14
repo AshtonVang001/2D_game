@@ -29,9 +29,9 @@ class _sprite
         //To do
         //add actions
 
-        enum{WALKLEFT, WALKRIGHT, WALKFRONT, WALKBACK, IDLE_F, IDLE_B, IDLE_L, IDLE_R};
+        enum{WALK_L, WALK_R, WALK_F, WALK_B, IDLE_F, IDLE_B, IDLE_L, IDLE_R};
 
-        int actionTrigger;
+        int actionTrigger = IDLE_F;
 
     protected:
 

@@ -85,7 +85,7 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/map Layer 1.png");
     myTex2->loadTexture("images/map Layer 2.png");
-    mySprite->spriteInit("images/CharacterRotate.png", 7, 4);
+    mySprite->spriteInit("images/knightAnimations.png", 6, 8);
 
     myCollider->loadFromTexture(
         myTex2->image,
@@ -171,10 +171,12 @@ void _Scene::drawScene() {
 
         glEnable(GL_DEPTH_TEST);
     }
+
+
     else if (currentScene == GAME_SCENE)
     {
-        // ---- DRAW GAME ----
-        ShowCursor(FALSE);
+    // ---- DRAW GAME ----
+    ShowCursor(FALSE);
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
@@ -237,7 +239,7 @@ void _Scene::drawScene() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, -3);
-        if (myTime->getTicks() > 100) {
+        if (myTime->getTicks() > 80) {
             mySprite->spriteActions();
             myTime->reset();
         }

@@ -6,6 +6,7 @@ _inputs::_inputs()
     isRotationActive = false;
     isTranslationActive = false;
     //isScalingActive = false;
+    lastDirection = _sprite::IDLE_F;
 }
 
 _inputs::~_inputs()
@@ -20,11 +21,39 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
     dx = 0.0f;
     dy = 0.0f;
 
+    isMoving = false;
+
     // ---- Input ----
-    if (keys['W']) { dy += 1; mySprite->actionTrigger = mySprite->IDLE_B; }
-    if (keys['S']) { dy -= 1; mySprite->actionTrigger = mySprite->IDLE_F; }
-    if (keys['A']) { dx -= 1; mySprite->actionTrigger = mySprite->IDLE_L; }
-    if (keys['D']) { dx += 1; mySprite->actionTrigger = mySprite->IDLE_R; }
+    if (keys['W']) {
+        dy += 1;
+        mySprite->actionTrigger = mySprite->WALK_B;
+        lastDirection = mySprite->IDLE_B;
+        isMoving = true;
+    }
+    if (keys['S']) {
+        dy -= 1;
+        mySprite->actionTrigger = mySprite->WALK_F;
+        lastDirection = mySprite->IDLE_F;
+        isMoving = true;
+    }
+    if (keys['A']) {
+        dx -= 1;
+        mySprite->actionTrigger = mySprite->WALK_L;
+        lastDirection = mySprite->IDLE_L;
+        isMoving = true;
+    }
+    if (keys['D']) {
+        dx += 1;
+        mySprite->actionTrigger = mySprite->WALK_R;
+        lastDirection = mySprite->IDLE_R;
+        isMoving = true;
+    }
+
+    if (!isMoving)
+    {
+        mySprite->actionTrigger = lastDirection;
+    }
+
 
     // ---- Normalize ----
     float len = sqrtf(dx * dx + dy * dy);
@@ -94,8 +123,4 @@ void _inputs::keyUp()
     {
         default: break;
     }
-}
-
-void _inputs::keyUp(_sprite* mySprite) {
-        mySprite->actionTrigger = mySprite->IDLE_F;
 }

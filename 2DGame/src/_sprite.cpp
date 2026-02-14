@@ -73,10 +73,14 @@ void _sprite::spriteActions()
 
     switch (actionTrigger)
     {
-        case IDLE_F: row = 1; break;
-        case IDLE_B: row = 3; break;
-        case IDLE_L: row = 0; break;
+        case IDLE_F: row = 0; break;
+        case IDLE_B: row = 1; break;
+        case IDLE_L: row = 3; break;
         case IDLE_R: row = 2; break;
+        case WALK_F: row = 4; break;
+        case WALK_B: row = 5; break;
+        case WALK_L: row = 7; break;
+        case WALK_R: row = 6; break;
         default:     return;
     }
 

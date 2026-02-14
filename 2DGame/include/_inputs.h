@@ -24,8 +24,6 @@ class _inputs
         void keyPressed(_sprite *, float deltaTime, _collisionCheck *);
         void keyPressed(_camera *, float);
 
-        void keyUp(_sprite *);
-
         void mouseEventUp();                                //mouse button released     (blank because not in use)
 
         void mouseMove(_camera *, double, double);
@@ -43,6 +41,8 @@ class _inputs
         vec2 playerPos;
         float followSpeed;
 
+        int lastDirection;
+        bool isMoving = false;
         bool isDashing = false;
         float dashRemaining = 0.0f;
         float dashSpeed = 25.0f;
