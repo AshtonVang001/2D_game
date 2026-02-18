@@ -178,7 +178,7 @@ void _Scene::drawScene() {
     else if (currentScene == GAME_SCENE)
     {
     // ---- DRAW GAME ----
-    ShowCursor(FALSE);
+    //ShowCursor(FALSE);
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
@@ -303,7 +303,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 return 0;           // stop further processing
             }
             else if(currentScene == MENU_SCENE){
-                //PostQuitMessage(0);
+                PostQuitMessage(0);
             }
         }
 
