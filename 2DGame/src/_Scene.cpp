@@ -110,13 +110,13 @@ void _Scene::drawScene() {
     glLoadIdentity();
 
     myTime->updateDeltaTime();
-    ShowCursor(FALSE);
+    //ShowCursor(FALSE);
 
     if (currentScene == MENU_SCENE)
     {
         // ---- DRAW MENU ----
-        glDisable(GL_DEPTH_TEST);
         ShowCursor(TRUE);
+        glDisable(GL_DEPTH_TEST);
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
@@ -134,6 +134,7 @@ void _Scene::drawScene() {
         glEnable(GL_DEPTH_TEST);
     }
     else if (currentScene == HELP_SCENE){
+        ShowCursor(TRUE);
         glDisable(GL_DEPTH_TEST);
 
         glMatrixMode(GL_PROJECTION);
@@ -153,6 +154,7 @@ void _Scene::drawScene() {
         glEnable(GL_DEPTH_TEST);
     }
     else if (currentScene == SETTINGS_SCENE){
+        ShowCursor(TRUE);
         glDisable(GL_DEPTH_TEST);
 
         glMatrixMode(GL_PROJECTION);
@@ -294,8 +296,28 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch(uMsg)
     {
     case WM_KEYDOWN:
-        myInput->wParam = wParam;
-        myInput->keys[wParam] = true;
+        {
+            // ---- GLOBAL ESC HANDLER ----
+        if (wParam == VK_ESCAPE)
+        {
+            if (currentScene != MENU_SCENE)
+            {
+                ShowCursor(TRUE);   // make sure cursor returns
+                currentScene = MENU_SCENE;
+                return 0;           // stop further processing
+            }
+            else if(currentScene == MENU_SCENE){
+                //PostQuitMessage(0);
+            }
+        }
+
+        // ---- Only send input to game when in game scene ----
+        if (currentScene == GAME_SCENE)
+        {
+            myInput->wParam = wParam;
+            myInput->keys[wParam] = true;
+        }
+        }
         break;
     case WM_KEYUP:
         myInput->wParam = wParam;
