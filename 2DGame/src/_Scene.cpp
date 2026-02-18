@@ -85,7 +85,7 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/map Layer 1.png");
     myTex2->loadTexture("images/map Layer 2.png");
-    mySprite->spriteInit("images/knightAnimations.png", 6, 8);
+    mySprite->spriteInit("images/knightAnimations2.png", 6, 8);
 
     myCollider->loadFromTexture(
         myTex2->image,
@@ -214,7 +214,7 @@ void _Scene::drawScene() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glDepthMask(GL_TRUE); // important
+        glDepthMask(GL_TRUE);
         glEnable(GL_DEPTH_TEST);
 
         myTex2->bindTexture();
@@ -241,7 +241,11 @@ void _Scene::drawScene() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, -3);
-        if (myTime->getTicks() > 80) {
+        if (myInput->isMoving && myTime->getTicks() > 60) {
+            mySprite->spriteActions();
+            myTime->reset();
+        }
+        else if (myTime->getTicks() > 100) {
             mySprite->spriteActions();
             myTime->reset();
         }
