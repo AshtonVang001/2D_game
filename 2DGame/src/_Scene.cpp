@@ -110,7 +110,7 @@ void _Scene::drawScene() {
     glLoadIdentity();
 
     myTime->updateDeltaTime();
-    ShowCursor(FALSE);
+    //ShowCursor(FALSE);
 
     if (currentScene == MENU_SCENE)
     {
@@ -303,7 +303,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 return 0;           // stop further processing
             }
             else if(currentScene == MENU_SCENE){
-                //done = true;
+                //PostQuitMessage(0);
             }
         }
 
