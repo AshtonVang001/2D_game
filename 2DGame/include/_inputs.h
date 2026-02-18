@@ -44,9 +44,12 @@ class _inputs
         int lastDirection;
         bool isMoving = false;
         bool isDashing = false;
-        float dashRemaining = 0.0f;
-        float dashSpeed = 25.0f;
+        float dashDistance = 3.5f;
+        float dashTraveled = 0.0f;
+        float dashSpeed = 20.0f;
         vec2 dashDir;
+        bool shiftWasDown = false;
+
 
         WPARAM wParam;
         LPARAM lParam;

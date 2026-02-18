@@ -73,22 +73,30 @@ void _sprite::spriteActions()
 
     switch (actionTrigger)
     {
-        case IDLE_F: row = 0; break;
-        case IDLE_B: row = 1; break;
-        case IDLE_L: row = 3; break;
-        case IDLE_R: row = 2; break;
-        case WALK_F: row = 4; break;
-        case WALK_B: row = 5; break;
-        case WALK_L: row = 7; break;
-        case WALK_R: row = 6; break;
+        case IDLE_F: row = 0;  break;
+        case IDLE_B: row = 1;  break;
+        case IDLE_L: row = 3;  break;
+        case IDLE_R: row = 2;  break;
+        case WALK_F: row = 4;  break;
+        case WALK_B: row = 5;  break;
+        case WALK_L: row = 7;  break;
+        case WALK_R: row = 6;  break;
+        case DASH_F: row = 8;  break;
+        case DASH_B: row = 9;  break;
+        case DASH_L: row = 11; break;
+        case DASH_R: row = 10; break;
         default:     return;
     }
 
+    if (animationFinished && !loop)
+        return;
+
     // lock Y
-    yMin = row * frameH;
-    yMax = yMin + frameH;
+    //yMin = row * frameH;
+    //yMax = yMin + frameH;
 
     // advance X
+    /*
     xMin += frameW;
     xMax = xMin + frameW;
 
@@ -96,6 +104,29 @@ void _sprite::spriteActions()
     if (xMin >= 1.0f) {
         xMin = 0.0f;
         xMax = frameW;
+    }
+    */
+
+    xMin = currentFrame * frameW;
+    xMax = xMin + frameW;
+
+    yMin = row * frameH;
+    yMax = yMin + frameH;
+
+    currentFrame++;
+
+    // If reached end
+    if (currentFrame >= frames.x)
+    {
+        if (loop)
+        {
+            currentFrame = 0;
+        }
+        else
+        {
+            currentFrame = frames.x - 1; // stay on last frame
+            animationFinished = true;
+        }
     }
 }
 

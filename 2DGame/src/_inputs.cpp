@@ -20,40 +20,39 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
     moveSpeed = 2.5f;
     dx = 0.0f;
     dy = 0.0f;
-
     isMoving = false;
 
-    // ---- Input ----
-    if (keys['W']) {
-        dy += 1;
-        mySprite->actionTrigger = mySprite->WALK_B;
-        lastDirection = mySprite->IDLE_B;
-        isMoving = true;
-    }
-    if (keys['S']) {
-        dy -= 1;
-        mySprite->actionTrigger = mySprite->WALK_F;
-        lastDirection = mySprite->IDLE_F;
-        isMoving = true;
-    }
-    if (keys['A']) {
-        dx -= 1;
-        mySprite->actionTrigger = mySprite->WALK_L;
-        lastDirection = mySprite->IDLE_L;
-        isMoving = true;
-    }
-    if (keys['D']) {
-        dx += 1;
-        mySprite->actionTrigger = mySprite->WALK_R;
-        lastDirection = mySprite->IDLE_R;
-        isMoving = true;
-    }
-
-    if (!isMoving)
+    // ---- Input (Disabled While Dashing) ----
+    if (!isDashing)
     {
-        mySprite->actionTrigger = lastDirection;
+        if (keys['W']) {
+            dy += 1;
+            mySprite->actionTrigger = mySprite->WALK_B;
+            lastDirection = mySprite->IDLE_B;
+            isMoving = true;
+        }
+        if (keys['S']) {
+            dy -= 1;
+            mySprite->actionTrigger = mySprite->WALK_F;
+            lastDirection = mySprite->IDLE_F;
+            isMoving = true;
+        }
+        if (keys['A']) {
+            dx -= 1;
+            mySprite->actionTrigger = mySprite->WALK_L;
+            lastDirection = mySprite->IDLE_L;
+            isMoving = true;
+        }
+        if (keys['D']) {
+            dx += 1;
+            mySprite->actionTrigger = mySprite->WALK_R;
+            lastDirection = mySprite->IDLE_R;
+            isMoving = true;
+        }
     }
 
+    if (!isMoving && !isDashing)
+        mySprite->actionTrigger = lastDirection;
 
     // ---- Normalize ----
     float len = sqrtf(dx * dx + dy * dy);
@@ -62,22 +61,112 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
         dy /= len;
     }
 
-    // ---- Sprint ----
-    if (keys[16])
-        moveSpeed *= 3.0f;
+    // ---- Dash Trigger ----
+    bool shiftDown = keys[16];
+    if (shiftDown && !shiftWasDown && !isDashing)
+    {
+        isDashing = true;
+        dashTraveled = 0.0f;
+        dashDir = {0.0f, 0.0f};
 
-    float nextX = mySprite->pos.x + dx * moveSpeed * deltaTime;
-    float nextY = mySprite->pos.y + dy * moveSpeed * deltaTime;
+        mySprite->setLoop(false);
 
-    // ---- player size ----
-    float halfW = 0.25f;
-    float halfH = 0.35f;
+        if (lastDirection == mySprite->IDLE_B) {
+            dashDir.y = 1;
+            mySprite->actionTrigger = mySprite->DASH_B;
+        }
+        else if (lastDirection == mySprite->IDLE_F) {
+            dashDir.y = -1;
+            mySprite->actionTrigger = mySprite->DASH_F;
+        }
+        else if (lastDirection == mySprite->IDLE_L) {
+            dashDir.x = -1;
+            mySprite->actionTrigger = mySprite->DASH_L;
+        }
+        else if (lastDirection == mySprite->IDLE_R) {
+            dashDir.x = 1;
+            mySprite->actionTrigger = mySprite->DASH_R;
+        }
 
-    // ---- Y Axis Collision ----
+        mySprite->resetAnimation();
+    }
+
+
+    // ---- Dashing ----
+
+    shiftWasDown = shiftDown;
+
+    if (isDashing)
+    {
+        dx = dashDir.x;
+        dy = dashDir.y;
+
+        float dashStep = dashSpeed * deltaTime;
+
+        float remaining = dashDistance - dashTraveled;
+        if (dashStep > remaining)
+            dashStep = remaining;
+
+        dashTraveled += dashStep;
+
+        float nextX = mySprite->pos.x + dx * dashStep;
+        float nextY = mySprite->pos.y + dy * dashStep;
+
+        float halfW = 0.20f;
+        float halfH = 0.30f;
+
+        // ---- X Collision ----
+        if (dx != 0.0f)
+        {
+            float testX = nextX + (dx > 0 ? halfW : -halfW);
+            float u = (testX + 8.0f) / 16.0f;
+            float v = (mySprite->pos.y + 3.2f) / 6.4f;
+            v = 1.0f - v;
+
+            if (!myCollider->isSolidUV(u, v))
+                mySprite->pos.x = nextX;
+        }
+
+        // ---- Y Collision ----
+        if (dy != 0.0f)
+        {
+            float testY = nextY + (dy > 0 ? halfH : -halfH);
+            float u = (mySprite->pos.x + 8.0f) / 16.0f;
+            float v = (testY + 3.2f) / 6.4f;
+            v = 1.0f - v;
+
+            if (!myCollider->isSolidUV(u, v))
+                mySprite->pos.y = nextY;
+        }
+
+        if (dashTraveled >= dashDistance && mySprite->animationFinished)
+        {
+            isDashing = false;
+            mySprite->setLoop(true);
+            mySprite->actionTrigger = lastDirection;
+            mySprite->resetAnimation();
+        }
+
+        playerPos.x = mySprite->pos.x;
+        playerPos.y = mySprite->pos.y;
+
+        return;
+    }
+
+    // ---- Normal Collision ----
+
+    float speed = moveSpeed;
+
+    float nextX = mySprite->pos.x + dx * speed * deltaTime;
+    float nextY = mySprite->pos.y + dy * speed * deltaTime;
+
+    float halfW = 0.20f;
+    float halfH = 0.30f;
+
+    // ---- X Collision ----
     if (dx != 0.0f)
     {
         float testX = nextX + (dx > 0 ? halfW : -halfW);
-
         float u = (testX + 8.0f) / 16.0f;
         float v = (mySprite->pos.y + 3.2f) / 6.4f;
         v = 1.0f - v;
@@ -86,11 +175,10 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
             mySprite->pos.x = nextX;
     }
 
-    // ---- Y Axis Collision ----
+    // ---- Y Collision ----
     if (dy != 0.0f)
     {
         float testY = nextY + (dy > 0 ? halfH : -halfH);
-
         float u = (mySprite->pos.x + 8.0f) / 16.0f;
         float v = (testY + 3.2f) / 6.4f;
         v = 1.0f - v;
@@ -102,6 +190,7 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
     playerPos.x = mySprite->pos.x;
     playerPos.y = mySprite->pos.y;
 }
+
 
 void _inputs::keyPressed(_camera* myCam, float deltaTime)
 {

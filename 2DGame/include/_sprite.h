@@ -26,12 +26,18 @@ class _sprite
 
         int prevAction = -1;
 
-        //To do
-        //add actions
-
-        enum{WALK_L, WALK_R, WALK_F, WALK_B, IDLE_F, IDLE_B, IDLE_L, IDLE_R};
+        enum{WALK_L, WALK_R, WALK_F, WALK_B, IDLE_F, IDLE_B, IDLE_L, IDLE_R, DASH_F, DASH_B, DASH_L, DASH_R};
 
         int actionTrigger = IDLE_F;
+
+        bool loop = true;
+        bool animationFinished = false;
+        int currentFrame = 0;
+
+
+        void setLoop(bool shouldLoop) { loop = shouldLoop; }
+        bool isFinished() const { return animationFinished; }
+        void resetAnimation() { currentFrame = 0; animationFinished = false; }
 
     protected:
 

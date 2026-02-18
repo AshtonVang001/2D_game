@@ -85,7 +85,7 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/map Layer 1.png");
     myTex2->loadTexture("images/map Layer 2.png");
-    mySprite->spriteInit("images/knightAnimations2.png", 6, 8);
+    mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
 
     myCollider->loadFromTexture(
         myTex2->image,
@@ -241,11 +241,20 @@ void _Scene::drawScene() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, -3);
-        if (myInput->isMoving && myTime->getTicks() > 60) {
-            mySprite->spriteActions();
-            myTime->reset();
+
+        int tickLimit = 100;
+
+        if (myInput->isDashing)
+        {
+            tickLimit = 40;
         }
-        else if (myTime->getTicks() > 100) {
+        else if (myInput->isMoving)
+        {
+            tickLimit = 60;
+        }
+
+        if (myTime->getTicks() > tickLimit)
+        {
             mySprite->spriteActions();
             myTime->reset();
         }
