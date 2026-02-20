@@ -112,6 +112,7 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
         float nextX = mySprite->pos.x + dx * dashStep;
         float nextY = mySprite->pos.y + dy * dashStep;
 
+        //Player Height
         float halfW = 0.20f;
         float halfH = 0.30f;
 

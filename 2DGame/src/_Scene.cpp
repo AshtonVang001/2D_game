@@ -83,8 +83,8 @@ void _Scene::initGL() {
     glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
 
-    myTex->loadTexture("images/map Layer 1.png");
-    myTex2->loadTexture("images/map Layer 2.png");
+    myTex->loadTexture("images/map Layer 1 ALT.png");
+    myTex2->loadTexture("images/map Layer 2 ALT.png");
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
 
     myCollider->loadFromTexture(

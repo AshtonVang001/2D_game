@@ -23,6 +23,7 @@ class _sprite
         void spriteInit(char *, int, int);                  //filename, number of x and y frames
         void drawSprite(float, float, float);
         void spriteActions();
+        float pivotOffsetY = 0.20f;
 
         int prevAction = -1;
 
