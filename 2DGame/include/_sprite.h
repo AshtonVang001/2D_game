@@ -27,7 +27,26 @@ class _sprite
 
         int prevAction = -1;
 
-        enum{WALK_L, WALK_R, WALK_F, WALK_B, IDLE_F, IDLE_B, IDLE_L, IDLE_R, DASH_F, DASH_B, DASH_L, DASH_R};
+        enum{
+            // ---- Character Movement ----
+            WALK_L,
+            WALK_R,
+            WALK_F,
+            WALK_B,
+
+            IDLE_F,
+            IDLE_B,
+            IDLE_L,
+            IDLE_R,
+
+            DASH_F,
+            DASH_B,
+            DASH_L,
+            DASH_R,
+
+            // ---- Environment Animations ----
+            TORCH
+        };
 
         int actionTrigger = IDLE_F;
 

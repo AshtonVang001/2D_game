@@ -37,11 +37,14 @@ class _Scene
         _skyBox *mySkyBox = new _skyBox();
         _sprite *mySprite = new _sprite();
         _timer *myTime = new _timer();
+        _timer *myWorldTime = new _timer();
         _camera *myCam = new _camera();
         _collisionCheck *myCollider = new _collisionCheck();
         _menu *menu = new _menu();
         _page *help = new _page();
         _page *settings = new _page();
+
+        _sprite *myTorch = new _sprite();
 
         void reSizeScene(int width, int height);
         void initGL();

@@ -4,6 +4,7 @@
 
 _Scene::_Scene() {
     myTime->startTime = clock();
+    myWorldTime->startTime = clock();
 }
 
 _Scene::~_Scene() {}
@@ -86,6 +87,7 @@ void _Scene::initGL() {
     myTex->loadTexture("images/map Layer 1 ALT.png");
     myTex2->loadTexture("images/map Layer 2 ALT.png");
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
+    myTorch->spriteInit("images/torchDemo.png", 4, 1);
 
     myCollider->loadFromTexture(
         myTex2->image,
@@ -110,6 +112,7 @@ void _Scene::drawScene() {
     glLoadIdentity();
 
     myTime->updateDeltaTime();
+    myWorldTime->updateDeltaTime();
     //ShowCursor(FALSE);
 
     if (currentScene == MENU_SCENE)
@@ -234,13 +237,33 @@ void _Scene::drawScene() {
     glPopMatrix();
 
 
+    // ---- Layer 3 (torches) ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glScalef(0.6f, 0.6f, 1);
+        myTorch->drawSprite(0.45, 1.2, -1);
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+
     // ---- Player ----
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, -3);
+        mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, 0);
 
         int tickLimit = 100;
 
