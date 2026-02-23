@@ -16,6 +16,7 @@
 #include <_collisionCheck.h>
 #include <_menu.h>
 #include <_page.h>
+#include <_sounds.h>
 
 enum SceneState
 {
@@ -42,6 +43,7 @@ class _Scene
         _menu *menu = new _menu();
         _page *help = new _page();
         _page *settings = new _page();
+        _sounds *theSound = new _sounds();
 
         void reSizeScene(int width, int height);
         void initGL();

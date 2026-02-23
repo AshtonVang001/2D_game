@@ -101,6 +101,8 @@ void _Scene::initGL() {
     help->init(width, height, "images/prlx.jpg");
     settings->init(width, height, "images/tex2.jpg");
 
+    theSound->playSound("sounds/untitled.mp3");
+
     myCam->camInit();
 }
 
