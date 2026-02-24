@@ -106,6 +106,8 @@ void _Scene::initGL() {
     theSound->playSound("sounds/untitled.mp3");
 
     myCam->camInit();
+
+    currentScene = MENU_SCENE;
 }
 
 void _Scene::drawScene() {
