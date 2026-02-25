@@ -69,8 +69,8 @@ class _Scene
         // Torch colors
         float torchColors[3][3] =
         {
-            {1.0f, 0.8f, 0.4f},   // deep orange
-            {1.0f, 0.9f, 0.5f}   // yellow-orange
+            {1.0f, 0.8f, 0.4f},
+            {1.0f, 0.9f, 0.5f}
         };
 
         float flickerTimer = 0.0f;

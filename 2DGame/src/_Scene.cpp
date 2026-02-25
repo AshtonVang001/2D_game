@@ -104,7 +104,7 @@ void _Scene::initGL() {
     settings->init(width, height, "images/tex2.jpg");
 
     theSound->playSound("sounds/untitled.mp3");
-    enemySprite->spriteInit("images/knightAnimations3.png", 6, 12);
+    enemySprite->spriteInit("images/characterRotate.png", 7,4);
     enemySprite->pos.x = 3.0f;
     enemySprite->pos.y = 2.0f;
 
@@ -280,9 +280,11 @@ void _Scene::drawScene() {
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(GL_FALSE);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, 0);
         enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, 0);
+
 
         int tickLimit = 100;
 
@@ -302,34 +304,39 @@ void _Scene::drawScene() {
             myTime->reset();
         }
 
+        glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
     }
 
 
-    // ---- Draw Game Text ----
     if (currentScene == GAME_SCENE) {
-        // ---- 2D TORCH LIGHTING ----
+
+        // ---- Torch Lighting Pipeline ----
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
 
 
-        float r = torchColors[currentColor][0] * (1.0f - flickerTimer)
-            + torchColors[nextColor][0] * flickerTimer;
+        float r = torchColors[currentColor][0] * (1.0f - flickerTimer) + torchColors[nextColor][0] * flickerTimer;
+        float g = torchColors[currentColor][1] * (1.0f - flickerTimer) + torchColors[nextColor][1] * flickerTimer;
+        float b = torchColors[currentColor][2] * (1.0f - flickerTimer) + torchColors[nextColor][2] * flickerTimer;
 
-        float g = torchColors[currentColor][1] * (1.0f - flickerTimer)
-                + torchColors[nextColor][1] * flickerTimer;
+        float flickerSpeed = 5.0f;
 
-        float b = torchColors[currentColor][2] * (1.0f - flickerTimer)
-                + torchColors[nextColor][2] * flickerTimer;
+        static float flickerTime = 0.0f;
+        flickerTime += myTime->deltaTime * flickerSpeed;
 
-        float radiusFlicker = 1.7f + (rand() % 10) / 100.0f;
-        float alphaFlicker = 0.55f + (rand() % 10) / 200.0f;
+        float flicker =
+            sin(flickerTime * 2.0f) * 0.10f +
+            sin(flickerTime * 5.0f) * 0.05f;
+
+        float radiusFlicker = 1.3f + flicker;
+        float alphaFlicker  = 0.5f + flicker * 0.4f;
 
 
 
-        //Darken entire screen
+        // ---- Darken Screen ----
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glDisable(GL_TEXTURE_2D);
@@ -343,7 +350,7 @@ void _Scene::drawScene() {
         glEnd();
 
 
-        //Add light back using additive blending
+        //---- light circle ----
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
         float radius = 2.0f;
@@ -351,26 +358,20 @@ void _Scene::drawScene() {
         float cy = 0.9f;
 
         glBegin(GL_TRIANGLE_FAN);
-
-        //bright center
-        //glColor4f(1.0f, 1.0f, 1.0f, 0.4f);
         glColor4f(r, g, b, alphaFlicker);
         glVertex3f(cx, cy, 0);
 
-        //fade outward
         for(int i = 0; i <= 360; i++)
         {
             float angle = i * 3.14159f / 180.0f;
             float x = cx + cos(angle) * radiusFlicker;
             float y = cy + sin(angle) * radiusFlicker;
 
-            //glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
             glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
             glVertex3f(x, y, 0);
         }
 
         glEnd();
-
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
 
