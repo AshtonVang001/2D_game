@@ -52,8 +52,8 @@ void _Scene::initGL() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHT0);
 
     //---- Room Light ----
     glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION,  1.0f);
@@ -189,6 +189,15 @@ void _Scene::drawScene() {
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
+    flickerTimer += myTime->deltaTime * 5.5f;   // speed of flicker
+
+    if (flickerTimer >= 1.0f)
+    {
+        flickerTimer = 0.0f;
+        currentColor = nextColor;
+        nextColor = rand() % 2;
+    }
+
     myInput->keyPressed(mySprite, smoothDT, myCollider);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
@@ -291,8 +300,82 @@ void _Scene::drawScene() {
     glPopMatrix();
     }
 
+
     // ---- Draw Game Text ----
     if (currentScene == GAME_SCENE) {
+        // ---- 2D TORCH LIGHTING ----
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+
+
+        float r = torchColors[currentColor][0] * (1.0f - flickerTimer)
+            + torchColors[nextColor][0] * flickerTimer;
+
+        float g = torchColors[currentColor][1] * (1.0f - flickerTimer)
+                + torchColors[nextColor][1] * flickerTimer;
+
+        float b = torchColors[currentColor][2] * (1.0f - flickerTimer)
+                + torchColors[nextColor][2] * flickerTimer;
+
+        float radiusFlicker = 1.7f + (rand() % 10) / 100.0f;
+        float alphaFlicker = 0.55f + (rand() % 10) / 200.0f;
+
+
+
+        //Darken entire screen
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glDisable(GL_TEXTURE_2D);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.10f);
+
+        glBegin(GL_QUADS);
+            glVertex3f(-20, -20, 0);
+            glVertex3f( 20, -20, 0);
+            glVertex3f( 20,  20, 0);
+            glVertex3f(-20,  20, 0);
+        glEnd();
+
+
+        //Add light back using additive blending
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+        float radius = 2.0f;
+        float cx = 0.30f;
+        float cy = 0.9f;
+
+        glBegin(GL_TRIANGLE_FAN);
+
+        //bright center
+        //glColor4f(1.0f, 1.0f, 1.0f, 0.4f);
+        glColor4f(r, g, b, alphaFlicker);
+        glVertex3f(cx, cy, 0);
+
+        //fade outward
+        for(int i = 0; i <= 360; i++)
+        {
+            float angle = i * 3.14159f / 180.0f;
+            float x = cx + cos(angle) * radiusFlicker;
+            float y = cy + sin(angle) * radiusFlicker;
+
+            //glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
+            glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+            glVertex3f(x, y, 0);
+        }
+
+        glEnd();
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+
+
+        // ---- Text ----
+        float fps = 0.0f;
+
+        if (myTime->deltaTime > 0.0f)
+        {
+            fps = 1.0f / myTime->deltaTime;
+        }
+
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
 
         glMatrixMode(GL_PROJECTION);
@@ -313,12 +396,14 @@ void _Scene::drawScene() {
         glRasterPos2i(20, height - 40);
 
         // ---- Draw Text ----
-        const char* text = "TEST";
+        char text[64];
+        sprintf(text, "FPS: %.0f", fps);
         for (const char* c = text; *c; ++c)
         {
             glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
         }
 
+        glEnable(GL_LIGHTING);
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
