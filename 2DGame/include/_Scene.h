@@ -9,6 +9,7 @@
 #include <_parallax.h>
 #include <_skyBox.h>
 #include <_sprite.h>
+#include <_enemies.h>
 #include <_timer.h>
 #include <_shader.h>
 #include <GL/glut.h>
@@ -37,6 +38,7 @@ class _Scene
         _parallax *myPrlx = new _parallax();
         _skyBox *mySkyBox = new _skyBox();
         _sprite *mySprite = new _sprite();
+        _enemies *enemySprite = new _enemies();
         _timer *myTime = new _timer();
         _timer *myWorldTime = new _timer();
         _camera *myCam = new _camera();
