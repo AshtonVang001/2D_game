@@ -67,15 +67,31 @@ class _Scene
 
 
         // Torch colors
-        float torchColors[3][3] =
+        float torchColors[2][3] =
         {
             {1.0f, 0.8f, 0.4f},
             {1.0f, 0.9f, 0.5f}
         };
 
+        float flickerTime = 0.0f;
         float flickerTimer = 0.0f;
         int currentColor = 0;
         int nextColor = 1;
+
+
+        // Torch positions
+        float cx = 0.30f;
+        float cy = 0.90f;
+
+        // Light radius
+        float radius = 2.0f;
+
+        // Flicker speed
+        float flickerSpeed = 5.0f;
+
+        float angle;
+        float x;
+        float y;
 
     private:
 };

@@ -118,6 +118,15 @@ void _Scene::drawScene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+
+    // ---- HARD RESET STATE ----
+    glDisable(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
+    glEnable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+
     myTime->updateDeltaTime();
     myWorldTime->updateDeltaTime();
     //ShowCursor(FALSE);
@@ -255,7 +264,7 @@ void _Scene::drawScene() {
     glPopMatrix();
 
 
-    // ---- Layer 3 (torches) ----
+    // ---- Layer 3 (torch sprites) ----
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
@@ -263,6 +272,25 @@ void _Scene::drawScene() {
 
         glScalef(0.6f, 0.6f, 1);
         myTorch->drawSprite(0.45, 1.2, -1);
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Layer 3 (torch sprites) ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glScalef(-0.6f, 0.6f, 1);
+        myTorch->drawSprite(8.0, -3.5, -1);
 
         if (myWorldTime->getTicks() > 100)
         {
@@ -318,13 +346,25 @@ void _Scene::drawScene() {
         glEnable(GL_BLEND);
 
 
+        // ---- Darken Screen ----
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glDisable(GL_TEXTURE_2D);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.20f);
+
+        glBegin(GL_QUADS);
+            glVertex3f(-20, -20, 0);
+            glVertex3f( 20, -20, 0);
+            glVertex3f( 20,  20, 0);
+            glVertex3f(-20,  20, 0);
+        glEnd();
+
+
+        // ---- Torch Parameters
         float r = torchColors[currentColor][0] * (1.0f - flickerTimer) + torchColors[nextColor][0] * flickerTimer;
         float g = torchColors[currentColor][1] * (1.0f - flickerTimer) + torchColors[nextColor][1] * flickerTimer;
         float b = torchColors[currentColor][2] * (1.0f - flickerTimer) + torchColors[nextColor][2] * flickerTimer;
 
-        float flickerSpeed = 5.0f;
-
-        static float flickerTime = 0.0f;
         flickerTime += myTime->deltaTime * flickerSpeed;
 
         float flicker =
@@ -335,27 +375,12 @@ void _Scene::drawScene() {
         float alphaFlicker  = 0.5f + flicker * 0.4f;
 
 
-
-        // ---- Darken Screen ----
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glDisable(GL_TEXTURE_2D);
-        glColor4f(0.0f, 0.0f, 0.0f, 0.10f);
-
-        glBegin(GL_QUADS);
-            glVertex3f(-20, -20, 0);
-            glVertex3f( 20, -20, 0);
-            glVertex3f( 20,  20, 0);
-            glVertex3f(-20,  20, 0);
-        glEnd();
-
-
         //---- light circle ----
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-        float radius = 2.0f;
-        float cx = 0.30f;
-        float cy = 0.9f;
+        radius = 2.0f;
+        cx = 0.30f;
+        cy = 0.9f;
 
         glBegin(GL_TRIANGLE_FAN);
         glColor4f(r, g, b, alphaFlicker);
@@ -363,15 +388,36 @@ void _Scene::drawScene() {
 
         for(int i = 0; i <= 360; i++)
         {
-            float angle = i * 3.14159f / 180.0f;
-            float x = cx + cos(angle) * radiusFlicker;
-            float y = cy + sin(angle) * radiusFlicker;
+            angle = i * 3.14159f / 180.0f;
+            x = cx + cos(angle) * radiusFlicker;
+            y = cy + sin(angle) * radiusFlicker;
 
             glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
             glVertex3f(x, y, 0);
         }
-
         glEnd();
+
+
+        // ---- Second Light ----
+        cx = -4.85f;
+        cy = -2.0f;
+
+        glBegin(GL_TRIANGLE_FAN);
+        glColor4f(r, g, b, alphaFlicker);
+        glVertex3f(cx, cy, 0);
+
+        for(int i = 0; i <= 360; i++)
+        {
+            angle = i * 3.14159f / 180.0f;
+            x = cx + cos(angle) * radiusFlicker;
+            y = cy + sin(angle) * radiusFlicker;
+
+            glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+            glVertex3f(x, y, 0);
+        }
+        glEnd();
+
+
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
 

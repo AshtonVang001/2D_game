@@ -1,6 +1,7 @@
 #ifndef _LIGHT_H
 #define _LIGHT_H
 #include <_common.h>
+#include <_timer.h>
 
 
 class _light
@@ -9,18 +10,20 @@ class _light
         _light();
         virtual ~_light();
 
-        void setLight(GLenum);
+        _timer* myTime = new _timer();
 
-        const float light_ambient[4]  = {0, 0, 0, 1};
-        const float light_diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
-        const float light_specular[4] = {0.5, 0.5, 0.5, 0.5};
+        void drawLight(float cx, float cy);
 
-        const float light_position[4] = {2.0, 5.0, 5.0, 0};
+        // Torch colors
+        float torchColors[3][3] =
+        {
+            {1.0f, 0.8f, 0.4f},
+            {1.0f, 0.9f, 0.5f}
+        };
 
-        const float mat_ambient[4]    = {0.7, 0.7, 0.7, 1.0};
-        const float mat_diffuse[4]    = {0.8, 0.8, 0.8, 1.0};
-        const float mat_specular[4]   = {1.0, 1.0, 1.0, 1.0};
-        const float high_shininess[2] = {100, 0.0};
+        float flickerTimer = 0.0f;
+        int currentColor = 0;
+        int nextColor = 1;
 
     protected:
 
