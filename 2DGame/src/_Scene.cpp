@@ -361,10 +361,13 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
         {
-        int mouseX = LOWORD(lParam);
-        int mouseY = HIWORD(lParam);
+        if (currentScene == MENU_SCENE)
+        {
+            int mouseX = LOWORD(lParam);
+            int mouseY = HIWORD(lParam);
 
-        ButtonAction action = menu->mouseClick(mouseX, mouseY);
+
+            ButtonAction action = menu->mouseClick(mouseX, mouseY);
 
         if (action == ACTION_PLAY)
         {
@@ -381,6 +384,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         else if (action == ACTION_QUIT)
         {
             PostQuitMessage(0);
+        }
         }
         }
         break;
