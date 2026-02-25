@@ -104,6 +104,9 @@ void _Scene::initGL() {
     settings->init(width, height, "images/tex2.jpg");
 
     theSound->playSound("sounds/untitled.mp3");
+    enemySprite->spriteInit("images/knightAnimations3.png", 6, 12);
+    enemySprite->pos.x = 3.0f;
+    enemySprite->pos.y = 2.0f;
 
     myCam->camInit();
 
@@ -202,6 +205,8 @@ void _Scene::drawScene() {
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
 
+    enemySprite->enemyMovement(mySprite->pos, smoothDT);
+
 
     // ---- World Textures ----
     // ---- Layer 1 (floor) ----
@@ -277,6 +282,7 @@ void _Scene::drawScene() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, 0);
+        enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, 0);
 
         int tickLimit = 100;
 
@@ -292,6 +298,7 @@ void _Scene::drawScene() {
         if (myTime->getTicks() > tickLimit)
         {
             mySprite->spriteActions();
+            enemySprite->spriteActions();
             myTime->reset();
         }
 
@@ -446,10 +453,13 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
         {
-        int mouseX = LOWORD(lParam);
-        int mouseY = HIWORD(lParam);
+        if (currentScene == MENU_SCENE)
+        {
+            int mouseX = LOWORD(lParam);
+            int mouseY = HIWORD(lParam);
 
-        ButtonAction action = menu->mouseClick(mouseX, mouseY);
+
+            ButtonAction action = menu->mouseClick(mouseX, mouseY);
 
         if (action == ACTION_PLAY)
         {
@@ -466,6 +476,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         else if (action == ACTION_QUIT)
         {
             PostQuitMessage(0);
+        }
         }
         }
         break;
