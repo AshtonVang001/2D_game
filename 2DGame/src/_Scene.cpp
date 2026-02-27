@@ -117,7 +117,7 @@ void _Scene::drawScene() {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        menu->update();
+        menu->update(myTime->deltaTime);
         menu->draw();
 
         glMatrixMode(GL_PROJECTION);

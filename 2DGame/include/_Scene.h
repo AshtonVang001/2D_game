@@ -93,6 +93,17 @@ class _Scene
         float x;
         float y;
 
+        float bgAlpha = 0.0f;
+        float buttonAlpha = 0.0f;
+
+        float fadeTimer = 0.0f;
+
+        float bgFadeDuration = 2.0f;      // seconds
+        float buttonFadeDelay = 1.0f;     // wait after bg starts
+        float buttonFadeDuration = 1.5f;  // seconds
+
+        bool fadeComplete = false;
+
     private:
 };
 

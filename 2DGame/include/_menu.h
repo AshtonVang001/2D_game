@@ -4,6 +4,7 @@
 #include <_button.h>
 #include <vector>
 #include <_textureLoader.h>
+#include <_timer.h>
 
 class _menu
 {
@@ -13,7 +14,7 @@ class _menu
 
         void init(int screenWidth, int screenHeight);
         void draw();
-        void update();
+        void update(float);
         void mouseMove(int x, int y);
         ButtonAction mouseClick(int x, int y);
 
@@ -21,10 +22,22 @@ class _menu
         int screenWidth;
         int screenHeight;
 
+        float bgAlpha;
+        //float buttonAlpha;
+        float fadeSpeed;
+        bool fadeDone;
+
+        float buttonAlpha = 0.0f; // start fully transparent
+        float buttonFadeSpeed = 0.5f; // tweak for speed
+
     protected:
 
     private:
-        std::vector<_button> buttons;
+        _button play;
+        _button quit;
+        _button help;
+        _button settings;
+        std::vector<_button*> buttons;
 };
 
 #endif // _MENU_H
