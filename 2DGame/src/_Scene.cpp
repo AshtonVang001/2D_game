@@ -15,7 +15,6 @@ void _Scene::reSizeScene(int width, int height) {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glFrustum(-aspectRatio, aspectRatio, -1.0, 1.0, 2.0, 100.0);
 
 
     // ---- Orthographic projection ----
@@ -52,42 +51,15 @@ void _Scene::initGL() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    //glEnable(GL_LIGHTING);
-    //glEnable(GL_LIGHT0);
-
-    //---- Room Light ----
-    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION,  1.0f);
-    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION,    0.1f);
-    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.02f);
-
-    //---- Room Light Material ----
-    const GLfloat room_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
-    const GLfloat room_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-    const GLfloat room_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    const GLfloat room_position[] = { 0.0f, 0.0f, 5.0f, 0.0f };
-
-    //---- Room Light Parameters ----
-    glLightfv(GL_LIGHT0, GL_AMBIENT,  room_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,  room_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, room_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, room_position);
-
-
-    const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
-    const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
-    const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
-    const GLfloat high_shininess[] = { 100.0f };
-
-
-    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
 
     myTex->loadTexture("images/map Layer 1 ALT.png");
     myTex2->loadTexture("images/map Layer 2 ALT.png");
+
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
+    enemySprite->spriteInit("images/characterRotate.png", 7,4);
+
     myTorch->spriteInit("images/torchDemo.png", 4, 1);
+
 
     myCollider->loadFromTexture(
         myTex2->image,
@@ -96,20 +68,21 @@ void _Scene::initGL() {
         myTex2->channels
     );
 
+
     SOIL_free_image_data(myTex2->image);
     myTex2->image = nullptr;
+
 
     menu->init(width, height);
     help->init(width, height, "images/prlx.jpg");
     settings->init(width, height, "images/tex2.jpg");
-
     theSound->playSound("sounds/untitled.mp3");
-    enemySprite->spriteInit("images/characterRotate.png", 7,4);
+
+
     enemySprite->pos.x = 3.0f;
     enemySprite->pos.y = 2.0f;
 
     myCam->camInit();
-
     currentScene = MENU_SCENE;
 }
 
@@ -217,7 +190,9 @@ void _Scene::drawScene() {
     enemySprite->enemyMovement(mySprite->pos, smoothDT);
 
 
+    //===========================================================================
     // ---- World Textures ----
+    //===========================================================================
     // ---- Layer 1 (floor) ----
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
@@ -336,133 +311,150 @@ void _Scene::drawScene() {
         glDisable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
+
+
+
+    //===========================================================================
+    // ---- Torch Lighting Pipeline ----
+    //===========================================================================
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+
+
+    // ---- Darken Screen ----
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.20f);
+
+    glBegin(GL_QUADS);
+        glVertex3f(-20, -20, 0);
+        glVertex3f( 20, -20, 0);
+        glVertex3f( 20,  20, 0);
+        glVertex3f(-20,  20, 0);
+    glEnd();
+
+
+    // ---- Torch Parameters
+    float r = torchColors[currentColor][0] * (1.0f - flickerTimer) + torchColors[nextColor][0] * flickerTimer;
+    float g = torchColors[currentColor][1] * (1.0f - flickerTimer) + torchColors[nextColor][1] * flickerTimer;
+    float b = torchColors[currentColor][2] * (1.0f - flickerTimer) + torchColors[nextColor][2] * flickerTimer;
+
+    flickerTime += myTime->deltaTime * flickerSpeed;
+
+    float flicker =
+        sin(flickerTime * 2.0f) * 0.10f +
+        sin(flickerTime * 5.0f) * 0.05f;
+
+    float radiusFlicker = 1.3f + flicker;
+    float alphaFlicker  = 0.5f + flicker * 0.4f;
+
+
+    //---- light circle ----
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+    radius = 2.0f;
+    cx = 0.30f;
+    cy = 0.9f;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+
+    // ---- Second Light ----
+    cx = -4.85f;
+    cy = -2.0f;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
+
+
+
+
+    //===========================================================================
+    // ---- Text ----
+    //===========================================================================
+    float fps = 0.0f;
+
+    if (myTime->deltaTime > 0.0f)
+    {
+        fps = 1.0f / myTime->deltaTime;
     }
 
+    glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
 
-    if (currentScene == GAME_SCENE) {
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
 
-        // ---- Torch Lighting Pipeline ----
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
+    gluOrtho2D(0, width, 0, height);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
 
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
 
-        // ---- Darken Screen ----
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // ---- Color & Position ----
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glRasterPos2i(20, height - 40);
 
-        glDisable(GL_TEXTURE_2D);
-        glColor4f(0.0f, 0.0f, 0.0f, 0.20f);
+    // ---- Draw Text ----
+    char text[64];
+    sprintf(text, "FPS: %.0f", fps);
+    for (const char* c = text; *c; ++c)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+    }
 
-        glBegin(GL_QUADS);
-            glVertex3f(-20, -20, 0);
-            glVertex3f( 20, -20, 0);
-            glVertex3f( 20,  20, 0);
-            glVertex3f(-20,  20, 0);
-        glEnd();
+    glEnable(GL_LIGHTING);
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glPopAttrib();
 
-
-        // ---- Torch Parameters
-        float r = torchColors[currentColor][0] * (1.0f - flickerTimer) + torchColors[nextColor][0] * flickerTimer;
-        float g = torchColors[currentColor][1] * (1.0f - flickerTimer) + torchColors[nextColor][1] * flickerTimer;
-        float b = torchColors[currentColor][2] * (1.0f - flickerTimer) + torchColors[nextColor][2] * flickerTimer;
-
-        flickerTime += myTime->deltaTime * flickerSpeed;
-
-        float flicker =
-            sin(flickerTime * 2.0f) * 0.10f +
-            sin(flickerTime * 5.0f) * 0.05f;
-
-        float radiusFlicker = 1.3f + flicker;
-        float alphaFlicker  = 0.5f + flicker * 0.4f;
-
-
-        //---- light circle ----
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-        radius = 2.0f;
-        cx = 0.30f;
-        cy = 0.9f;
-
-        glBegin(GL_TRIANGLE_FAN);
-        glColor4f(r, g, b, alphaFlicker);
-        glVertex3f(cx, cy, 0);
-
-        for(int i = 0; i <= 360; i++)
-        {
-            angle = i * 3.14159f / 180.0f;
-            x = cx + cos(angle) * radiusFlicker;
-            y = cy + sin(angle) * radiusFlicker;
-
-            glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
-            glVertex3f(x, y, 0);
-        }
-        glEnd();
-
-
-        // ---- Second Light ----
-        cx = -4.85f;
-        cy = -2.0f;
-
-        glBegin(GL_TRIANGLE_FAN);
-        glColor4f(r, g, b, alphaFlicker);
-        glVertex3f(cx, cy, 0);
-
-        for(int i = 0; i <= 360; i++)
-        {
-            angle = i * 3.14159f / 180.0f;
-            x = cx + cos(angle) * radiusFlicker;
-            y = cy + sin(angle) * radiusFlicker;
-
-            glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
-            glVertex3f(x, y, 0);
-        }
-        glEnd();
-
-
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
-
-
-        // ---- Text ----
-        float fps = 0.0f;
-
-        if (myTime->deltaTime > 0.0f)
-        {
-            fps = 1.0f / myTime->deltaTime;
-        }
-
-        glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
-
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-
-        gluOrtho2D(0, width, 0, height);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-
-        glDisable(GL_LIGHTING);
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_DEPTH_TEST);
-
-        // ---- Color & Position ----
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRasterPos2i(20, height - 40);
-
-        // ---- Draw Text ----
-        char text[64];
-        sprintf(text, "FPS: %.0f", fps);
-        for (const char* c = text; *c; ++c)
-        {
-            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
-        }
-
-        glEnable(GL_LIGHTING);
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-        glPopAttrib();
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
     }
 }
 
