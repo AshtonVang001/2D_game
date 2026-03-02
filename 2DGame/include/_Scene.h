@@ -103,6 +103,7 @@ class _Scene
         float buttonFadeDuration = 1.5f;  // seconds
 
         bool fadeComplete = false;
+        bool enemyInside = false;
 
     private:
 };

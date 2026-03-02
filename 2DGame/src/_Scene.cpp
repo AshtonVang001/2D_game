@@ -290,6 +290,49 @@ void _Scene::drawScene() {
         enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, 0);
 
 
+        // ---- Player Attack Trigger ----
+        // ---- Draw Circle
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(GL_FALSE);
+
+        float radius = 1.2f;
+        glColor4f(1.0f, 1.0f, 1.0f, 0.35f);  // (change alpha if needed)
+
+        glBegin(GL_TRIANGLE_FAN);
+            glVertex3f(mySprite->pos.x, mySprite->pos.y, -0.01f);
+            for(int i = 0; i <= 360; i++)
+            {
+                float angle = i * 3.14159f / 180.0f;
+                glVertex3f((mySprite->pos.x + cos(angle) * radius), (mySprite->pos.y + sin(angle) * radius), -0.01f);
+            }
+        glEnd();
+        // --------
+
+
+        // ---- Actual Trigger Logic ----
+        glDepthMask(GL_TRUE);
+
+        bool currentlyInside =
+        (
+            (enemySprite->pos.x - mySprite->pos.x) *
+            (enemySprite->pos.x - mySprite->pos.x)
+          +
+            (enemySprite->pos.y - mySprite->pos.y) *
+            (enemySprite->pos.y - mySprite->pos.y)
+        ) <= (radius * radius);
+
+        if (currentlyInside && !enemyInside)
+        {
+            cout << "test" << endl;
+        }
+
+        enemyInside = currentlyInside;
+        // --------
+
+
+        // ---- Animation timing ----
         int tickLimit = 100;
 
         if (myInput->isDashing)
