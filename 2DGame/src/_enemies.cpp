@@ -4,6 +4,8 @@
 _enemies::_enemies()
 {
     moveSpeed = 1.5f;
+    radius = 0.2f;
+    footOffset = 0.1f;
 }
 
 _enemies::~_enemies()
@@ -25,8 +27,51 @@ void _enemies::enemyMovement(vec3 playerPos, float deltaTime)
         direction.x /= distance;
         direction.y /= distance;
 
-        pos.x += direction.x * moveSpeed * deltaTime;
-        pos.y += direction.y * moveSpeed * deltaTime;
+        float newX = pos.x + direction.x * moveSpeed * deltaTime;
+        float newY = pos.y + direction.y * moveSpeed * deltaTime;
+
+
+        // --- Try X movement ---
+        float leftX  = newX - radius;
+        float rightX = newX + radius;
+        float topY   = (pos.y + footOffset) + radius;
+        float botY   = (pos.y + footOffset) - radius;
+
+        // Convert to UV
+        float uLeft  = (leftX + 8.0f) / 16.0f;
+        float uRight = (rightX + 8.0f) / 16.0f;
+
+        float vTop = 1.0f - ((topY + 3.2f) / 6.4f);
+        float vBot = 1.0f - ((botY + 3.2f) / 6.4f);
+
+        if (!collisionMap->isSolidUV(uLeft, vTop)  &&
+            !collisionMap->isSolidUV(uLeft, vBot)  &&
+            !collisionMap->isSolidUV(uRight, vTop) &&
+            !collisionMap->isSolidUV(uRight, vBot))
+        {
+            pos.x = newX;
+        }
+
+        // --- Try Y movement ---
+        leftX  = pos.x - radius;
+        rightX = pos.x + radius;
+        topY = (newY + footOffset) + radius;
+        botY = (newY + footOffset) - radius;
+
+        uLeft  = (leftX + 8.0f) / 16.0f;
+        uRight = (rightX + 8.0f) / 16.0f;
+
+        vTop = 1.0f - ((topY + 3.2f) / 6.4f);
+        vBot = 1.0f - ((botY + 3.2f) / 6.4f);
+
+        if (!collisionMap->isSolidUV(uLeft, vTop)  &&
+            !collisionMap->isSolidUV(uLeft, vBot)  &&
+            !collisionMap->isSolidUV(uRight, vTop) &&
+            !collisionMap->isSolidUV(uRight, vBot))
+        {
+            pos.y = newY;
+        }
+
 
         if (abs(direction.x) > abs(direction.y))
         {

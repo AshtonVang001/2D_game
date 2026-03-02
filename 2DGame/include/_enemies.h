@@ -2,6 +2,7 @@
 #define _ENEMIES_H
 
 #include<_sprite.h>
+#include<_collisionCheck.h>
 
 
 class _enemies : public _sprite
@@ -10,10 +11,14 @@ class _enemies : public _sprite
         _enemies();
         virtual ~_enemies();
 
+        _collisionCheck* collisionMap;
+
         void enemyMovement(vec3 playerPos, float deltaTime);
         void enemyHealth();
 
         float moveSpeed;
+        float radius;
+        float footOffset;
 
     protected:
 

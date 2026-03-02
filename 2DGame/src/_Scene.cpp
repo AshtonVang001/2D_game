@@ -79,8 +79,9 @@ void _Scene::initGL() {
     theSound->playSound("sounds/untitled.mp3");
 
 
-    enemySprite->pos.x = 3.0f;
-    enemySprite->pos.y = 2.0f;
+    enemySprite->pos.x = 0.0f;
+    enemySprite->pos.y = 5.0f;
+    enemySprite->collisionMap = myCollider;
 
     myCam->camInit();
     currentScene = MENU_SCENE;
