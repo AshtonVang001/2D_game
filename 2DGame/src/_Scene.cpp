@@ -323,11 +323,6 @@ void _Scene::drawScene() {
             (enemySprite->pos.y - mySprite->pos.y)
         ) <= (radius * radius);
 
-        if (currentlyInside && !enemyInside)
-        {
-            cout << "test" << endl;
-        }
-
         enemyInside = currentlyInside;
         // --------
 
@@ -488,6 +483,15 @@ void _Scene::drawScene() {
     {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
     }
+
+    char boolText[64];
+    sprintf(boolText, "Can Attack: %s", currentlyInside ? "true" : "false");
+    glRasterPos2i(20, height - 70);  // lower Y value = lower on screen
+    for (const char* c = boolText; *c; ++c)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+    }
+
 
     glEnable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
