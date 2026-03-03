@@ -19,6 +19,7 @@ class _enemies : public _sprite
         float moveSpeed;
         float radius;
         float footOffset;
+        float playerRadius = 0.25f;
 
     protected:
 

@@ -104,6 +104,8 @@ class _Scene
 
         bool fadeComplete = false;
         bool enemyInside = false;
+        bool currentlyInside = false;
+        bool currentlyInsideDash = false;
 
     private:
 };

@@ -277,9 +277,14 @@ void _Scene::drawScene() {
         glDisable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
 
 
+    //===========================================================================
     // ---- Player ----
+    //===========================================================================
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
@@ -291,40 +296,117 @@ void _Scene::drawScene() {
 
 
         // ---- Player Attack Trigger ----
-        // ---- Draw Circle
+        // ---- Trigger Logic ----
+        float fx = 0.0f;
+        float fy = 0.0f;
+
+        switch (mySprite->actionTrigger)
+        {
+            case mySprite->IDLE_F:
+            case mySprite->WALK_F:
+            case mySprite->DASH_F:  fy = -1.0f; break;
+
+            case mySprite->IDLE_B:
+            case mySprite->WALK_B:
+            case mySprite->DASH_B:  fy =  1.0f; break;
+
+            case mySprite->IDLE_L:
+            case mySprite->WALK_L:
+            case mySprite->DASH_L:  fx = -1.0f; break;
+
+            case mySprite->IDLE_R:
+            case mySprite->WALK_R:
+            case mySprite->DASH_R:  fx =  1.0f; break;
+        }
+
+        float dx = enemySprite->pos.x - mySprite->pos.x;
+        float dy = enemySprite->pos.y - mySprite->pos.y;
+
+        float distSq = dx*dx + dy*dy;
+        bool insideRadius = distSq <= (radius * radius);
+        float baseAngle = atan2(fy, fx);
+        float length = sqrt(distSq);
+
+        float normalizedDot = 0.0f;
+        if (length > 0.0001f)
+        {
+            normalizedDot = (dx * fx + dy * fy) / length;
+        }
+
+        bool inFront = normalizedDot > -0.34f; //cos(angle / 2)
+
+        currentlyInside = insideRadius && inFront;
+        enemyInside = currentlyInside;
+        // --------
+
+
+        // ---- Draw Attack Radius ----
         glDisable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDepthMask(GL_FALSE);
 
-        float radius = 1.2f;
-        glColor4f(1.0f, 1.0f, 1.0f, 0.35f);  // (change alpha if needed)
+        radius = 1.2f;
+        float arcHalfAngle = 110.0f * 3.14159f / 180.0f;
+        glColor4f(1.0f, 1.0f, 1.0f, 0.35f);
 
         glBegin(GL_TRIANGLE_FAN);
+        glVertex3f(mySprite->pos.x, mySprite->pos.y, -0.01f);
+
+        for (int i = -35; i <= 35; i++)  // controls smoothness
+        {
+            float t = (float)i / 35.0f;  // -1 to 1
+            float angle = baseAngle + t * arcHalfAngle;
+
+            float x = mySprite->pos.x + cos(angle) * radius;
+            float y = mySprite->pos.y + sin(angle) * radius;
+
+            glVertex3f(x, y, -0.01f);
+        }
+
+        glEnd();
+        glDepthMask(GL_TRUE);
+        // --------
+
+
+        // ---- Draw Dash Trigger ----
+        glPushMatrix();
+        glColor4f(0.0, 1.0, 0.0, 0.35);
+        if (myInput->isDashing) {
+            glBegin(GL_TRIANGLE_FAN);
             glVertex3f(mySprite->pos.x, mySprite->pos.y, -0.01f);
+
             for(int i = 0; i <= 360; i++)
             {
                 float angle = i * 3.14159f / 180.0f;
-                glVertex3f((mySprite->pos.x + cos(angle) * radius), (mySprite->pos.y + sin(angle) * radius), -0.01f);
+
+                glVertex3f(
+                    mySprite->pos.x + cos(angle) * 0.4f,
+                    mySprite->pos.y + sin(angle) * 0.4f,
+                    -0.01f
+                );
             }
-        glEnd();
-        // --------
+            glEnd();
+        //--------
 
 
-        // ---- Actual Trigger Logic ----
-        glDepthMask(GL_TRUE);
+        // ---- Dash Trigger Logic ----
+            currentlyInsideDash =
+            (
+                (enemySprite->pos.x - mySprite->pos.x) *
+                (enemySprite->pos.x - mySprite->pos.x)
+              +
+                (enemySprite->pos.y - mySprite->pos.y) *
+                (enemySprite->pos.y - mySprite->pos.y)
+            ) <= (radius * 0.4);
 
-        bool currentlyInside =
-        (
-            (enemySprite->pos.x - mySprite->pos.x) *
-            (enemySprite->pos.x - mySprite->pos.x)
-          +
-            (enemySprite->pos.y - mySprite->pos.y) *
-            (enemySprite->pos.y - mySprite->pos.y)
-        ) <= (radius * radius);
+            enemyInside = currentlyInsideDash;
+        }
+        if (!myInput->isDashing)
+            currentlyInsideDash = false;
 
-        enemyInside = currentlyInside;
-        // --------
+        glPopMatrix();
+        //--------
 
 
         // ---- Animation timing ----
@@ -378,7 +460,7 @@ void _Scene::drawScene() {
     glEnd();
 
 
-    // ---- Torch Parameters
+    // ---- Torch Parameters ----
     float r = torchColors[currentColor][0] * (1.0f - flickerTimer) + torchColors[nextColor][0] * flickerTimer;
     float g = torchColors[currentColor][1] * (1.0f - flickerTimer) + torchColors[nextColor][1] * flickerTimer;
     float b = torchColors[currentColor][2] * (1.0f - flickerTimer) + torchColors[nextColor][2] * flickerTimer;
@@ -438,7 +520,6 @@ void _Scene::drawScene() {
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
-
     //===========================================================================
     //===========================================================================
     //===========================================================================
@@ -492,6 +573,14 @@ void _Scene::drawScene() {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
     }
 
+    char boolText2[64];
+    sprintf(boolText2, "Dash Attack: %s", currentlyInsideDash ? "true" : "false");
+    glRasterPos2i(20, height - 100);  // lower Y value = lower on screen
+    for (const char* c = boolText2; *c; ++c)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+    }
+
 
     glEnable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
@@ -499,7 +588,6 @@ void _Scene::drawScene() {
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glPopAttrib();
-
     //===========================================================================
     //===========================================================================
     //===========================================================================

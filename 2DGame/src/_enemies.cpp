@@ -30,6 +30,18 @@ void _enemies::enemyMovement(vec3 playerPos, float deltaTime)
         float newX = pos.x + direction.x * moveSpeed * deltaTime;
         float newY = pos.y + direction.y * moveSpeed * deltaTime;
 
+        // ---- Player Collision ----
+        float dx = newX - playerPos.x;
+        float dy = newY - playerPos.y;
+
+        float combinedRadius = radius + playerRadius;
+
+        if ((dx * dx + dy * dy) < (combinedRadius * combinedRadius))
+        {
+            return;  // too close — cancel movement entirely
+        }
+        //--------
+
 
         // --- Try X movement ---
         float leftX  = newX - radius;
