@@ -49,6 +49,15 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
             lastDirection = mySprite->IDLE_R;
             isMoving = true;
         }
+
+        bool attackDown = keys['F'];
+        if (attackDown && !attackWasDown) {
+            attackPressed = true;
+        }
+        else {
+            attackPressed = false;
+        }
+        attackWasDown = attackDown;
     }
 
     if (!isMoving && !isDashing)
@@ -66,6 +75,7 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
     if (shiftDown && !shiftWasDown && !isDashing)
     {
         isDashing = true;
+        dashAttack = true;
         dashTraveled = 0.0f;
         dashDir = {0.0f, 0.0f};
 
@@ -143,6 +153,7 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
         if (dashTraveled >= dashDistance && mySprite->animationFinished)
         {
             isDashing = false;
+            dashAttack = false;
             mySprite->setLoop(true);
             mySprite->actionTrigger = lastDirection;
             mySprite->resetAnimation();

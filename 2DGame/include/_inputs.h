@@ -8,6 +8,7 @@
 #include <_camera.h>
 #include <_timer.h>
 #include <_collisionCheck.h>
+#include <_enemies.h>
 
 class _inputs
 {
@@ -48,7 +49,12 @@ class _inputs
         float dashTraveled = 0.0f;
         float dashSpeed = 20.0f;
         vec2 dashDir;
+
+        bool dashAttack = false;
         bool shiftWasDown = false;
+
+        bool attackPressed = false;
+        bool attackWasDown = false;
 
 
         WPARAM wParam;

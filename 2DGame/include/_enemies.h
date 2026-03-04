@@ -16,6 +16,7 @@ class _enemies : public _sprite
         void enemyMovement(vec3 playerPos, float deltaTime);
         void enemyHealth();
 
+        float health = 30;
         float moveSpeed;
         float radius;
         float footOffset;

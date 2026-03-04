@@ -292,7 +292,9 @@ void _Scene::drawScene() {
         glDepthMask(GL_FALSE);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, 0);
-        enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, 0);
+        if (enemySprite->health > 0) {
+            enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, 0);
+        }
 
 
         // ---- Player Attack Trigger ----
@@ -435,6 +437,17 @@ void _Scene::drawScene() {
     //===========================================================================
     //===========================================================================
     //===========================================================================
+
+
+
+    // ---- ROUGH ATTACK SYSTEM ----
+    if (myInput->attackPressed && currentlyInside) {
+        enemySprite->health -= 10;
+    }
+    if (myInput->dashAttack && currentlyInsideDash) {
+        enemySprite->health -= 30;
+    }
+    // --------
 
 
 
