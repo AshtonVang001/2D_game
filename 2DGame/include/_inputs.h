@@ -56,6 +56,9 @@ class _inputs
         bool attackPressed = false;
         bool attackWasDown = false;
 
+        bool showHitboxes = false;
+        bool bWasDown = false;
+
 
         WPARAM wParam;
         LPARAM lParam;

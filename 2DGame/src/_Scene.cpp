@@ -189,6 +189,7 @@ void _Scene::drawScene() {
     myCam->setUpCamera();
 
     enemySprite->enemyMovement(mySprite->pos, smoothDT);
+    enemySprite->updateDamage(smoothDT);
 
 
     //===========================================================================
@@ -295,6 +296,7 @@ void _Scene::drawScene() {
         if (enemySprite->health > 0) {
             enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, 0);
         }
+        enemySprite->drawDamageText();
 
 
         // ---- Player Attack Trigger ----
@@ -342,58 +344,8 @@ void _Scene::drawScene() {
         // --------
 
 
-        // ---- Draw Attack Radius ----
-        glDisable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDepthMask(GL_FALSE);
-
-        radius = 1.2f;
-        float arcHalfAngle = 110.0f * 3.14159f / 180.0f;
-        glColor4f(1.0f, 1.0f, 1.0f, 0.35f);
-
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex3f(mySprite->pos.x, mySprite->pos.y, -0.01f);
-
-        for (int i = -35; i <= 35; i++)  // controls smoothness
-        {
-            float t = (float)i / 35.0f;  // -1 to 1
-            float angle = baseAngle + t * arcHalfAngle;
-
-            float x = mySprite->pos.x + cos(angle) * radius;
-            float y = mySprite->pos.y + sin(angle) * radius;
-
-            glVertex3f(x, y, -0.01f);
-        }
-
-        glEnd();
-        glDepthMask(GL_TRUE);
-        // --------
-
-
-        // ---- Draw Dash Trigger ----
-        glPushMatrix();
-        glColor4f(0.0, 1.0, 0.0, 0.35);
-        if (myInput->isDashing) {
-            glBegin(GL_TRIANGLE_FAN);
-            glVertex3f(mySprite->pos.x, mySprite->pos.y, -0.01f);
-
-            for(int i = 0; i <= 360; i++)
-            {
-                float angle = i * 3.14159f / 180.0f;
-
-                glVertex3f(
-                    mySprite->pos.x + cos(angle) * 0.4f,
-                    mySprite->pos.y + sin(angle) * 0.4f,
-                    -0.01f
-                );
-            }
-            glEnd();
-        //--------
-
-
         // ---- Dash Trigger Logic ----
-            currentlyInsideDash =
+        currentlyInsideDash =
             (
                 (enemySprite->pos.x - mySprite->pos.x) *
                 (enemySprite->pos.x - mySprite->pos.x)
@@ -402,8 +354,63 @@ void _Scene::drawScene() {
                 (enemySprite->pos.y - mySprite->pos.y)
             ) <= (radius * 0.4);
 
-            enemyInside = currentlyInsideDash;
+        enemyInside = currentlyInsideDash;
+        //--------
+
+
+        // ---- Draw Debug Triggers ----
+        if (myInput->showHitboxes) {
+            // ---- Draw Attack Trigger
+            glDisable(GL_TEXTURE_2D);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDepthMask(GL_FALSE);
+
+            radius = 1.2f;
+            float arcHalfAngle = 110.0f * 3.14159f / 180.0f;
+            glColor4f(1.0f, 1.0f, 1.0f, 0.35f);
+
+            glBegin(GL_TRIANGLE_FAN);
+            glVertex3f(mySprite->pos.x, mySprite->pos.y, -0.01f);
+
+            for (int i = -35; i <= 35; i++)  // controls smoothness
+            {
+                float t = (float)i / 35.0f;  // -1 to 1
+                float angle = baseAngle + t * arcHalfAngle;
+
+                float x = mySprite->pos.x + cos(angle) * radius;
+                float y = mySprite->pos.y + sin(angle) * radius;
+
+                glVertex3f(x, y, -0.01f);
+            }
+
+            glEnd();
+            glDepthMask(GL_TRUE);
+            // --------
+
+
+            // ---- Draw Dash Trigger ----
+            glPushMatrix();
+            glColor4f(0.0, 1.0, 0.0, 0.35);
+            if (myInput->isDashing) {
+                glBegin(GL_TRIANGLE_FAN);
+                glVertex3f(mySprite->pos.x, mySprite->pos.y, -0.01f);
+
+                for(int i = 0; i <= 360; i++)
+                {
+                    float angle = i * 3.14159f / 180.0f;
+
+                    glVertex3f(
+                        mySprite->pos.x + cos(angle) * 0.4f,
+                        mySprite->pos.y + sin(angle) * 0.4f,
+                        -0.01f
+                    );
+                }
+                glEnd();
+                //--------
+            }
         }
+
         if (!myInput->isDashing)
             currentlyInsideDash = false;
 
@@ -442,10 +449,10 @@ void _Scene::drawScene() {
 
     // ---- ROUGH ATTACK SYSTEM ----
     if (myInput->attackPressed && currentlyInside) {
-        enemySprite->health -= 10;
+        enemySprite->takeDamage(10);
     }
     if (myInput->dashAttack && currentlyInsideDash) {
-        enemySprite->health -= 30;
+        enemySprite->takeDamage(30);
     }
     // --------
 
@@ -578,20 +585,22 @@ void _Scene::drawScene() {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
     }
 
-    char boolText[64];
-    sprintf(boolText, "Can Attack: %s", currentlyInside ? "true" : "false");
-    glRasterPos2i(20, height - 70);  // lower Y value = lower on screen
-    for (const char* c = boolText; *c; ++c)
-    {
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
-    }
+    if (myInput->showHitboxes) {
+        char boolText[64];
+        sprintf(boolText, "Can Attack: %s", currentlyInside ? "true" : "false");
+        glRasterPos2i(20, height - 70);  // lower Y value = lower on screen
+        for (const char* c = boolText; *c; ++c)
+        {
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+        }
 
-    char boolText2[64];
-    sprintf(boolText2, "Dash Attack: %s", currentlyInsideDash ? "true" : "false");
-    glRasterPos2i(20, height - 100);  // lower Y value = lower on screen
-    for (const char* c = boolText2; *c; ++c)
-    {
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+        char boolText2[64];
+        sprintf(boolText2, "Dash Attack: %s", currentlyInsideDash ? "true" : "false");
+        glRasterPos2i(20, height - 100);  // lower Y value = lower on screen
+        for (const char* c = boolText2; *c; ++c)
+        {
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+        }
     }
 
 

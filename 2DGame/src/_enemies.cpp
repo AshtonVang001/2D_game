@@ -108,4 +108,56 @@ void _enemies::enemyHealth()
 
 }
 
+void _enemies::takeDamage(int dmg)
+{
+    health -= dmg;
+
+    damageValue = dmg;
+    showDamage = true;
+    damageTimer = 0.8f;     // how long text stays
+    damageOffsetY = 0.0f;
+}
+
+void _enemies::updateDamage(float deltaTime)
+{
+    if (showDamage)
+    {
+        damageTimer -= deltaTime;
+        damageOffsetY += deltaTime * 0.5f; // float upward
+
+        if (damageTimer <= 0.0f)
+        {
+            showDamage = false;
+        }
+    }
+}
+
+void _enemies::drawDamageText()
+{
+    if (!showDamage) return;
+
+    glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    float alpha = damageTimer / 0.8f;
+    glColor4f(1.0f, 0.2f, 0.2f, alpha);
+
+    char dmgText[32];
+    sprintf(dmgText, "-%d", damageValue);
+
+    glPushMatrix();
+        glTranslatef(pos.x, pos.y + 0.6f + damageOffsetY, 0.01f);
+        glScalef(0.0025f, 0.0025f, 0.0025f);
+        glLineWidth(4.0f);
+
+        for (const char* c = dmgText; *c; ++c)
+        {
+            glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+        }
+    glPopMatrix();
+    glPopAttrib();
+}
 

@@ -58,6 +58,12 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
             attackPressed = false;
         }
         attackWasDown = attackDown;
+
+        bool bDown = keys['B'];
+        if (bDown && !bWasDown) {
+            showHitboxes = !showHitboxes;
+        }
+        bWasDown = bDown;
     }
 
     if (!isMoving && !isDashing)
