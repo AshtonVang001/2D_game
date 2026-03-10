@@ -418,6 +418,32 @@ void _Scene::drawScene() {
         //--------
 
 
+        // ---- Enemy / Player Collision ----
+        float colDx = enemySprite->pos.x - mySprite->pos.x;
+        float colDy = enemySprite->pos.y - mySprite->pos.y;
+        float distanceSq = colDx * colDx + colDy * colDy;
+        float enemyRadius  = enemySprite->radius;
+        float combinedRadius = playerRadius + enemyRadius;
+
+        if (distanceSq < combinedRadius * combinedRadius)
+        {
+            float distance = sqrt(distanceSq);
+
+            if (distance > 0.0001f)
+            {
+                float overlap = combinedRadius - distance;
+
+                // normalize
+                colDx /= distance;
+                colDy /= distance;
+
+                // push enemy away
+                enemySprite->pos.x += colDx * overlap;
+                enemySprite->pos.y += colDy * overlap;
+            }
+        }
+
+
         // ---- Animation timing ----
         int tickLimit = 100;
 
@@ -444,7 +470,6 @@ void _Scene::drawScene() {
     //===========================================================================
     //===========================================================================
     //===========================================================================
-
 
 
     // ---- ROUGH ATTACK SYSTEM ----
