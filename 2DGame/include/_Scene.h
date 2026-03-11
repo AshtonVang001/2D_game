@@ -91,6 +91,14 @@ class _Scene
         float buttonFadeDuration = 1.5f;  // seconds
         bool fadeComplete = false;
 
+        bool paused = false;
+
+        _button pauseButton;
+        _button resumeButton;
+        _button quitPauseButton;
+
+        _textureLoader pausePanel;
+
         // ---- Hitbox stuff ----
         bool enemyInside = false;
         bool currentlyInside = false;

@@ -10,7 +10,9 @@ enum ButtonAction
     ACTION_PLAY,
     ACTION_QUIT,
     ACTION_HELP,
-    ACTION_SETTINGS
+    ACTION_SETTINGS,
+    ACTION_PAUSE,
+    ACTION_RESUME
 };
 
 class _button

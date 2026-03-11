@@ -78,6 +78,35 @@ void _Scene::initGL() {
     settings->init(width, height, "images/tex2.jpg");
     theSound->playSound("sounds/untitled.mp3");
 
+    pausePanel.loadTexture("images/tex.jpg");
+
+    pauseButton.setButton(
+        width - 70,   // top right corner
+        20,
+        50,
+        50,
+        "images/pause.png",
+        ACTION_PAUSE
+    );
+
+    resumeButton.setButton(
+        width/2 - 100,
+        height/2 - 40,
+        200,
+        60,
+        "images/tex2.jpg",
+        ACTION_RESUME
+    );
+
+    quitPauseButton.setButton(
+        width/2 - 100,
+        height/2 + 40,
+        200,
+        60,
+        "images/tex2.jpg",
+        ACTION_QUIT
+    );
+
 
     enemySprite->pos.x = 0.0f;
     enemySprite->pos.y = 5.0f;
@@ -184,12 +213,15 @@ void _Scene::drawScene() {
         nextColor = rand() % 2;
     }
 
+    if(!paused)
+{
     myInput->keyPressed(mySprite, smoothDT, myCollider);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
 
     enemySprite->enemyMovement(mySprite->pos, smoothDT);
     enemySprite->updateDamage(smoothDT);
+}
 
 
     //===========================================================================
@@ -628,13 +660,79 @@ void _Scene::drawScene() {
         }
     }
 
+    // ---- UI Projection (top-left origin like Windows mouse) ----
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, height, 0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+
+    // ---- Pause Button ----
+    pauseButton.update();
+    pauseButton.draw();
+
+    if(paused)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // gray overlay
+        glDisable(GL_TEXTURE_2D);
+        glColor4f(0,0,0,0.6f);
+
+        glBegin(GL_QUADS);
+            glVertex2f(0,0);
+            glVertex2f(width,0);
+            glVertex2f(width,height);
+            glVertex2f(0,height);
+        glEnd();
+
+        // pause panel
+        glEnable(GL_TEXTURE_2D);
+        pausePanel.bindTexture();
+
+        float w = 400;
+        float h = 300;
+
+        float cx = width/2 - w/2;
+        float cy = height/2 - h/2;
+
+        glColor4f(1,1,1,1);
+
+        glBegin(GL_QUADS);
+            glTexCoord2f(0,0); glVertex2f(cx,cy);
+            glTexCoord2f(1,0); glVertex2f(cx+w,cy);
+            glTexCoord2f(1,1); glVertex2f(cx+w,cy+h);
+            glTexCoord2f(0,1); glVertex2f(cx,cy+h);
+        glEnd();
+
+        resumeButton.update();
+        resumeButton.draw();
+
+        quitPauseButton.update();
+        quitPauseButton.draw();
+    }
+
+    // ---- Restore matrices ----
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+
 
     glEnable(GL_LIGHTING);
+
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glPopAttrib();
+
     //===========================================================================
     //===========================================================================
     //===========================================================================
@@ -675,6 +773,35 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
         {
+            if(currentScene == GAME_SCENE)
+            {
+                int mouseX = LOWORD(lParam);
+                int mouseY = HIWORD(lParam);
+
+                if(!paused)
+                {
+                    if(pauseButton.checkClick(mouseX, mouseY))
+                    {
+                        paused = true;
+                        ShowCursor(TRUE);
+                    }
+                }
+                else
+                {
+                    if(resumeButton.checkClick(mouseX, mouseY))
+                    {
+                        paused = false;
+                        ShowCursor(FALSE);
+                    }
+
+                    if(quitPauseButton.checkClick(mouseX, mouseY))
+                    {
+                        paused = false;
+                        currentScene = MENU_SCENE;
+                        ShowCursor(TRUE);
+                    }
+                }
+            }
         if (currentScene == MENU_SCENE)
         {
             int mouseX = LOWORD(lParam);
@@ -704,6 +831,19 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_MOUSEMOVE:
         {
+            if(currentScene == GAME_SCENE)
+            {
+                int mouseX = LOWORD(lParam);
+                int mouseY = HIWORD(lParam);
+
+                pauseButton.checkHover(mouseX, mouseY);
+
+                if(paused)
+                {
+                    resumeButton.checkHover(mouseX, mouseY);
+                    quitPauseButton.checkHover(mouseX, mouseY);
+                }
+            }
         int mouseX = LOWORD(lParam);
         int mouseY = HIWORD(lParam);
 
