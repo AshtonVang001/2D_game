@@ -28,7 +28,7 @@ class _menu
         bool fadeDone;
 
         float buttonAlpha = 0.0f; // start fully transparent
-        float buttonFadeSpeed = 0.5f; // tweak for speed
+        float buttonFadeSpeed = 0.9f; // tweak for speed
 
     protected:
 

@@ -15,7 +15,7 @@ void _menu::init(int screenWidth, int screenHeight)
     if(!fadeDone)
     {
         bgAlpha = 1.0f;      // start fully black
-        fadeSpeed = 0.4f;    // adjust speed if you want
+        fadeSpeed = 0.8f;    // adjust speed if you want
     }
 
     this->screenWidth = screenWidth;

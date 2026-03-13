@@ -81,11 +81,11 @@ void _Scene::initGL() {
     pausePanel.loadTexture("images/tex.jpg");
 
     pauseButton.setButton(
-        width - 70,   // top right corner
+        width - 90,   // top right corner
         20,
-        50,
-        50,
-        "images/pause.png",
+        75,
+        75,
+        "images/pause2.png",
         ACTION_PAUSE
     );
 
@@ -673,13 +673,25 @@ void _Scene::drawScene() {
     glDisable(GL_DEPTH_TEST);
 
     // ---- Pause Button ----
-    pauseButton.update();
-    pauseButton.draw();
+    glPushMatrix();
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        pauseButton.update();
+        pauseButton.draw();
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    glPopMatrix();
 
     if(paused)
     {
+        glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_TEXTURE_2D);
+        glColor4f(1,1,1,1);
 
         // gray overlay
         glDisable(GL_TEXTURE_2D);
