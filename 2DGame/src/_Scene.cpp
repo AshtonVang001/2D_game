@@ -107,6 +107,7 @@ void _Scene::initGL() {
         ACTION_QUIT
     );
 
+    ashes->init(150, mySprite->pos.x, mySprite->pos.y);
 
     enemySprite->pos.x = 0.0f;
     enemySprite->pos.y = 5.0f;
@@ -205,6 +206,8 @@ void _Scene::drawScene() {
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
     flickerTimer += myTime->deltaTime * 5.5f;   // speed of flicker
+
+    ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
 
     if (flickerTimer >= 1.0f)
     {
@@ -328,6 +331,9 @@ void _Scene::drawScene() {
         if (enemySprite->health > 0) {
             enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, 0);
         }
+
+        ashes->draw();
+
         enemySprite->drawDamageText();
 
 
@@ -509,11 +515,9 @@ void _Scene::drawScene() {
         enemySprite->takeDamage(10);
     }
     if (myInput->dashAttack && currentlyInsideDash) {
-        enemySprite->takeDamage(30);
+        enemySprite->takeDamage(1);
     }
     // --------
-
-
 
 
     //===========================================================================
@@ -600,9 +604,6 @@ void _Scene::drawScene() {
     //===========================================================================
     //===========================================================================
     //===========================================================================
-
-
-
 
 
     //===========================================================================

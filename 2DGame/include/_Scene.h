@@ -18,6 +18,7 @@
 #include <_menu.h>
 #include <_page.h>
 #include <_sounds.h>
+#include "_particleSystem.h"
 
 enum SceneState
 {
@@ -51,6 +52,8 @@ class _Scene
         _sprite *myTorch = new _sprite();
         _textureLoader *myTex = new _textureLoader();
         _textureLoader *myTex2 = new _textureLoader();
+
+        _particleSystem* ashes = new _particleSystem();
 
         SceneState currentScene;
 
