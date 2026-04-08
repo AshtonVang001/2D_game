@@ -52,8 +52,8 @@ void _Scene::initGL() {
     glDepthFunc(GL_LESS);
 
 
-    myTex->loadTexture("images/map Layer 1 ALT.png");
-    myTex2->loadTexture("images/map Layer 2 ALT.png");
+    myTex->loadTexture("images/newFloor.png");
+    myTex2->loadTexture("images/newWalls.png");
 
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
     enemySprite->spriteInit("images/characterRotate.png", 7,4);
@@ -261,7 +261,7 @@ void _Scene::drawScene() {
 
         myTex2->bindTexture();
         glColor3f(1,1,1);
-        glScalef(1,-1,1);
+        glScalef(3,-3,1);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, 0.0f, 1.0f);
             glTexCoord2f(0,0); glVertex3f(-8, -3.2, -7.99);
@@ -814,6 +814,8 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         ShowCursor(TRUE);
                     }
                 }
+
+                cout << "X: " << mouseX << " Y: " << mouseY << endl;
             }
         if (currentScene == MENU_SCENE)
         {

@@ -15,8 +15,8 @@ void _particleSystem::init(int maxParticles, float playerX, float playerY)
     {
         Particle p;
 
-        p.x = ((rand() % 200) / 100.0f - 1.0f) * 10.0f;
-        p.y = ((rand() % 200) / 100.0f - 1.0f) * 6.0f;
+        p.x = ((rand() % 200) / 100.0f - 1.0f) * 20.0f;
+        p.y = ((rand() % 200) / 100.0f - 1.0f) * 20.0f;
 
         p.vx = 0.3f + (rand() % 100) / 300.0f;
         p.vy = -0.6f - (rand() % 100) / 300.0f;
@@ -34,8 +34,8 @@ void _particleSystem::init(int maxParticles, float playerX, float playerY)
 
 void _particleSystem::respawn(Particle &p, float playerX, float playerY)
 {
-    p.x = playerX + ((rand() % 200) / 100.0f - 1.0f) * 10.0f;
-    p.y = playerY + 6.0f + (rand() % 100) / 20.0f;
+    p.x = playerX + ((rand() % 200) / 100.0f - 1.0f) * 20.0f;
+    p.y = playerY + 6.0f + (rand() % 100) / 40.0f;
 
     p.vx = 0.3f + (rand() % 100) / 300.0f;
     p.vy = -0.6f - (rand() % 100) / 300.0f;

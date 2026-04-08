@@ -36,11 +36,11 @@ bool _collisionCheck::isSolidPixel(int x, int y) const {
 }
 
 bool _collisionCheck::isSolidUV(float u, float v) const {
-    if (u < 0.f || u > 1.f || v < 0.f || v > 1.f)
-        return false;
+        if (u < 0.f || u > 1.f || v < 0.f || v > 1.f)
+            return false;
 
-    int x = int(u * width);
-    int y = int(v * height);
+        int x = int(u * width);
+        int y = int(v * height);
 
-    return isSolidPixel(x, y);
+        return isSolidPixel(x, y);
 }
