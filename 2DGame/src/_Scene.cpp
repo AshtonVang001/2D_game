@@ -5,6 +5,8 @@
 _Scene::_Scene() {
     myTime->startTime = clock();
     myWorldTime->startTime = clock();
+
+
 }
 
 _Scene::~_Scene() {}
@@ -50,6 +52,10 @@ void _Scene::initGL() {
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    gameCursor = LoadCursorFromFileA("cursors/GAME.cur");
+    menuCursor = LoadCursorFromFileA("cursors/MENU.ani");
+    attackCursor = LoadCursorFromFileA("cursors/ENEMY.cur");
 
 
     myTex->loadTexture("images/newFloor.png");
@@ -138,7 +144,8 @@ void _Scene::drawScene() {
     if (currentScene == MENU_SCENE)
     {
         // ---- DRAW MENU ----
-        ShowCursor(TRUE);
+        //ShowCursor(TRUE);
+        SetCursor(menuCursor);
         glDisable(GL_DEPTH_TEST);
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -157,7 +164,8 @@ void _Scene::drawScene() {
         glEnable(GL_DEPTH_TEST);
     }
     else if (currentScene == HELP_SCENE){
-        ShowCursor(TRUE);
+        //ShowCursor(TRUE);
+        SetCursor(menuCursor);
         glDisable(GL_DEPTH_TEST);
 
         glMatrixMode(GL_PROJECTION);
@@ -177,7 +185,8 @@ void _Scene::drawScene() {
         glEnable(GL_DEPTH_TEST);
     }
     else if (currentScene == SETTINGS_SCENE){
-        ShowCursor(TRUE);
+        //ShowCursor(TRUE);
+        SetCursor(menuCursor);
         glDisable(GL_DEPTH_TEST);
 
         glMatrixMode(GL_PROJECTION);
@@ -202,6 +211,7 @@ void _Scene::drawScene() {
     {
     // ---- DRAW GAME ----
     //ShowCursor(FALSE);
+    //SetCursor(gameCursor);
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
@@ -218,6 +228,7 @@ void _Scene::drawScene() {
 
     if(!paused)
 {
+    SetCursor(gameCursor);
     myInput->keyPressed(mySprite, smoothDT, myCollider);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
@@ -688,6 +699,7 @@ void _Scene::drawScene() {
 
     if(paused)
     {
+        SetCursor(menuCursor);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

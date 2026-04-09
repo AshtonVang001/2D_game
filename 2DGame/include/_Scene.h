@@ -108,6 +108,10 @@ class _Scene
         bool currentlyInsideDash = false;
         float playerRadius = 0.3f;
 
+        HCURSOR gameCursor;
+        HCURSOR menuCursor;
+        HCURSOR attackCursor;
+
     private:
 };
 
