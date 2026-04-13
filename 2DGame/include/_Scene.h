@@ -19,6 +19,9 @@
 #include <_page.h>
 #include <_sounds.h>
 #include "_particleSystem.h"
+#include <_spawner.h>
+
+#include <algorithm>
 
 enum SceneState
 {
@@ -111,6 +114,11 @@ class _Scene
         HCURSOR gameCursor;
         HCURSOR menuCursor;
         HCURSOR attackCursor;
+
+        std::vector<_enemies*> enemies;
+        std::vector<_spawner*> spawners;
+
+        int currentWave = 0;
 
     private:
 };

@@ -5,8 +5,6 @@
 _Scene::_Scene() {
     myTime->startTime = clock();
     myWorldTime->startTime = clock();
-
-
 }
 
 _Scene::~_Scene() {}
@@ -62,7 +60,6 @@ void _Scene::initGL() {
     myTex2->loadTexture("images/newWalls.png");
 
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
-    enemySprite->spriteInit("images/characterRotate.png", 7,4);
 
     myTorch->spriteInit("images/torchDemo.png", 4, 1);
 
@@ -115,9 +112,8 @@ void _Scene::initGL() {
 
     ashes->init(150, mySprite->pos.x, mySprite->pos.y);
 
-    enemySprite->pos.x = 0.0f;
-    enemySprite->pos.y = 5.0f;
-    enemySprite->collisionMap = myCollider;
+    spawners.push_back(new _spawner(5, 0.5f, 0.0f, 5.0f));   // wave 1
+    spawners.push_back(new _spawner(8, 0.3f, -3.0f, 5.0f));  // wave 2
 
     myCam->camInit();
     currentScene = MENU_SCENE;
@@ -233,8 +229,11 @@ void _Scene::drawScene() {
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
 
-    enemySprite->enemyMovement(mySprite->pos, smoothDT);
-    enemySprite->updateDamage(smoothDT);
+    for (auto& e : enemies)
+    {
+        e->enemyMovement(mySprite->pos, smoothDT);
+        e->updateDamage(smoothDT);
+    }
 }
 
 
@@ -339,13 +338,15 @@ void _Scene::drawScene() {
         glDepthMask(GL_FALSE);
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, 0);
-        if (enemySprite->health > 0) {
-            enemySprite->drawSprite(enemySprite->pos.x, enemySprite->pos.y, 0);
+
+        for (auto& e : enemies)
+        {
+            if (e->health > 0)
+            {
+                e->drawSprite(e->pos.x, e->pos.y, 0);
+                e->drawDamageText();
+            }
         }
-
-        ashes->draw();
-
-        enemySprite->drawDamageText();
 
 
         // ---- Player Attack Trigger ----
@@ -372,24 +373,43 @@ void _Scene::drawScene() {
             case mySprite->DASH_R:  fx =  1.0f; break;
         }
 
-        float dx = enemySprite->pos.x - mySprite->pos.x;
-        float dy = enemySprite->pos.y - mySprite->pos.y;
-
-        float distSq = dx*dx + dy*dy;
-        bool insideRadius = distSq <= (radius * radius);
         float baseAngle = atan2(fy, fx);
-        float length = sqrt(distSq);
 
-        float normalizedDot = 0.0f;
-        if (length > 0.0001f)
+        bool anyEnemyHit = false;
+
+        for (auto& e : enemies)
         {
-            normalizedDot = (dx * fx + dy * fy) / length;
+            float dx = e->pos.x - mySprite->pos.x;
+            float dy = e->pos.y - mySprite->pos.y;
+
+            float distSq = dx*dx + dy*dy;
+            float length = sqrt(distSq);
+
+            bool insideRadius = distSq <= (radius * radius);
+
+            float normalizedDot = 0.0f;
+            if (length > 0.0001f)
+            {
+                normalizedDot = (dx * fx + dy * fy) / length;
+            }
+
+            bool inFront = normalizedDot > -0.34f;
+
+            bool hit = insideRadius && inFront;
+
+            if (hit)
+                anyEnemyHit = true;
+
+            // APPLY DAMAGE HERE
+            if (myInput->attackPressed && hit)
+                e->takeDamage(10);
+
+            if (myInput->dashAttack && distSq <= (radius * 0.4f))
+                e->takeDamage(1);
         }
 
-        bool inFront = normalizedDot > -0.34f; //cos(angle / 2)
-
-        currentlyInside = insideRadius && inFront;
-        enemyInside = currentlyInside;
+        currentlyInside = anyEnemyHit;
+        enemyInside = anyEnemyHit;
         // --------
 
 
@@ -468,27 +488,28 @@ void _Scene::drawScene() {
 
 
         // ---- Enemy / Player Collision ----
-        float colDx = enemySprite->pos.x - mySprite->pos.x;
-        float colDy = enemySprite->pos.y - mySprite->pos.y;
-        float distanceSq = colDx * colDx + colDy * colDy;
-        float enemyRadius  = enemySprite->radius;
-        float combinedRadius = playerRadius + enemyRadius;
-
-        if (distanceSq < combinedRadius * combinedRadius)
+        for (auto& e : enemies)
         {
-            float distance = sqrt(distanceSq);
+            float colDx = e->pos.x - mySprite->pos.x;
+            float colDy = e->pos.y - mySprite->pos.y;
 
-            if (distance > 0.0001f)
+            float distanceSq = colDx * colDx + colDy * colDy;
+            float combinedRadius = playerRadius + e->radius;
+
+            if (distanceSq < combinedRadius * combinedRadius)
             {
-                float overlap = combinedRadius - distance;
+                float distance = sqrt(distanceSq);
 
-                // normalize
-                colDx /= distance;
-                colDy /= distance;
+                if (distance > 0.0001f)
+                {
+                    float overlap = combinedRadius - distance;
 
-                // push enemy away
-                enemySprite->pos.x += colDx * overlap;
-                enemySprite->pos.y += colDy * overlap;
+                    colDx /= distance;
+                    colDy /= distance;
+
+                    e->pos.x += colDx * overlap;
+                    e->pos.y += colDy * overlap;
+                }
             }
         }
 
@@ -508,7 +529,10 @@ void _Scene::drawScene() {
         if (myTime->getTicks() > tickLimit)
         {
             mySprite->spriteActions();
-            enemySprite->spriteActions();
+            for (auto& e : enemies)
+            {
+                e->spriteActions();
+            }
             myTime->reset();
         }
 
@@ -522,14 +546,30 @@ void _Scene::drawScene() {
 
 
     // ---- ROUGH ATTACK SYSTEM ----
-    if (myInput->attackPressed && currentlyInside) {
-        enemySprite->takeDamage(10);
-    }
-    if (myInput->dashAttack && currentlyInsideDash) {
-        enemySprite->takeDamage(1);
+    //moved to loop
+    // --------
+    // ---- SPAWNER SYSTEM ----
+    if (currentWave < spawners.size())
+    {
+        spawners[currentWave]->update(myTime->deltaTime, enemies, myCollider);
+
+        bool allDead = true;
+
+        for (auto& e : enemies)
+        {
+            if (e->health > 0)
+            {
+                allDead = false;
+                break;
+            }
+        }
+
+        if (spawners[currentWave]->isFinished() && allDead)
+        {
+            currentWave++;
+        }
     }
     // --------
-
 
     //===========================================================================
     // ---- Torch Lighting Pipeline ----
@@ -742,6 +782,11 @@ void _Scene::drawScene() {
         quitPauseButton.update();
         quitPauseButton.draw();
     }
+    enemies.erase(
+        std::remove_if(enemies.begin(), enemies.end(),
+            [](_enemies* e) { return e->health <= 0; }),
+        enemies.end()
+    );
 
     // ---- Restore matrices ----
     glMatrixMode(GL_PROJECTION);
