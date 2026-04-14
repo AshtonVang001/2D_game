@@ -7,6 +7,11 @@ _inputs::_inputs()
     isTranslationActive = false;
     //isScalingActive = false;
     lastDirection = _sprite::IDLE_F;
+
+    scale = 3.0;
+    colliderX = 8.0 * scale;
+    colliderY = 3.2 * scale;
+
 }
 
 _inputs::~_inputs()
@@ -136,8 +141,8 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
         if (dx != 0.0f)
         {
             float testX = nextX + (dx > 0 ? halfW : -halfW);
-            float u = (testX + 8.0f) / 16.0f;
-            float v = (mySprite->pos.y + 3.2f) / 6.4f;
+            float u = (testX + colliderX) / (colliderX*2);                        //float u = (testX + 8.0f) / 16.0f;
+            float v = (mySprite->pos.y + colliderY) / (colliderY*2);              //float v = (mySprite->pos.y + 3.2f) / 6.4f;
             v = 1.0f - v;
 
             if (!myCollider->isSolidUV(u, v))
@@ -148,8 +153,8 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
         if (dy != 0.0f)
         {
             float testY = nextY + (dy > 0 ? halfH : -halfH);
-            float u = (mySprite->pos.x + 8.0f) / 16.0f;
-            float v = (testY + 3.2f) / 6.4f;
+            float u = (mySprite->pos.x + colliderX) / (colliderX*2);              //float u = (mySprite->pos.x + 8.0f) / 16.0f;
+            float v = (testY + colliderY) / (colliderY*2);                        //float v = (testY + 3.2f) / 6.4f;
             v = 1.0f - v;
 
             if (!myCollider->isSolidUV(u, v))
@@ -185,8 +190,8 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
     if (dx != 0.0f)
     {
         float testX = nextX + (dx > 0 ? halfW : -halfW);
-        float u = (testX + 8.0f) / 16.0f;
-        float v = (mySprite->pos.y + 3.2f) / 6.4f;
+        float u = (testX + colliderX) / (colliderX*2);                    //float u = (testX + 8.0f) / 16.0f;
+        float v = (mySprite->pos.y + colliderY) / (colliderY*2);          //float v = (mySprite->pos.y + 3.2f) / 6.4f;
         v = 1.0f - v;
 
         if (!myCollider->isSolidUV(u, v))
@@ -197,8 +202,8 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
     if (dy != 0.0f)
     {
         float testY = nextY + (dy > 0 ? halfH : -halfH);
-        float u = (mySprite->pos.x + 8.0f) / 16.0f;
-        float v = (testY + 3.2f) / 6.4f;
+        float u = (mySprite->pos.x + colliderX) / (colliderX*2);          //float u = (mySprite->pos.x + 8.0f) / 16.0f;
+        float v = (testY + colliderY) / (colliderY*2);                    //float v = (testY + 3.2f) / 6.4f;
         v = 1.0f - v;
 
         if (!myCollider->isSolidUV(u, v))

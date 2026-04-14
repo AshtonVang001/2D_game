@@ -8,7 +8,8 @@ _sprite::_sprite()
     xMax = yMax = 1.0;
 
     rot.x = rot.y = rot.z = 0;
-    pos.x = pos.y = pos.z = 0;
+    pos.x = pos.z = 0;
+    pos.y = -2;
 
     vertX[0].x = -0.5; vertX[0].y = -0.5; vertX[0].z = 1;
     vertX[1].x =  0.5; vertX[1].y = -0.5; vertX[1].z = 1;

@@ -63,6 +63,10 @@ class _inputs
         WPARAM wParam;
         LPARAM lParam;
 
+        float colliderX;
+        float colliderY;
+        float scale;
+
     protected:
 
     private:

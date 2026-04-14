@@ -71,7 +71,6 @@ void _Scene::initGL() {
         myTex2->channels
     );
 
-
     SOIL_free_image_data(myTex2->image);
     myTex2->image = nullptr;
 
@@ -271,13 +270,13 @@ void _Scene::drawScene() {
 
         myTex2->bindTexture();
         glColor3f(1,1,1);
-        glScalef(3,-3,1);
+        glScalef(1,-1,1);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, 0.0f, 1.0f);
-            glTexCoord2f(0,0); glVertex3f(-8, -3.2, -7.99);
-            glTexCoord2f(1,0); glVertex3f( 8, -3.2, -7.99);
-            glTexCoord2f(1,1); glVertex3f( 8,  3.2, -7.99);
-            glTexCoord2f(0,1); glVertex3f(-8,  3.2, -7.99);
+            glTexCoord2f(0,0); glVertex3f(-8*3, -3.2*3, -7.99);
+            glTexCoord2f(1,0); glVertex3f( 8*3, -3.2*3, -7.99);
+            glTexCoord2f(1,1); glVertex3f( 8*3,  3.2*3, -7.99);
+            glTexCoord2f(0,1); glVertex3f(-8*3,  3.2*3, -7.99);
         glEnd();
 
         glDisable(GL_BLEND);
