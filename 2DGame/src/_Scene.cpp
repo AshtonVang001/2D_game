@@ -55,6 +55,9 @@ void _Scene::initGL() {
     menuCursor = LoadCursorFromFileA("cursors/MENU.ani");
     attackCursor = LoadCursorFromFileA("cursors/ENEMY.cur");
 
+    currentCursor = gameCursor;
+    SetCursor(gameCursor);
+
 
     myTex->loadTexture("images/newFloor.png");
     myTex2->loadTexture("images/newWalls.png");
@@ -223,7 +226,7 @@ void _Scene::drawScene() {
 
     if(!paused)
 {
-    SetCursor(gameCursor);
+    //SetCursor(gameCursor);
     myInput->keyPressed(mySprite, smoothDT, myCollider);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
@@ -232,6 +235,30 @@ void _Scene::drawScene() {
     {
         e->enemyMovement(mySprite->pos, smoothDT);
         e->updateDamage(smoothDT);
+    }
+    bool enemyInCursorRange = false;
+
+    float cursorRange = 1.5f; // tweak later
+
+    for (auto& e : enemies)
+    {
+        float dx = e->pos.x - mySprite->pos.x;
+        float dy = e->pos.y - mySprite->pos.y;
+
+        float distSq = dx*dx + dy*dy;
+
+        if (distSq <= cursorRange * cursorRange)
+        {
+            enemyInCursorRange = true;
+            break; // early exit = faster
+        }
+    }
+    HCURSOR desiredCursor = enemyInCursorRange ? attackCursor : gameCursor;
+
+    if (desiredCursor != currentCursor)
+    {
+        currentCursor = desiredCursor;
+        SetCursor(currentCursor);
     }
     // ---- Enemy Separation ----
         float separationRadius = 0.8f;   // tweak this
