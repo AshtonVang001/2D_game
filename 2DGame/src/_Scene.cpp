@@ -233,6 +233,43 @@ void _Scene::drawScene() {
         e->enemyMovement(mySprite->pos, smoothDT);
         e->updateDamage(smoothDT);
     }
+    // ---- Enemy Separation ----
+        float separationRadius = 0.8f;   // tweak this
+        float separationForce  = 1.5f;   // tweak strength
+
+        for (size_t i = 0; i < enemies.size(); i++)
+        {
+            for (size_t j = i + 1; j < enemies.size(); j++)
+            {
+                _enemies* a = enemies[i];
+                _enemies* b = enemies[j];
+
+                float dx = a->pos.x - b->pos.x;
+                float dy = a->pos.y - b->pos.y;
+
+                float distSq = dx*dx + dy*dy;
+
+                if (distSq < separationRadius * separationRadius)
+                {
+                    float dist = sqrt(distSq);
+
+                    if (dist > 0.0001f)
+                    {
+                        float overlap = separationRadius - dist;
+
+                        dx /= dist;
+                        dy /= dist;
+
+                        // push both away from each other
+                        a->pos.x += dx * overlap * separationForce * 0.5f;
+                        a->pos.y += dy * overlap * separationForce * 0.5f;
+
+                        b->pos.x -= dx * overlap * separationForce * 0.5f;
+                        b->pos.y -= dy * overlap * separationForce * 0.5f;
+                    }
+                }
+            }
+        }
 }
 
 
