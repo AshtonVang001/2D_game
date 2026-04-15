@@ -228,45 +228,10 @@ void _Scene::drawScene() {
 
 
     else if (currentScene == SHOP_SCENE) {
-    doorFadeTimer -= myTime->deltaTime;
 
-    if (doorFadeTimer < 0.0f)
-        doorFadeTimer = 0.0f;
+    myFade->fadeIn(myTime->deltaTime);
+    myFade->draw(width, height);
 
-    float t = doorFadeTimer / doorFadeDuration;
-
-    // ---- Fade In ----
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    gluOrtho2D(0, width, 0, height);
-
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_TEXTURE_2D);
-
-    glColor4f(0, 0, 0, t);
-
-    glBegin(GL_QUADS);
-        glVertex2f(0, 0);
-        glVertex2f(width, 0);
-        glVertex2f(width, height);
-        glVertex2f(0, height);
-    glEnd();
-
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    //--------
 
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
@@ -398,7 +363,70 @@ void _Scene::drawScene() {
     //===========================================================================
 
 
+    //===========================================================================
+    // ---- Triggers ----
+    //===========================================================================
+    // ---- DOOR TRIGGER ----
+    float halfW = doorWidth * 0.5f;
+    float halfH = doorHeight * 0.5f;
 
+    bool inside =
+        (mySprite->pos.x >= shopDoorX - halfW &&
+         mySprite->pos.x <= shopDoorX + halfW &&
+         mySprite->pos.y >= shopDoorY - halfH &&
+         mySprite->pos.y <= shopDoorY + halfH);
+
+    // enter event (only once per entry)
+    if (inside && !playerInsideDoor)
+    {
+        shopDoorActivated = true;
+    }
+
+    playerInsideDoor = inside;
+
+    if (shopDoorActivated)
+    {
+        myFade->fadeOut(myTime->deltaTime);
+        if (myFade->fadeComplete)
+        {
+            currentScene = GAME_SCENE;
+
+            myFade->fadeTimer = 0.0f;      // IMPORTANT: start from black
+            myFade->fadeComplete = false;
+
+            myFade->fadeInOnEnter = true;          // trigger fade-in
+
+            shopDoorActivated = false;
+            playerInsideDoor = false;
+            doorActivated = false;
+            doorTriggerActive = false;
+
+            mySprite->pos.x = 0;
+            mySprite->pos.y = -3.0f;
+        }
+    }
+
+
+    if (myInput->showHitboxes) {
+        // ---- DOOR TRIGGER DEBUG VISUAL ----
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glColor4f(0.0f, 0.8f, 1.0f, 0.3f);
+
+        glBegin(GL_QUADS);
+            glVertex3f(shopDoorX - halfW, shopDoorY - halfH, -0.01f);
+            glVertex3f(shopDoorX + halfW, shopDoorY - halfH, -0.01f);
+            glVertex3f(shopDoorX + halfW, shopDoorY + halfH, -0.01f);
+            glVertex3f(shopDoorX - halfW, shopDoorY + halfH, -0.01f);
+        glEnd();
+
+        glDisable(GL_BLEND);
+    }
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
     }
 
 
@@ -411,6 +439,18 @@ void _Scene::drawScene() {
     flickerTimer += myTime->deltaTime * 5.5f;   // speed of flicker
 
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
+
+
+    if (myFade->fadeInOnEnter)
+    {
+        myFade->fadeIn(myTime->deltaTime);
+
+        if (myFade->fadeComplete)
+        {
+            myFade->fadeInOnEnter = false; // stop fading once done
+        }
+    }
+
 
     if (flickerTimer >= 1.0f)
     {
@@ -845,7 +885,8 @@ void _Scene::drawScene() {
             // enter event (only once per entry)
             if (inside && !playerInsideDoor)
             {
-                printf("test\n");
+                //printf("test\n");
+                returnToGame = true;
             }
 
             playerInsideDoor = inside;
@@ -1449,73 +1490,32 @@ void _Scene::drawScene() {
     if (playerInsideDoor && !doorActivated)
     {
         doorActivated = true;
+        canMove = false;
     }
-
-    if (playerInsideDoor && !doorActivated)
-{
-    doorActivated = true;
-    canMove = false;
-}
 
     if (doorActivated && currentScene == GAME_SCENE)
     {
-        doorFadeTimer += myTime->deltaTime;
+        myFade->fadeOut(myTime->deltaTime);
 
-        if (doorFadeTimer >= doorFadeDuration)
+        if (myFade->fadeComplete)
         {
-            doorFadeTimer = doorFadeDuration;
             currentScene = SHOP_SCENE;
-            doorFadeTimer = doorFadeDuration;
-            canMove = true;
 
+            myFade->fadeTimer = myFade->fadeDuration;
+            myFade->fadeComplete = false;
+
+            shopDoorActivated = false;
+            doorActivated = false;
+            playerInsideDoor = false;
+            doorTriggerActive = false;
+
+            canMove = true;
             mySprite->pos.x = 0;
             mySprite->pos.y = 0;
         }
     }
 
-    else if (!doorActivated)
-    {
-        doorFadeTimer -= myTime->deltaTime;
-
-        if (doorFadeTimer < 0.0f)
-            doorFadeTimer = 0.0f;
-    }
-
-    float t = doorFadeTimer / doorFadeDuration;
-    if (t > 1.0f) t = 1.0f;
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    gluOrtho2D(0, width, 0, height);
-
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_TEXTURE_2D);
-
-    glColor4f(0, 0, 0, t);
-
-    glBegin(GL_QUADS);
-        glVertex2f(0, 0);
-        glVertex2f(width, 0);
-        glVertex2f(width, height);
-        glVertex2f(0, height);
-    glEnd();
-
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    //--------
-
+    myFade->draw(width, height);
 }
 
 int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

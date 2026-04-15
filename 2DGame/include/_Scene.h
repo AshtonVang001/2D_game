@@ -20,6 +20,7 @@
 #include <_sounds.h>
 #include "_particleSystem.h"
 #include <_spawner.h>
+#include <_fadeInOut.h>
 
 #include <algorithm>
 
@@ -63,6 +64,7 @@ class _Scene
         _textureLoader *myArrowTexture = new _textureLoader();
 
         _particleSystem* ashes = new _particleSystem();
+        _fadeInOut* myFade = new _fadeInOut();
 
         SceneState currentScene;
 
@@ -132,18 +134,15 @@ class _Scene
 
         float doorX = 0.0f;
         float doorY = 9.25f;
+        float shopDoorX = 0.0f;
+        float shopDoorY = 2.5f;
         float doorWidth = 1.0f;
         float doorHeight = 2.0f;
         bool doorTriggerActive = false;
         bool playerInsideDoor = false;
         bool doorActivated = false;
-
-        float doorFadeTimer = 0.0f;
-        float doorFadeDuration = 1.0f;
-        bool doorFadeComplete = false;
-
-        bool fadingOut = false;
-        bool fadingIn = false;
+        bool shopDoorActivated = false;
+        bool returnToGame = false;
 
         float arrowX = 0.0f;
         float arrowY = 0.0f;
