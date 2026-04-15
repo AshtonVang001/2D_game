@@ -116,6 +116,8 @@ class _Scene
         HCURSOR menuCursor;
         HCURSOR attackCursor;
 
+        HCURSOR currentCursor = nullptr;
+
         std::vector<_enemies*> enemies;
         std::vector<_spawner*> spawners;
 

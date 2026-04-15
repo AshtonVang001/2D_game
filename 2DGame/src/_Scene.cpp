@@ -55,6 +55,9 @@ void _Scene::initGL() {
     menuCursor = LoadCursorFromFileA("cursors/MENU.ani");
     attackCursor = LoadCursorFromFileA("cursors/ENEMY.cur");
 
+    currentCursor = gameCursor;
+    SetCursor(gameCursor);
+
 
     myTex->loadTexture("images/newFloor.png");
     myTex2->loadTexture("images/newWalls.png");
@@ -223,7 +226,7 @@ void _Scene::drawScene() {
 
     if(!paused)
 {
-    SetCursor(gameCursor);
+    //SetCursor(gameCursor);
     myInput->keyPressed(mySprite, smoothDT, myCollider);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
@@ -233,6 +236,67 @@ void _Scene::drawScene() {
         e->enemyMovement(mySprite->pos, smoothDT);
         e->updateDamage(smoothDT);
     }
+    bool enemyInCursorRange = false;
+
+    float cursorRange = 1.5f; // tweak later
+
+    for (auto& e : enemies)
+    {
+        float dx = e->pos.x - mySprite->pos.x;
+        float dy = e->pos.y - mySprite->pos.y;
+
+        float distSq = dx*dx + dy*dy;
+
+        if (distSq <= cursorRange * cursorRange)
+        {
+            enemyInCursorRange = true;
+            break; // early exit = faster
+        }
+    }
+    HCURSOR desiredCursor = enemyInCursorRange ? attackCursor : gameCursor;
+
+    if (desiredCursor != currentCursor)
+    {
+        currentCursor = desiredCursor;
+        SetCursor(currentCursor);
+    }
+    // ---- Enemy Separation ----
+        float separationRadius = 0.8f;   // tweak this
+        float separationForce  = 1.5f;   // tweak strength
+
+        for (size_t i = 0; i < enemies.size(); i++)
+        {
+            for (size_t j = i + 1; j < enemies.size(); j++)
+            {
+                _enemies* a = enemies[i];
+                _enemies* b = enemies[j];
+
+                float dx = a->pos.x - b->pos.x;
+                float dy = a->pos.y - b->pos.y;
+
+                float distSq = dx*dx + dy*dy;
+
+                if (distSq < separationRadius * separationRadius)
+                {
+                    float dist = sqrt(distSq);
+
+                    if (dist > 0.0001f)
+                    {
+                        float overlap = separationRadius - dist;
+
+                        dx /= dist;
+                        dy /= dist;
+
+                        // push both away from each other
+                        a->pos.x += dx * overlap * separationForce * 0.5f;
+                        a->pos.y += dy * overlap * separationForce * 0.5f;
+
+                        b->pos.x -= dx * overlap * separationForce * 0.5f;
+                        b->pos.y -= dy * overlap * separationForce * 0.5f;
+                    }
+                }
+            }
+        }
 }
 
 
