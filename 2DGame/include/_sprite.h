@@ -53,6 +53,8 @@ class _sprite
         bool loop = true;
         bool animationFinished = false;
         int currentFrame = 0;
+        bool forceIdle = false;
+        int idleRow = 0;
 
 
         void setLoop(bool shouldLoop) { loop = shouldLoop; }

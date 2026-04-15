@@ -28,7 +28,8 @@ enum SceneState
     MENU_SCENE,
     GAME_SCENE,
     HELP_SCENE,
-    SETTINGS_SCENE
+    SETTINGS_SCENE,
+    SHOP_SCENE
 };
 class _Scene
 {
@@ -42,11 +43,13 @@ class _Scene
         _parallax *myPrlx = new _parallax();
         _skyBox *mySkyBox = new _skyBox();
         _sprite *mySprite = new _sprite();
+        _sprite *myShopKeeper = new _sprite();
         _enemies *enemySprite = new _enemies();
         _timer *myTime = new _timer();
         _timer *myWorldTime = new _timer();
         _camera *myCam = new _camera();
         _collisionCheck *myCollider = new _collisionCheck();
+        _collisionCheck *myCollider2 = new _collisionCheck();
         _menu *menu = new _menu();
         _page *help = new _page();
         _page *settings = new _page();
@@ -55,6 +58,9 @@ class _Scene
         _sprite *myTorch = new _sprite();
         _textureLoader *myTex = new _textureLoader();
         _textureLoader *myTex2 = new _textureLoader();
+        _textureLoader *shopF = new _textureLoader();
+        _textureLoader *shopW = new _textureLoader();
+        _textureLoader *myArrowTexture = new _textureLoader();
 
         _particleSystem* ashes = new _particleSystem();
 
@@ -122,6 +128,28 @@ class _Scene
         std::vector<_spawner*> spawners;
 
         int currentWave = 0;
+        bool levelComplete = false;
+
+        float doorX = 0.0f;
+        float doorY = 9.25f;
+        float doorWidth = 1.0f;
+        float doorHeight = 2.0f;
+        bool doorTriggerActive = false;
+        bool playerInsideDoor = false;
+        bool doorActivated = false;
+
+        float doorFadeTimer = 0.0f;
+        float doorFadeDuration = 1.0f;
+        bool doorFadeComplete = false;
+
+        bool fadingOut = false;
+        bool fadingIn = false;
+
+        float arrowX = 0.0f;
+        float arrowY = 0.0f;
+        float arrowHeightOffset = 0.0f;
+
+        bool canMove = true;
 
     private:
 };

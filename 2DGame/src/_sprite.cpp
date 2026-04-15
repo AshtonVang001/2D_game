@@ -72,21 +72,28 @@ void _sprite::spriteActions()
     float frameW = 1.0f / frames.x;
     float frameH = 1.0f / frames.y;
 
-    switch (actionTrigger)
+    if (forceIdle)
     {
-        case IDLE_F: row = 0;  break;
-        case IDLE_B: row = 1;  break;
-        case IDLE_L: row = 3;  break;
-        case IDLE_R: row = 2;  break;
-        case WALK_F: row = 4;  break;
-        case WALK_B: row = 5;  break;
-        case WALK_L: row = 7;  break;
-        case WALK_R: row = 6;  break;
-        case DASH_F: row = 8;  break;
-        case DASH_B: row = 9;  break;
-        case DASH_L: row = 11; break;
-        case DASH_R: row = 10; break;
-        default:     return;
+        row = idleRow;
+    }
+    else
+    {
+        switch (actionTrigger)
+        {
+            case IDLE_F: row = 0;  break;
+            case IDLE_B: row = 1;  break;
+            case IDLE_L: row = 3;  break;
+            case IDLE_R: row = 2;  break;
+            case WALK_F: row = 4;  break;
+            case WALK_B: row = 5;  break;
+            case WALK_L: row = 7;  break;
+            case WALK_R: row = 6;  break;
+            case DASH_F: row = 8;  break;
+            case DASH_B: row = 9;  break;
+            case DASH_L: row = 11; break;
+            case DASH_R: row = 10; break;
+            default: return;
+        }
     }
 
     if (animationFinished && !loop)

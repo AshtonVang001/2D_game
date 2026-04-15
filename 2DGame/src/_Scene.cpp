@@ -61,8 +61,19 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/newFloor.png");
     myTex2->loadTexture("images/newWalls.png");
+    shopF->loadTexture("images/shopFloor.png");
+    shopW->loadTexture("images/shopWall.png");
+
+    myArrowTexture->loadTexture("images/arrow.png");
 
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
+
+    myShopKeeper->spriteInit("images/shopKeeper.png", 4, 1);
+    myShopKeeper->forceIdle = true;
+    myShopKeeper->loop = true;
+    myShopKeeper->animationFinished = false;
+    myShopKeeper->currentFrame = 0;
+    myShopKeeper->idleRow = 0;
 
     myTorch->spriteInit("images/torchDemo.png", 4, 1);
 
@@ -72,6 +83,13 @@ void _Scene::initGL() {
         myTex2->width,
         myTex2->height,
         myTex2->channels
+    );
+
+    myCollider2->loadFromTexture(
+        shopW->image,
+        shopW->width,
+        shopW->height,
+        shopW->channels
     );
 
     SOIL_free_image_data(myTex2->image);
@@ -115,7 +133,7 @@ void _Scene::initGL() {
     ashes->init(150, mySprite->pos.x, mySprite->pos.y);
 
     spawners.push_back(new _spawner(5, 0.5f, 0.0f, 5.0f));   // wave 1
-    spawners.push_back(new _spawner(8, 0.3f, -3.0f, 5.0f));  // wave 2
+    spawners.push_back(new _spawner(8, 0.3f, 0.0f, -5.0f));  // wave 2
 
     myCam->camInit();
     currentScene = MENU_SCENE;
@@ -161,6 +179,8 @@ void _Scene::drawScene() {
         glMatrixMode(GL_MODELVIEW);
         glEnable(GL_DEPTH_TEST);
     }
+
+
     else if (currentScene == HELP_SCENE){
         //ShowCursor(TRUE);
         SetCursor(menuCursor);
@@ -182,6 +202,8 @@ void _Scene::drawScene() {
 
         glEnable(GL_DEPTH_TEST);
     }
+
+
     else if (currentScene == SETTINGS_SCENE){
         //ShowCursor(TRUE);
         SetCursor(menuCursor);
@@ -205,14 +227,187 @@ void _Scene::drawScene() {
     }
 
 
-    else if (currentScene == GAME_SCENE)
-    {
-    // ---- DRAW GAME ----
-    //ShowCursor(FALSE);
-    //SetCursor(gameCursor);
+    else if (currentScene == SHOP_SCENE) {
+    doorFadeTimer -= myTime->deltaTime;
+
+    if (doorFadeTimer < 0.0f)
+        doorFadeTimer = 0.0f;
+
+    float t = doorFadeTimer / doorFadeDuration;
+
+    // ---- Fade In ----
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, 0, height);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_TEXTURE_2D);
+
+    glColor4f(0, 0, 0, t);
+
+    glBegin(GL_QUADS);
+        glVertex2f(0, 0);
+        glVertex2f(width, 0);
+        glVertex2f(width, height);
+        glVertex2f(0, height);
+    glEnd();
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    //--------
+
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
+    ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
+
+    myInput->keyPressed(mySprite, smoothDT, myCollider2);
+    myInput->keyPressed(myCam, smoothDT);
+    myCam->setUpCamera();
+
+
+    //===========================================================================
+    // ---- World Textures ----
+    //===========================================================================
+    // ---- Layer 1 (floor) ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        shopF->bindTexture();
+        glColor3f(1,1,1);
+        glScalef(worldScale,-worldScale,1);
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f, 0.0f, 1.0f);
+            glTexCoord2f(0,0); glVertex3f(-8, -5.15, -8);
+            glTexCoord2f(1,0); glVertex3f( 8, -5.15, -8);
+            glTexCoord2f(1,1); glVertex3f( 8,  5.15, -8);
+            glTexCoord2f(0,1); glVertex3f(-8,  5.15, -8);
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Layer 2 (walls) ----
+    glPushMatrix();
+        glEnable(GL_ALPHA_TEST);
+        glAlphaFunc(GL_GREATER, 0.5f);
+
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glDepthMask(GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+
+        shopW->bindTexture();
+        glColor3f(1,1,1);
+        glScalef(worldScale,-worldScale,1);
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f, 0.0f, 1.0f);
+            glTexCoord2f(0,0); glVertex3f(-8, -5.15, -7.99);
+            glTexCoord2f(1,0); glVertex3f( 8, -5.15, -7.99);
+            glTexCoord2f(1,1); glVertex3f( 8,  5.15, -7.99);
+            glTexCoord2f(0,1); glVertex3f(-8,  5.15, -7.99);
+        glEnd();
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_ALPHA_TEST);
+    glPopMatrix();
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
+
+    //===========================================================================
+    // ---- Player ----
+    //===========================================================================
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(GL_FALSE);
+
+        mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, 0);
+
+        myShopKeeper->drawSprite(3, -0.75, 0);
+
+
+        for (auto& e : enemies)
+        {
+            if (e->health > 0)
+            {
+                e->drawSprite(e->pos.x, e->pos.y, 0);
+                e->drawDamageText();
+            }
+        }
+
+        ashes->draw();
+
+        if (myInput->showHitboxes)
+            drawGrid(0.5, 20);
+
+
+        // ---- Animation timing ----
+        int tickLimit = 100;
+        static float keeperTime = 0;
+        keeperTime += myTime->deltaTime * 1000;
+
+        if (myInput->isDashing)
+        {
+            tickLimit = 40;
+        }
+        else if (myInput->isMoving)
+        {
+            tickLimit = 60;
+        }
+
+        if (myTime->getTicks() > tickLimit)
+        {
+            mySprite->spriteActions();
+            for (auto& e : enemies)
+            {
+                e->spriteActions();
+            }
+            myTime->reset();
+        }
+
+        if (keeperTime > 120)
+        {
+            myShopKeeper->spriteActions();
+            keeperTime = 0;
+        }
+
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
+
+
+    }
+
+
+    else if (currentScene == GAME_SCENE)
+    {
+
+    // ---- DRAW GAME ----
+    static float smoothDT = 0.16f;
+    smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
     flickerTimer += myTime->deltaTime * 5.5f;   // speed of flicker
 
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
@@ -297,7 +492,7 @@ void _Scene::drawScene() {
                 }
             }
         }
-}
+    }
 
 
     //===========================================================================
@@ -509,6 +704,52 @@ void _Scene::drawScene() {
         ashes->draw();
 
 
+        // ---- Level Complete Arrow ----
+        if (levelComplete)
+        {
+            float targetX = 0.0f;
+            float targetY = 10.0f;
+
+            float px = mySprite->pos.x;
+            float py = mySprite->pos.y;
+
+            float dx = targetX - px;
+            float dy = targetY - py;
+
+            float angle = atan2(dy, dx) * 180.0f / 3.14159f;
+
+            float offsetY = arrowHeightOffset;
+
+            glPushMatrix();
+                glTranslatef(px, py + offsetY, -0.5f);
+                glRotatef(angle, 0.0f, 0.0f, 1.0f);
+
+                glEnable(GL_TEXTURE_2D);
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                myArrowTexture->bindTexture();
+                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+                glScalef(0.6, 0.6, 1);
+
+                float w = 1.5f;
+                float h = 0.5f;
+
+                glBegin(GL_QUADS);
+                    glTexCoord2f(0,1); glVertex3f(-w, -h, 0);
+                    glTexCoord2f(1,1); glVertex3f(-w,  h, 0);
+                    glTexCoord2f(1,0); glVertex3f( w,  h, 0);
+                    glTexCoord2f(0,0); glVertex3f( w, -h, 0);
+                glEnd();
+
+                glDisable(GL_TEXTURE_2D);
+                glDisable(GL_BLEND);
+
+            glPopMatrix();
+        }
+
+
         // ---- Player Attack Trigger ----
         // ---- Trigger Logic ----
         float fx = 0.0f;
@@ -587,6 +828,35 @@ void _Scene::drawScene() {
         //--------
 
 
+
+        // ---- DOOR TRIGGER ----
+        doorTriggerActive = levelComplete;
+        if (doorTriggerActive)
+        {
+            float halfW = doorWidth * 0.5f;
+            float halfH = doorHeight * 0.5f;
+
+            bool inside =
+                (mySprite->pos.x >= doorX - halfW &&
+                 mySprite->pos.x <= doorX + halfW &&
+                 mySprite->pos.y >= doorY - halfH &&
+                 mySprite->pos.y <= doorY + halfH);
+
+            // enter event (only once per entry)
+            if (inside && !playerInsideDoor)
+            {
+                printf("test\n");
+            }
+
+            playerInsideDoor = inside;
+        }
+        else
+        {
+            playerInsideDoor = false;
+        }
+
+
+
         // ---- Draw Debug Triggers ----
         if (myInput->showHitboxes) {
             drawGrid(0.5, 20);
@@ -640,6 +910,26 @@ void _Scene::drawScene() {
                 glEnd();
                 //--------
             }
+
+
+            // ---- DOOR TRIGGER DEBUG VISUAL ----
+            float halfW = doorWidth * 0.5f;
+            float halfH = doorHeight * 0.5f;
+
+            glDisable(GL_TEXTURE_2D);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            glColor4f(0.0f, 0.8f, 1.0f, 0.3f);
+
+            glBegin(GL_QUADS);
+                glVertex3f(doorX - halfW, doorY - halfH, -0.01f);
+                glVertex3f(doorX + halfW, doorY - halfH, -0.01f);
+                glVertex3f(doorX + halfW, doorY + halfH, -0.01f);
+                glVertex3f(doorX - halfW, doorY + halfH, -0.01f);
+            glEnd();
+
+            glDisable(GL_BLEND);
         }
 
         if (!myInput->isDashing)
@@ -712,24 +1002,46 @@ void _Scene::drawScene() {
     //moved to loop
     // --------
     // ---- SPAWNER SYSTEM ----
-    if (currentWave < spawners.size())
+    if (!levelComplete)
     {
-        spawners[currentWave]->update(myTime->deltaTime, enemies, myCollider);
-
-        bool allDead = true;
-
-        for (auto& e : enemies)
+        if (currentWave < spawners.size())
         {
-            if (e->health > 0)
+            spawners[currentWave]->update(myTime->deltaTime, enemies, myCollider);
+
+            bool allDead = true;
+
+            for (auto& e : enemies)
             {
-                allDead = false;
-                break;
+                if (e->health > 0)
+                {
+                    allDead = false;
+                    break;
+                }
+            }
+
+            if (spawners[currentWave]->isFinished() && allDead)
+            {
+                currentWave++;
             }
         }
-
-        if (spawners[currentWave]->isFinished() && allDead)
+        else
         {
-            currentWave++;
+            // All waves completed AND no more spawners left
+            bool allDead = true;
+
+            for (auto& e : enemies)
+            {
+                if (e->health > 0)
+                {
+                    allDead = false;
+                    break;
+                }
+            }
+
+            if (allDead)
+            {
+                levelComplete = true;
+            }
         }
     }
     // --------
@@ -1129,6 +1441,81 @@ void _Scene::drawScene() {
     //===========================================================================
     //===========================================================================
     }
+
+
+
+    // ---- Fade after level ends ----
+
+    if (playerInsideDoor && !doorActivated)
+    {
+        doorActivated = true;
+    }
+
+    if (playerInsideDoor && !doorActivated)
+{
+    doorActivated = true;
+    canMove = false;
+}
+
+    if (doorActivated && currentScene == GAME_SCENE)
+    {
+        doorFadeTimer += myTime->deltaTime;
+
+        if (doorFadeTimer >= doorFadeDuration)
+        {
+            doorFadeTimer = doorFadeDuration;
+            currentScene = SHOP_SCENE;
+            doorFadeTimer = doorFadeDuration;
+            canMove = true;
+
+            mySprite->pos.x = 0;
+            mySprite->pos.y = 0;
+        }
+    }
+
+    else if (!doorActivated)
+    {
+        doorFadeTimer -= myTime->deltaTime;
+
+        if (doorFadeTimer < 0.0f)
+            doorFadeTimer = 0.0f;
+    }
+
+    float t = doorFadeTimer / doorFadeDuration;
+    if (t > 1.0f) t = 1.0f;
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, 0, height);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_TEXTURE_2D);
+
+    glColor4f(0, 0, 0, t);
+
+    glBegin(GL_QUADS);
+        glVertex2f(0, 0);
+        glVertex2f(width, 0);
+        glVertex2f(width, height);
+        glVertex2f(0, height);
+    glEnd();
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    //--------
+
 }
 
 int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1152,7 +1539,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
 
         // ---- Only send input to game when in game scene ----
-        if (currentScene == GAME_SCENE)
+        if (/*currentScene == (GAME_SCENE || SHOP_SCENE) && */canMove)
         {
             myInput->wParam = wParam;
             myInput->keys[wParam] = true;
@@ -1165,7 +1552,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
         {
-            if(currentScene == GAME_SCENE)
+            if(currentScene == GAME_SCENE || SHOP_SCENE)
             {
                 int mouseX = LOWORD(lParam);
                 int mouseY = HIWORD(lParam);
@@ -1251,21 +1638,30 @@ void _Scene::drawGrid(float step, float range)
 {
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_LIGHTING);
-    glColor4f(1.0f, 1.0f, 1.0f, 0.15f);
     glLineWidth(1.0f);
 
     glBegin(GL_LINES);
 
-    // vertical lines
     for (float x = -range; x <= range; x += step)
     {
+        // X-axis (vertical lines)
+        if (fabs(x) < 0.0001f)
+            glColor4f(0.0f, 0.0f, 1.0f, 0.6f); // Y-axis line (blue when x=0)
+        else
+            glColor4f(1.0f, 1.0f, 1.0f, 0.15f);
+
         glVertex3f(x, -range, -0.02f);
         glVertex3f(x,  range, -0.02f);
     }
 
-    // horizontal lines
     for (float y = -range; y <= range; y += step)
     {
+        // Y-axis (horizontal line)
+        if (fabs(y) < 0.0001f)
+            glColor4f(1.0f, 0.0f, 0.0f, 0.6f); // X-axis line (red when y=0)
+        else
+            glColor4f(1.0f, 1.0f, 1.0f, 0.15f);
+
         glVertex3f(-range, y, -0.02f);
         glVertex3f( range, y, -0.02f);
     }
