@@ -245,13 +245,13 @@ void _Scene::drawScene() {
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
         myTex->bindTexture();
         glColor3f(1,1,1);
-        glScalef(3,-3,1);
+        glScalef(worldScale,-worldScale,1);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, 0.0f, 1.0f);
-            glTexCoord2f(0,0); glVertex3f(-8, -3.2, -8);
-            glTexCoord2f(1,0); glVertex3f( 8, -3.2, -8);
-            glTexCoord2f(1,1); glVertex3f( 8,  3.2, -8);
-            glTexCoord2f(0,1); glVertex3f(-8,  3.2, -8);
+            glTexCoord2f(0,0); glVertex3f(-8, -5.15, -8);
+            glTexCoord2f(1,0); glVertex3f( 8, -5.15, -8);
+            glTexCoord2f(1,1); glVertex3f( 8,  5.15, -8);
+            glTexCoord2f(0,1); glVertex3f(-8,  5.15, -8);
         glEnd();
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
@@ -270,13 +270,13 @@ void _Scene::drawScene() {
 
         myTex2->bindTexture();
         glColor3f(1,1,1);
-        glScalef(1,-1,1);
+        glScalef(worldScale,-worldScale,1);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, 0.0f, 1.0f);
-            glTexCoord2f(0,0); glVertex3f(-8*3, -3.2*3, -7.99);
-            glTexCoord2f(1,0); glVertex3f( 8*3, -3.2*3, -7.99);
-            glTexCoord2f(1,1); glVertex3f( 8*3,  3.2*3, -7.99);
-            glTexCoord2f(0,1); glVertex3f(-8*3,  3.2*3, -7.99);
+            glTexCoord2f(0,0); glVertex3f(-8, -5.15, -7.99);
+            glTexCoord2f(1,0); glVertex3f( 8, -5.15, -7.99);
+            glTexCoord2f(1,1); glVertex3f( 8,  5.15, -7.99);
+            glTexCoord2f(0,1); glVertex3f(-8,  5.15, -7.99);
         glEnd();
 
         glDisable(GL_BLEND);
@@ -291,8 +291,11 @@ void _Scene::drawScene() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glScalef(0.6f, 0.6f, 1);
-        myTorch->drawSprite(0.45, 1.2, -1);
+        glPushMatrix();
+            glTranslatef(2.6f, 4.5f, -1.0f);
+            glScalef(0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
 
         if (myWorldTime->getTicks() > 100)
         {
@@ -304,14 +307,105 @@ void _Scene::drawScene() {
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 
-    // ---- Layer 3 (torch sprites) ----
+    // ---- Second Torch ----
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glScalef(-0.6f, 0.6f, 1);
-        myTorch->drawSprite(8.0, -3.5, -1);
+        glPushMatrix();
+            glTranslatef(-2.6f, 4.5f, -1.0f);
+            glScalef(-0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Third Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(2.6f, -6.0f, -1.0f);
+            glScalef(0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Fourth Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(-2.6f, -6.0f, -1.0f);
+            glScalef(-0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Fifth Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(14.9f, -0.7f, -1.0f);
+            glScalef(0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Sixth Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(-14.9f, -0.7f, -1.0f);
+            glScalef(-0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
 
         if (myWorldTime->getTicks() > 100)
         {
@@ -338,6 +432,7 @@ void _Scene::drawScene() {
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, 0);
 
+
         for (auto& e : enemies)
         {
             if (e->health > 0)
@@ -346,6 +441,8 @@ void _Scene::drawScene() {
                 e->drawDamageText();
             }
         }
+
+        ashes->draw();
 
 
         // ---- Player Attack Trigger ----
@@ -428,6 +525,8 @@ void _Scene::drawScene() {
 
         // ---- Draw Debug Triggers ----
         if (myInput->showHitboxes) {
+            drawGrid(0.5, 20);
+
             // ---- Draw Attack Trigger
             glDisable(GL_TEXTURE_2D);
             glEnable(GL_BLEND);
@@ -484,6 +583,7 @@ void _Scene::drawScene() {
 
         glPopMatrix();
         //--------
+
 
 
         // ---- Enemy / Player Collision ----
@@ -581,13 +681,13 @@ void _Scene::drawScene() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glDisable(GL_TEXTURE_2D);
-    glColor4f(0.0f, 0.0f, 0.0f, 0.20f);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.25f);
 
     glBegin(GL_QUADS);
-        glVertex3f(-20, -20, 0);
-        glVertex3f( 20, -20, 0);
-        glVertex3f( 20,  20, 0);
-        glVertex3f(-20,  20, 0);
+        glVertex3f(-200, -200, 0);
+        glVertex3f( 200, -200, 0);
+        glVertex3f( 200,  200, 0);
+        glVertex3f(-200,  200, 0);
     glEnd();
 
 
@@ -608,10 +708,11 @@ void _Scene::drawScene() {
 
     //---- light circle ----
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    float offset = 0.1;
 
-    radius = 2.0f;
-    cx = 0.30f;
-    cy = 0.9f;
+
+    cx = 2.6f;
+    cy = 4.5f + offset;
 
     glBegin(GL_TRIANGLE_FAN);
     glColor4f(r, g, b, alphaFlicker);
@@ -630,8 +731,8 @@ void _Scene::drawScene() {
 
 
     // ---- Second Light ----
-    cx = -4.85f;
-    cy = -2.0f;
+    cx = -2.6f;
+    cy = 4.5f + offset;
 
     glBegin(GL_TRIANGLE_FAN);
     glColor4f(r, g, b, alphaFlicker);
@@ -647,6 +748,164 @@ void _Scene::drawScene() {
         glVertex3f(x, y, 0);
     }
     glEnd();
+
+    // ---- Third Light ----
+    cx = 2.6f;
+    cy = -6.0f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Fourth Light ----
+    cx = -2.6f;
+    cy = -6.0f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Fifth Light ----
+    cx = 14.9f;
+    cy = -0.7f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Sixth Light ----
+    cx = -14.9f;
+    cy = -0.7f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+
+
+
+    // ---- GARGOYLE LIGHTS ----
+    cx = 1.18;
+    cy = 10.15;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker/2);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker/3;
+        y = cy + sin(angle) * radiusFlicker/3;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Second Gargoyle light ----
+    cx = -1.18;
+    cy = 10.15;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker/2);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker/3;
+        y = cy + sin(angle) * radiusFlicker/3;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+
+    // ---- Third Gargoyle light ----
+    cx = 8.3;
+    cy = 3.63;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker/2);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker/3;
+        y = cy + sin(angle) * radiusFlicker/3;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Fourth Gargoyle light ----
+    cx = -8.3;
+    cy = 3.63;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker/2);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker/3;
+        y = cy + sin(angle) * radiusFlicker/3;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+
 
 
     glDisable(GL_BLEND);
@@ -870,8 +1129,6 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         ShowCursor(TRUE);
                     }
                 }
-
-                cout << "X: " << mouseX << " Y: " << mouseY << endl;
             }
         if (currentScene == MENU_SCENE)
         {
@@ -923,4 +1180,31 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     }
     return 0;
+}
+
+
+void _Scene::drawGrid(float step, float range)
+{
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_LIGHTING);
+    glColor4f(1.0f, 1.0f, 1.0f, 0.15f);
+    glLineWidth(1.0f);
+
+    glBegin(GL_LINES);
+
+    // vertical lines
+    for (float x = -range; x <= range; x += step)
+    {
+        glVertex3f(x, -range, -0.02f);
+        glVertex3f(x,  range, -0.02f);
+    }
+
+    // horizontal lines
+    for (float y = -range; y <= range; y += step)
+    {
+        glVertex3f(-range, y, -0.02f);
+        glVertex3f( range, y, -0.02f);
+    }
+
+    glEnd();
 }

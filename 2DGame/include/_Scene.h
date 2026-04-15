@@ -64,6 +64,7 @@ class _Scene
         void initGL();
         void drawScene();
         int winMsg(HWND, UINT, WPARAM, LPARAM);
+        void drawGrid(float step, float range);
 
         int width, height;
 

@@ -65,7 +65,6 @@ class _inputs
 
         float colliderX;
         float colliderY;
-        float scale;
 
     protected:
 

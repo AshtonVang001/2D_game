@@ -48,5 +48,9 @@ typedef struct{
 
 } col4;
 
+const float imgRatioX = 8;          //2912
+const float imgRatioY = 5.015;      //1824
+const float worldScale = 4.5;
+
 
 #endif // _COMMON_H

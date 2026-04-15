@@ -3,6 +3,7 @@
 
 #include<_sprite.h>
 #include<_collisionCheck.h>
+#include<_common.h>
 
 
 class _enemies : public _sprite
@@ -29,6 +30,9 @@ class _enemies : public _sprite
         int damageValue = 0;
         float damageTimer = 0.0f;
         float damageOffsetY = 0.0f;
+
+        float colliderX;
+        float colliderY;
 
     protected:
 

@@ -8,9 +8,8 @@ _inputs::_inputs()
     //isScalingActive = false;
     lastDirection = _sprite::IDLE_F;
 
-    scale = 3.0;
-    colliderX = 8.0 * scale;
-    colliderY = 3.2 * scale;
+    colliderX = imgRatioX * worldScale;
+    colliderY = imgRatioY * worldScale;
 
 }
 

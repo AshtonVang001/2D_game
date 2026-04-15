@@ -6,6 +6,9 @@ _enemies::_enemies()
     moveSpeed = 1.5f;
     radius = 0.2f;
     footOffset = 0.1f;
+
+    colliderX = imgRatioX * worldScale;
+    colliderY = imgRatioY * worldScale;
 }
 
 _enemies::~_enemies()
@@ -50,11 +53,11 @@ void _enemies::enemyMovement(vec3 playerPos, float deltaTime)
         float botY   = (pos.y + footOffset) - radius;
 
         // Convert to UV
-        float uLeft  = (leftX + 8.0f) / 16.0f;
-        float uRight = (rightX + 8.0f) / 16.0f;
+        float uLeft  = (leftX + colliderX) / (colliderX*2);
+        float uRight = (rightX + colliderX) / (colliderX*2);
 
-        float vTop = 1.0f - ((topY + 3.2f) / 6.4f);
-        float vBot = 1.0f - ((botY + 3.2f) / 6.4f);
+        float vTop = 1.0f - ((topY + colliderY) / (colliderY*2));
+        float vBot = 1.0f - ((botY + colliderY) / (colliderY*2));
 
         if (!collisionMap->isSolidUV(uLeft, vTop)  &&
             !collisionMap->isSolidUV(uLeft, vBot)  &&
@@ -70,11 +73,11 @@ void _enemies::enemyMovement(vec3 playerPos, float deltaTime)
         topY = (newY + footOffset) + radius;
         botY = (newY + footOffset) - radius;
 
-        uLeft  = (leftX + 8.0f) / 16.0f;
-        uRight = (rightX + 8.0f) / 16.0f;
+        uLeft  = (leftX + colliderX) / (colliderX*2);
+        uRight = (rightX + colliderX) / (colliderX*2);
 
-        vTop = 1.0f - ((topY + 3.2f) / 6.4f);
-        vBot = 1.0f - ((botY + 3.2f) / 6.4f);
+        vTop = 1.0f - ((topY + colliderY) / (colliderY*2));
+        vBot = 1.0f - ((botY + colliderY) / (colliderY*2));
 
         if (!collisionMap->isSolidUV(uLeft, vTop)  &&
             !collisionMap->isSolidUV(uLeft, vBot)  &&
