@@ -157,6 +157,11 @@ void _Scene::drawScene() {
     myWorldTime->updateDeltaTime();
     //ShowCursor(FALSE);
 
+
+
+
+
+
     if (currentScene == MENU_SCENE)
     {
         // ---- DRAW MENU ----
@@ -179,6 +184,11 @@ void _Scene::drawScene() {
         glMatrixMode(GL_MODELVIEW);
         glEnable(GL_DEPTH_TEST);
     }
+
+
+
+
+
 
 
     else if (currentScene == HELP_SCENE){
@@ -204,6 +214,12 @@ void _Scene::drawScene() {
     }
 
 
+
+
+
+
+
+
     else if (currentScene == SETTINGS_SCENE){
         //ShowCursor(TRUE);
         SetCursor(menuCursor);
@@ -227,6 +243,14 @@ void _Scene::drawScene() {
     }
 
 
+
+
+
+
+
+    //===========================================================================
+    // ---- SHOP SCENE ----
+    //===========================================================================
     else if (currentScene == SHOP_SCENE) {
 
     static float smoothDT = 0.16f;
@@ -290,6 +314,29 @@ void _Scene::drawScene() {
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_ALPHA_TEST);
     glPopMatrix();
+
+
+    // ---- Layer 3 (torch sprites) ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(1.85f, 1.5f, -1.0f);
+            glScalef(0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
     //===========================================================================
     //===========================================================================
     //===========================================================================
@@ -306,7 +353,11 @@ void _Scene::drawScene() {
 
         mySprite->drawSprite(mySprite->pos.x, mySprite->pos.y, 0);
 
-        myShopKeeper->drawSprite(3, -0.75, 0);
+        glPushMatrix();
+            glTranslatef(3.0f, -0.75f, 0.0f);
+            glScalef(1.1f, 1.1f, 1.0f);
+            myShopKeeper->drawSprite(0, 0, 0);
+        glPopMatrix();
 
 
         for (auto& e : enemies)
@@ -348,7 +399,7 @@ void _Scene::drawScene() {
             myTime->reset();
         }
 
-        if (keeperTime > 120)
+        if (keeperTime > 150)
         {
             myShopKeeper->spriteActions();
             keeperTime = 0;
@@ -384,12 +435,14 @@ void _Scene::drawScene() {
         myFade->fadeDuration = 1.0;
         myFade->fadeTimer = 0.0;
         myFade->fadeComplete = false;
+        myFade->fadeInOnEnter = false;
     }
 
     playerInsideDoor = inside;
 
     if (shopDoorActivated && currentScene == SHOP_SCENE)
     {
+        canMove = false;
         myFade->fadeOut(myTime->deltaTime);
 
         if (myFade->fadeComplete) {
@@ -404,12 +457,36 @@ void _Scene::drawScene() {
             myFade->fadeTimer = 1.0;
             myFade->fadeInOnEnter = true;
 
+            canMove = true;
+
             currentScene = GAME_SCENE;
         }
 
     }
 
+    // ---- SHOP TRIGGER ----
+    float halfSize = 0.5f;
 
+    bool shopInside =
+        (mySprite->pos.x >= shopX - halfSize &&
+         mySprite->pos.x <= shopX + halfSize &&
+         mySprite->pos.y >= shopY - halfSize &&
+         mySprite->pos.y <= shopY + halfSize);
+
+    // enter event (fires once)
+    if (shopInside && !playerInsideShop)
+    {
+        shopActivated = true;
+        canMove = false;
+    }
+
+    playerInsideShop = shopInside;
+
+
+
+
+
+    // ---- DRAW TRIGGERS ----
     if (myInput->showHitboxes) {
         // ---- DOOR TRIGGER DEBUG VISUAL ----
         glDisable(GL_TEXTURE_2D);
@@ -426,13 +503,125 @@ void _Scene::drawScene() {
         glEnd();
 
         glDisable(GL_BLEND);
+
+
+        // ---- SHOP TRIGGER VISUAL ----
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glColor4f(1.0f, 0.5f, 0.0f, 0.3f); // orange-ish
+
+        glBegin(GL_QUADS);
+            glVertex3f(shopX - halfSize, shopY - halfSize, -0.01f);
+            glVertex3f(shopX + halfSize, shopY - halfSize, -0.01f);
+            glVertex3f(shopX + halfSize, shopY + halfSize, -0.01f);
+            glVertex3f(shopX - halfSize, shopY + halfSize, -0.01f);
+        glEnd();
+
+        glDisable(GL_BLEND);
     }
     //===========================================================================
     //===========================================================================
     //===========================================================================
+
+
+    //===========================================================================
+    // ---- Torch Lighting Pipeline ----
+    //===========================================================================
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+
+
+    // ---- Darken Screen ----
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.25f);
+
+    glBegin(GL_QUADS);
+        glVertex3f(-200, -200, 0);
+        glVertex3f( 200, -200, 0);
+        glVertex3f( 200,  200, 0);
+        glVertex3f(-200,  200, 0);
+    glEnd();
+
+
+    // ---- Torch Parameters ----
+    float r = torchColors[currentColor][0] * (1.0f - flickerTimer) + torchColors[nextColor][0] * flickerTimer;
+    float g = torchColors[currentColor][1] * (1.0f - flickerTimer) + torchColors[nextColor][1] * flickerTimer;
+    float b = torchColors[currentColor][2] * (1.0f - flickerTimer) + torchColors[nextColor][2] * flickerTimer;
+
+    flickerTime += myTime->deltaTime * flickerSpeed;
+
+    float flicker =
+        sin(flickerTime * 2.0f) * 0.10f +
+        sin(flickerTime * 5.0f) * 0.05f;
+
+    float radiusFlicker = 1.3f + flicker;
+    float alphaFlicker  = 0.5f + flicker * 0.4f;
+
+
+    //---- light circle ----
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    float offset = 0.1;
+
+
+    cx = 1.85f;
+    cy = 1.5f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
     }
+    glEnd();
 
 
+    // ---- FURNACE LIGHT ----
+    cx = 3.335;
+    cy = 0.3;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r * 1.3f, g * 0.4f, b * 0.2f, alphaFlicker/3);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker/3.5;
+        y = cy + sin(angle) * radiusFlicker/3.5;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
+    }
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
+
+
+
+
+
+
+    //===========================================================================
+    // ---- GAME SCENE ----
+    //===========================================================================
     else if (currentScene == GAME_SCENE)
     {
 
@@ -888,6 +1077,7 @@ void _Scene::drawScene() {
                 myFade->fadeDuration = 1.0;
                 myFade->fadeTimer = 0.0;
                 myFade->fadeComplete = false;
+                myFade->fadeInOnEnter = false;
             }
 
             playerInsideDoor = inside;
@@ -900,6 +1090,7 @@ void _Scene::drawScene() {
 
         if (doorActivated && currentScene == GAME_SCENE)
         {
+            canMove = false;
             myFade->fadeOut(myTime->deltaTime);
 
             if (myFade->fadeComplete) {
@@ -913,6 +1104,8 @@ void _Scene::drawScene() {
 
                 mySprite->pos.x = 0;
                 mySprite->pos.y = -3;
+
+                canMove = true;
 
                 currentScene = SHOP_SCENE;
             }
@@ -1503,6 +1696,13 @@ void _Scene::drawScene() {
     //===========================================================================
     //===========================================================================
     }
+    // ---- END GAME SCENE ----
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
+
+
 
     // ---- Fade after level ends ----
     myFade->draw(width, height);
@@ -1528,11 +1728,19 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
         }
 
+        if (wParam == VK_TAB) {
+            if (currentScene == SHOP_SCENE && shopActivated) {
+                canMove = true;
+                shopActivated = false;
+            }
+        }
+
         // ---- Only send input to game when in game scene ----
-        if (/*currentScene == (GAME_SCENE || SHOP_SCENE) && */canMove)
+        if (currentScene == GAME_SCENE || currentScene == SHOP_SCENE)
         {
             myInput->wParam = wParam;
-            myInput->keys[wParam] = true;
+            if (canMove)
+                myInput->keys[wParam] = true;
         }
         }
         break;
