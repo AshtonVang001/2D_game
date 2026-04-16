@@ -138,11 +138,11 @@ class _Scene
         float shopDoorY = 2.5f;
         float doorWidth = 1.0f;
         float doorHeight = 2.0f;
+
         bool doorTriggerActive = false;
         bool playerInsideDoor = false;
         bool doorActivated = false;
         bool shopDoorActivated = false;
-        bool returnToGame = false;
 
         float arrowX = 0.0f;
         float arrowY = 0.0f;

@@ -229,10 +229,6 @@ void _Scene::drawScene() {
 
     else if (currentScene == SHOP_SCENE) {
 
-    myFade->fadeIn(myTime->deltaTime);
-    myFade->draw(width, height);
-
-
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
@@ -242,6 +238,10 @@ void _Scene::drawScene() {
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
 
+    if (myFade->fadeInOnEnter)
+    {
+        myFade->fadeIn(myTime->deltaTime);
+    }
 
     //===========================================================================
     // ---- World Textures ----
@@ -380,30 +380,33 @@ void _Scene::drawScene() {
     if (inside && !playerInsideDoor)
     {
         shopDoorActivated = true;
+
+        myFade->fadeDuration = 1.0;
+        myFade->fadeTimer = 0.0;
+        myFade->fadeComplete = false;
     }
 
     playerInsideDoor = inside;
 
-    if (shopDoorActivated)
+    if (shopDoorActivated && currentScene == SHOP_SCENE)
     {
         myFade->fadeOut(myTime->deltaTime);
-        if (myFade->fadeComplete)
-        {
-            currentScene = GAME_SCENE;
 
-            myFade->fadeTimer = 0.0f;      // IMPORTANT: start from black
-            myFade->fadeComplete = false;
-
-            myFade->fadeInOnEnter = true;          // trigger fade-in
-
-            shopDoorActivated = false;
-            playerInsideDoor = false;
+        if (myFade->fadeComplete) {
             doorActivated = false;
             doorTriggerActive = false;
+            playerInsideDoor = false;
+            shopDoorActivated = false;
 
             mySprite->pos.x = 0;
-            mySprite->pos.y = -3.0f;
+            mySprite->pos.y = -3;
+
+            myFade->fadeTimer = 1.0;
+            myFade->fadeInOnEnter = true;
+
+            currentScene = GAME_SCENE;
         }
+
     }
 
 
@@ -444,11 +447,6 @@ void _Scene::drawScene() {
     if (myFade->fadeInOnEnter)
     {
         myFade->fadeIn(myTime->deltaTime);
-
-        if (myFade->fadeComplete)
-        {
-            myFade->fadeInOnEnter = false; // stop fading once done
-        }
     }
 
 
@@ -885,17 +883,40 @@ void _Scene::drawScene() {
             // enter event (only once per entry)
             if (inside && !playerInsideDoor)
             {
-                //printf("test\n");
-                returnToGame = true;
+                doorActivated = true;
+
+                myFade->fadeDuration = 1.0;
+                myFade->fadeTimer = 0.0;
+                myFade->fadeComplete = false;
             }
 
             playerInsideDoor = inside;
+
         }
-        else
-        {
+
+        else {
             playerInsideDoor = false;
         }
 
+        if (doorActivated && currentScene == GAME_SCENE)
+        {
+            myFade->fadeOut(myTime->deltaTime);
+
+            if (myFade->fadeComplete) {
+                doorActivated = false;
+                doorTriggerActive = false;
+                playerInsideDoor = false;
+                shopDoorActivated = false;
+
+                myFade->fadeTimer = 1.0;
+                myFade->fadeInOnEnter = true;
+
+                mySprite->pos.x = 0;
+                mySprite->pos.y = -3;
+
+                currentScene = SHOP_SCENE;
+            }
+        }
 
 
         // ---- Draw Debug Triggers ----
@@ -1483,38 +1504,7 @@ void _Scene::drawScene() {
     //===========================================================================
     }
 
-
-
     // ---- Fade after level ends ----
-
-    if (playerInsideDoor && !doorActivated)
-    {
-        doorActivated = true;
-        canMove = false;
-    }
-
-    if (doorActivated && currentScene == GAME_SCENE)
-    {
-        myFade->fadeOut(myTime->deltaTime);
-
-        if (myFade->fadeComplete)
-        {
-            currentScene = SHOP_SCENE;
-
-            myFade->fadeTimer = myFade->fadeDuration;
-            myFade->fadeComplete = false;
-
-            shopDoorActivated = false;
-            doorActivated = false;
-            playerInsideDoor = false;
-            doorTriggerActive = false;
-
-            canMove = true;
-            mySprite->pos.x = 0;
-            mySprite->pos.y = 0;
-        }
-    }
-
     myFade->draw(width, height);
 }
 

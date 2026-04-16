@@ -10,9 +10,9 @@ _fadeInOut::~_fadeInOut()
     //dtor
 }
 
-void _fadeInOut::fadeIn(float deltaTime)
+void _fadeInOut::fadeIn(float dt)
 {
-    fadeTimer -= deltaTime;
+    fadeTimer -= dt;
 
     if (fadeTimer <= 0.0f)
     {
@@ -21,11 +21,11 @@ void _fadeInOut::fadeIn(float deltaTime)
     }
 }
 
-void _fadeInOut::fadeOut(float deltaTime)
+void _fadeInOut::fadeOut(float dt)
 {
-    fadeTimer += deltaTime;
+    fadeTimer += dt;
 
-    if (fadeTimer >= fadeDuration)
+    if (fadeTimer >= 1.0)
     {
         fadeTimer = fadeDuration;
         fadeComplete = true;
@@ -35,8 +35,11 @@ void _fadeInOut::fadeOut(float deltaTime)
 void _fadeInOut::draw(int width, int height)
 {
     float t = fadeTimer / fadeDuration;
+    t = glm::clamp(t, 0.0f, 1.0f);
 
     if (t <= 0.0f) return;
+
+    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -50,7 +53,6 @@ void _fadeInOut::draw(int width, int height)
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_TEXTURE_2D);
 
     glColor4f(0, 0, 0, t);
 
@@ -61,11 +63,9 @@ void _fadeInOut::draw(int width, int height)
         glVertex2f(0, height);
     glEnd();
 
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+
+    glPopAttrib();
 }
