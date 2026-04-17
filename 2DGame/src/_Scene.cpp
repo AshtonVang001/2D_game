@@ -1641,14 +1641,14 @@ void _Scene::drawScene() {
     glRasterPos2i(20, height - 40);
 
     // ---- Draw Text ----
-    char text[64];
-    sprintf(text, "FPS: %.0f", fps);
-    for (const char* c = text; *c; ++c)
-    {
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
-    }
-
     if (myInput->showHitboxes) {
+        char text[64];
+        sprintf(text, "FPS: %.0f", fps);
+        for (const char* c = text; *c; ++c)
+        {
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+        }
+
         char boolText[64];
         sprintf(boolText, "Can Attack: %s", currentlyInside ? "true" : "false");
         glRasterPos2i(20, height - 70);  // lower Y value = lower on screen
