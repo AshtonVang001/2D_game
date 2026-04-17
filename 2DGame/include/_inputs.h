@@ -59,6 +59,8 @@ class _inputs
         bool showHitboxes = false;
         bool bWasDown = false;
 
+        bool canMove = true;
+
 
         WPARAM wParam;
         LPARAM lParam;

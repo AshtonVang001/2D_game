@@ -29,25 +29,25 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
     // ---- Input (Disabled While Dashing) ----
     if (!isDashing)
     {
-        if (keys['W']) {
+        if (keys['W'] && canMove) {
             dy += 1;
             mySprite->actionTrigger = mySprite->WALK_B;
             lastDirection = mySprite->IDLE_B;
             isMoving = true;
         }
-        if (keys['S']) {
+        if (keys['S'] && canMove) {
             dy -= 1;
             mySprite->actionTrigger = mySprite->WALK_F;
             lastDirection = mySprite->IDLE_F;
             isMoving = true;
         }
-        if (keys['A']) {
+        if (keys['A'] && canMove) {
             dx -= 1;
             mySprite->actionTrigger = mySprite->WALK_L;
             lastDirection = mySprite->IDLE_L;
             isMoving = true;
         }
-        if (keys['D']) {
+        if (keys['D'] && canMove) {
             dx += 1;
             mySprite->actionTrigger = mySprite->WALK_R;
             lastDirection = mySprite->IDLE_R;

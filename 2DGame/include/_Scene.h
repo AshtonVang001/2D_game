@@ -21,6 +21,7 @@
 #include "_particleSystem.h"
 #include <_spawner.h>
 #include <_fadeInOut.h>
+#include <_shop.h>
 
 #include <algorithm>
 
@@ -61,12 +62,15 @@ class _Scene
         _textureLoader *myTex2 = new _textureLoader();
         _textureLoader *shopF = new _textureLoader();
         _textureLoader *shopW = new _textureLoader();
+        _textureLoader *shopUI = new _textureLoader();
         _textureLoader *myArrowTexture = new _textureLoader();
 
         _particleSystem* ashes = new _particleSystem();
         _fadeInOut* myFade = new _fadeInOut();
+        _shop* myShop = new _shop();
 
         SceneState currentScene;
+        SceneState lastScene;
 
         void reSizeScene(int width, int height);
         void initGL();
@@ -135,8 +139,8 @@ class _Scene
         float doorX = 0.0f;
         float doorY = 9.25f;
         float shopDoorX = 0.0f;
-        float shopDoorY = 2.5f;
-        float shopX = 2.0f;
+        float shopDoorY = 2.6f;
+        float shopX = 2.25f;
         float shopY = -0.75f;
 
         float doorWidth = 1.0f;
@@ -149,12 +153,13 @@ class _Scene
 
         bool shopActivated = false;
         bool playerInsideShop = false;
+        bool returnToGame = false;
 
         float arrowX = 0.0f;
         float arrowY = 0.0f;
         float arrowHeightOffset = 0.0f;
 
-        bool canMove = true;
+        //bool canMove = true;
 
     private:
 };

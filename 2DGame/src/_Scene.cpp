@@ -64,11 +64,13 @@ void _Scene::initGL() {
     shopF->loadTexture("images/shopFloor.png");
     shopW->loadTexture("images/shopWall.png");
 
+    myShop->initShop();
+
     myArrowTexture->loadTexture("images/arrow.png");
 
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
 
-    myShopKeeper->spriteInit("images/shopKeeper.png", 4, 1);
+    myShopKeeper->spriteInit("images/shopKeeper.png", 8, 1);
     myShopKeeper->forceIdle = true;
     myShopKeeper->loop = true;
     myShopKeeper->animationFinished = false;
@@ -137,6 +139,7 @@ void _Scene::initGL() {
 
     myCam->camInit();
     currentScene = MENU_SCENE;
+    lastScene = GAME_SCENE;
 }
 
 void _Scene::drawScene() {
@@ -355,7 +358,7 @@ void _Scene::drawScene() {
 
         glPushMatrix();
             glTranslatef(3.0f, -0.75f, 0.0f);
-            glScalef(1.1f, 1.1f, 1.0f);
+            glScalef(1.0f, 1.0f, 1.0f);
             myShopKeeper->drawSprite(0, 0, 0);
         glPopMatrix();
 
@@ -436,30 +439,59 @@ void _Scene::drawScene() {
         myFade->fadeTimer = 0.0;
         myFade->fadeComplete = false;
         myFade->fadeInOnEnter = false;
+
+        returnToGame = false;
     }
 
     playerInsideDoor = inside;
 
     if (shopDoorActivated && currentScene == SHOP_SCENE)
     {
-        canMove = false;
-        myFade->fadeOut(myTime->deltaTime);
+        myInput->canMove = false;
 
-        if (myFade->fadeComplete) {
-            doorActivated = false;
-            doorTriggerActive = false;
-            playerInsideDoor = false;
-            shopDoorActivated = false;
 
-            mySprite->pos.x = 0;
-            mySprite->pos.y = -3;
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, width, height, 0);
 
-            myFade->fadeTimer = 1.0;
-            myFade->fadeInOnEnter = true;
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
 
-            canMove = true;
+        glDisable(GL_DEPTH_TEST);
 
-            currentScene = GAME_SCENE;
+        myShop->drawExitPrompt(width, height);
+
+        glEnable(GL_DEPTH_TEST);
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+
+        glMatrixMode(GL_MODELVIEW);
+
+
+        if (returnToGame) {
+            myFade->fadeOut(myTime->deltaTime);
+
+            if (myFade->fadeComplete) {
+                doorActivated = false;
+                doorTriggerActive = false;
+                playerInsideDoor = false;
+                shopDoorActivated = false;
+
+                mySprite->pos.x = 0;
+                mySprite->pos.y = -3;
+
+                myFade->fadeTimer = 1.0;
+                myFade->fadeInOnEnter = true;
+
+                myInput->canMove = true;
+
+                lastScene = SHOP_SCENE;
+                currentScene = GAME_SCENE;
+            }
         }
 
     }
@@ -477,7 +509,7 @@ void _Scene::drawScene() {
     if (shopInside && !playerInsideShop)
     {
         shopActivated = true;
-        canMove = false;
+        myInput->canMove = false;
     }
 
     playerInsideShop = shopInside;
@@ -524,6 +556,38 @@ void _Scene::drawScene() {
     //===========================================================================
     //===========================================================================
     //===========================================================================
+
+
+    //===========================================================================
+    // ---- Handle Shop Logic ----
+    //===========================================================================
+    if (shopActivated)
+    {
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, width, height, 0);
+
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glDisable(GL_DEPTH_TEST);
+
+        myShop->drawShopUI(width, height);
+
+        glEnable(GL_DEPTH_TEST);
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+
+        glMatrixMode(GL_MODELVIEW);
+    }
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
 
 
     //===========================================================================
@@ -1090,7 +1154,7 @@ void _Scene::drawScene() {
 
         if (doorActivated && currentScene == GAME_SCENE)
         {
-            canMove = false;
+            myInput->canMove = false;
             myFade->fadeOut(myTime->deltaTime);
 
             if (myFade->fadeComplete) {
@@ -1105,8 +1169,9 @@ void _Scene::drawScene() {
                 mySprite->pos.x = 0;
                 mySprite->pos.y = -3;
 
-                canMove = true;
+                myInput->canMove = true;
 
+                lastScene = GAME_SCENE;
                 currentScene = SHOP_SCENE;
             }
         }
@@ -1728,9 +1793,26 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
         }
 
+        if (wParam == 'Y') {
+
+            if (currentScene == SHOP_SCENE && shopDoorActivated) {
+                myInput->canMove = true;
+                returnToGame = true;
+            }
+        }
+
+        if (wParam == 'N') {
+
+            if (currentScene == SHOP_SCENE && shopDoorActivated) {
+                myInput->canMove = true;
+                returnToGame = false;
+                shopDoorActivated = false;
+            }
+        }
+
         if (wParam == VK_TAB) {
             if (currentScene == SHOP_SCENE && shopActivated) {
-                canMove = true;
+                myInput->canMove = true;
                 shopActivated = false;
             }
         }
@@ -1739,8 +1821,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         if (currentScene == GAME_SCENE || currentScene == SHOP_SCENE)
         {
             myInput->wParam = wParam;
-            if (canMove)
-                myInput->keys[wParam] = true;
+            myInput->keys[wParam] = true;
         }
         }
         break;
@@ -1750,7 +1831,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
         {
-            if(currentScene == GAME_SCENE || SHOP_SCENE)
+            if(currentScene == GAME_SCENE || currentScene == SHOP_SCENE)
             {
                 int mouseX = LOWORD(lParam);
                 int mouseY = HIWORD(lParam);
@@ -1787,22 +1868,22 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
             ButtonAction action = menu->mouseClick(mouseX, mouseY);
 
-        if (action == ACTION_PLAY)
-        {
-            currentScene = GAME_SCENE;   // switch to parallax scene
-        }
-        else if (action == ACTION_HELP)
-        {
-            currentScene = HELP_SCENE;   // switch to help scene
-        }
-        else if (action == ACTION_SETTINGS)
-        {
-            currentScene = SETTINGS_SCENE;  //switch to settings
-        }
-        else if (action == ACTION_QUIT)
-        {
-            PostQuitMessage(0);
-        }
+            if (action == ACTION_PLAY)
+            {
+                currentScene = lastScene;   // switch to last scene
+            }
+            else if (action == ACTION_HELP)
+            {
+                currentScene = HELP_SCENE;   // switch to help scene
+            }
+            else if (action == ACTION_SETTINGS)
+            {
+                currentScene = SETTINGS_SCENE;  //switch to settings
+            }
+            else if (action == ACTION_QUIT)
+            {
+                PostQuitMessage(0);
+            }
         }
         }
         break;
