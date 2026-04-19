@@ -18,90 +18,116 @@ _enemies::~_enemies()
 
 void _enemies::enemyMovement(vec3 playerPos, float deltaTime)
 {
-    vec3 direction;
-    direction.x = playerPos.x - pos.x;
-    direction.y = playerPos.y - pos.y;
-    direction.z = 0.0f;
+    vec3 toPlayer;
+    toPlayer.x = playerPos.x - pos.x;
+    toPlayer.y = playerPos.y - pos.y;
 
-    float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
+    float dist = sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y);
 
-    if (distance > 0.1f)
+    if (dist < 0.1f) return;
+
+    toPlayer.x /= dist;
+    toPlayer.y /= dist;
+
+    // Candidate directions
+    glm::vec2 forward = glm::vec2(toPlayer.x, toPlayer.y);
+    glm::vec2 left    = glm::vec2(-forward.y, forward.x);
+    glm::vec2 right   = glm::vec2(forward.y, -forward.x);
+
+    // Bias toward forward but allow sliding
+    glm::vec2 directions[5] = {
+        forward,
+        (forward + left)  * 0.7f,
+        (forward + right) * 0.7f,
+        left,
+        right
+    };
+
+    bool moved = false;
+
+    for (int i = 0; i < 5; i++)
     {
-        direction.x /= distance;
-        direction.y /= distance;
+        glm::vec2 dir = directions[i];
 
-        float newX = pos.x + direction.x * moveSpeed * deltaTime;
-        float newY = pos.y + direction.y * moveSpeed * deltaTime;
+        float len = sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (len > 0.0001f)
+        {
+            dir /= len;
+        }
 
-        // ---- Player Collision ----
+        float newX = pos.x + dir.x * moveSpeed * deltaTime;
+        float newY = pos.y + dir.y * moveSpeed * deltaTime;
+
+        // Player collision check
         float dx = newX - playerPos.x;
         float dy = newY - playerPos.y;
 
         float combinedRadius = radius + playerRadius;
 
         if ((dx * dx + dy * dy) < (combinedRadius * combinedRadius))
-        {
-            return;  // too close — cancel movement entirely
-        }
-        //--------
+            continue;
 
-
-        // --- Try X movement ---
-        float leftX  = newX - radius;
-        float rightX = newX + radius;
-        float topY   = (pos.y + footOffset) + radius;
-        float botY   = (pos.y + footOffset) - radius;
-
-        // Convert to UV
-        float uLeft  = (leftX + colliderX) / (colliderX*2);
-        float uRight = (rightX + colliderX) / (colliderX*2);
-
-        float vTop = 1.0f - ((topY + colliderY) / (colliderY*2));
-        float vBot = 1.0f - ((botY + colliderY) / (colliderY*2));
-
-        if (!collisionMap->isSolidUV(uLeft, vTop)  &&
-            !collisionMap->isSolidUV(uLeft, vBot)  &&
-            !collisionMap->isSolidUV(uRight, vTop) &&
-            !collisionMap->isSolidUV(uRight, vBot))
+        if (canMoveTo(newX, newY))
         {
             pos.x = newX;
-        }
-
-        // --- Try Y movement ---
-        leftX  = pos.x - radius;
-        rightX = pos.x + radius;
-        topY = (newY + footOffset) + radius;
-        botY = (newY + footOffset) - radius;
-
-        uLeft  = (leftX + colliderX) / (colliderX*2);
-        uRight = (rightX + colliderX) / (colliderX*2);
-
-        vTop = 1.0f - ((topY + colliderY) / (colliderY*2));
-        vBot = 1.0f - ((botY + colliderY) / (colliderY*2));
-
-        if (!collisionMap->isSolidUV(uLeft, vTop)  &&
-            !collisionMap->isSolidUV(uLeft, vBot)  &&
-            !collisionMap->isSolidUV(uRight, vTop) &&
-            !collisionMap->isSolidUV(uRight, vBot))
-        {
             pos.y = newY;
-        }
+            moved = true;
 
+            // update facing
+            if (abs(dir.x) > abs(dir.y))
+                actionTrigger = (dir.x > 0) ? IDLE_R : IDLE_L;
+            else
+                actionTrigger = (dir.y > 0) ? IDLE_F : IDLE_B;
 
-        if (abs(direction.x) > abs(direction.y))
-        {
-            if (direction.x > 0)
-                actionTrigger = IDLE_R;
-            else
-                actionTrigger = IDLE_L;
+            break;
         }
-        else
-        {
-            if (direction.y > 0)
-                actionTrigger = IDLE_F;
-            else
-                actionTrigger = IDLE_B;
-        }
+        else{
+            if (canMoveTo(newX, pos.y))
+                pos.x = newX;
+
+            if (canMoveTo(pos.x, newY))
+                pos.y = newY;
+            }
+    }
+}
+bool _enemies::canMoveTo(float newX, float newY)
+{
+    float leftX  = newX - radius;
+    float rightX = newX + radius;
+    float topY   = (newY + footOffset) + radius;
+    float botY   = (newY + footOffset) - radius;
+
+    float uLeft  = (leftX + colliderX) / (colliderX * 2);
+    float uRight = (rightX + colliderX) / (colliderX * 2);
+
+    float vTop = 1.0f - ((topY + colliderY) / (colliderY * 2));
+    float vBot = 1.0f - ((botY + colliderY) / (colliderY * 2));
+
+    return !collisionMap->isSolidUV(uLeft, vTop)  &&
+           !collisionMap->isSolidUV(uLeft, vBot)  &&
+           !collisionMap->isSolidUV(uRight, vTop) &&
+           !collisionMap->isSolidUV(uRight, vBot);
+}
+
+void _enemies::resolveCollision()
+{
+    const float pushStep = 0.02f;
+    const int maxSteps = 10;
+
+    for (int i = 0; i < maxSteps; i++)
+    {
+        if (canMoveTo(pos.x, pos.y))
+            return;
+
+        // try small pushes in 4 directions
+        if (canMoveTo(pos.x + pushStep, pos.y))
+            pos.x += pushStep;
+        else if (canMoveTo(pos.x - pushStep, pos.y))
+            pos.x -= pushStep;
+        else if (canMoveTo(pos.x, pos.y + pushStep))
+            pos.y += pushStep;
+        else if (canMoveTo(pos.x, pos.y - pushStep))
+            pos.y -= pushStep;
     }
 }
 

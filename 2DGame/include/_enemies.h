@@ -15,6 +15,8 @@ class _enemies : public _sprite
         _collisionCheck* collisionMap;
 
         void enemyMovement(vec3 playerPos, float deltaTime);
+        bool canMoveTo(float, float);
+        void resolveCollision();
         void enemyHealth();
         void takeDamage(int dmg);
         void updateDamage(float deltaTime);

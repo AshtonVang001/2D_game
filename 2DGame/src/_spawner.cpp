@@ -40,11 +40,20 @@ void _spawner::update(float dt, std::vector<_enemies*>& enemies, _collisionCheck
         _enemies* e = new _enemies();
         e->spriteInit("images/characterRotate.png", 7, 4);
 
-        // small random spread so they don't stack
-        e->pos.x = spawnX + (rand() % 3 - 1);
-        e->pos.y = spawnY + (rand() % 3 - 1);
-
         e->collisionMap = map;
+
+        for (int tries = 0; tries < 10; tries++)
+        {
+            float x = spawnX + (rand() % 3 - 1);
+            float y = spawnY + (rand() % 3 - 1);
+
+            if (e->canMoveTo(x, y))
+            {
+                e->pos.x = x;
+                e->pos.y = y;
+                break;
+            }
+        }
 
         enemies.push_back(e);
         spawned++;

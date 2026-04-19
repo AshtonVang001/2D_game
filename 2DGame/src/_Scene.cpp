@@ -722,6 +722,7 @@ void _Scene::drawScene() {
     {
         e->enemyMovement(mySprite->pos, smoothDT);
         e->updateDamage(smoothDT);
+        e->resolveCollision();
     }
     /*bool enemyInCursorRange = false;
 
@@ -775,11 +776,28 @@ void _Scene::drawScene() {
                         dy /= dist;
 
                         // push both away from each other
-                        a->pos.x += dx * overlap * separationForce * 0.5f;
-                        a->pos.y += dy * overlap * separationForce * 0.5f;
+                        float pushX = dx * overlap * separationForce * 0.5f;
+                        float pushY = dy * overlap * separationForce * 0.5f;
 
-                        b->pos.x -= dx * overlap * separationForce * 0.5f;
-                        b->pos.y -= dy * overlap * separationForce * 0.5f;
+                        // Try move A
+                        float newAX = a->pos.x + pushX;
+                        float newAY = a->pos.y + pushY;
+
+                        if (a->canMoveTo(newAX, newAY))
+                        {
+                            a->pos.x = newAX;
+                            a->pos.y = newAY;
+                        }
+
+                        // Try move B
+                        float newBX = b->pos.x - pushX;
+                        float newBY = b->pos.y - pushY;
+
+                        if (b->canMoveTo(newBX, newBY))
+                        {
+                            b->pos.x = newBX;
+                            b->pos.y = newBY;
+                        }
                     }
                 }
             }
