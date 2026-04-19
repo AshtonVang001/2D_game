@@ -256,7 +256,7 @@ void _Scene::drawScene() {
     // ---- SHOP SCENE ----
     //===========================================================================
     else if (currentScene == SHOP_SCENE) {
-    SetCursor(shopCursor);
+    SetCursor(gameCursor);
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
