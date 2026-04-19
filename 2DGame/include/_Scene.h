@@ -127,6 +127,7 @@ class _Scene
         HCURSOR gameCursor;
         HCURSOR menuCursor;
         HCURSOR attackCursor;
+        HCURSOR shopCursor;
 
         HCURSOR currentCursor = nullptr;
 

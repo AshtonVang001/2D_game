@@ -54,6 +54,7 @@ void _Scene::initGL() {
     gameCursor = LoadCursorFromFileA("cursors/GAME.cur");
     menuCursor = LoadCursorFromFileA("cursors/MENU.ani");
     attackCursor = LoadCursorFromFileA("cursors/ENEMY.cur");
+    shopCursor = LoadCursorFromFileA("cursors/SHOP.ani");
 
     currentCursor = gameCursor;
     SetCursor(gameCursor);
@@ -255,7 +256,7 @@ void _Scene::drawScene() {
     // ---- SHOP SCENE ----
     //===========================================================================
     else if (currentScene == SHOP_SCENE) {
-
+    SetCursor(shopCursor);
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
@@ -693,7 +694,7 @@ void _Scene::drawScene() {
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
     flickerTimer += myTime->deltaTime * 5.5f;   // speed of flicker
-
+    //SetCursor(gameCursor);
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
 
 
@@ -712,7 +713,7 @@ void _Scene::drawScene() {
 
     if(!paused)
 {
-    //SetCursor(gameCursor);
+    SetCursor(gameCursor);
     myInput->keyPressed(mySprite, smoothDT, myCollider);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
@@ -722,7 +723,7 @@ void _Scene::drawScene() {
         e->enemyMovement(mySprite->pos, smoothDT);
         e->updateDamage(smoothDT);
     }
-    bool enemyInCursorRange = false;
+    /*bool enemyInCursorRange = false;
 
     float cursorRange = 1.5f; // tweak later
 
@@ -745,7 +746,7 @@ void _Scene::drawScene() {
     {
         currentCursor = desiredCursor;
         SetCursor(currentCursor);
-    }
+    }*/
     // ---- Enemy Separation ----
         float separationRadius = 0.8f;   // tweak this
         float separationForce  = 1.5f;   // tweak strength
@@ -1782,11 +1783,11 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             // ---- GLOBAL ESC HANDLER ----
         if (wParam == VK_ESCAPE)
         {
-            if (currentScene != MENU_SCENE)
+            if (currentScene == GAME_SCENE || currentScene == SHOP_SCENE)
             {
-                ShowCursor(TRUE);   // make sure cursor returns
-                currentScene = MENU_SCENE;
-                return 0;           // stop further processing
+                paused = !paused;
+                ShowCursor(TRUE);
+                return 0;
             }
             else if(currentScene == MENU_SCENE){
                 PostQuitMessage(0);
