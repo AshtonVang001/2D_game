@@ -162,6 +162,9 @@ class _Scene
 
         //bool canMove = true;
 
+        void drawPauseUI();
+        bool isPauseAllowed();
+
     private:
 };
 

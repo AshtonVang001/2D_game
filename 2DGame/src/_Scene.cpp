@@ -262,8 +262,10 @@ void _Scene::drawScene() {
 
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
 
+    if(!paused){
     myInput->keyPressed(mySprite, smoothDT, myCollider2);
     myInput->keyPressed(myCam, smoothDT);
+    }
     myCam->setUpCamera();
 
     if (myFade->fadeInOnEnter)
@@ -697,7 +699,6 @@ void _Scene::drawScene() {
     //SetCursor(gameCursor);
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
 
-
     if (myFade->fadeInOnEnter)
     {
         myFade->fadeIn(myTime->deltaTime);
@@ -712,7 +713,7 @@ void _Scene::drawScene() {
     }
 
     if(!paused)
-{
+    {
     SetCursor(gameCursor);
     myInput->keyPressed(mySprite, smoothDT, myCollider);
     myInput->keyPressed(myCam, smoothDT);
@@ -1697,64 +1698,6 @@ void _Scene::drawScene() {
 
     glDisable(GL_DEPTH_TEST);
 
-    // ---- Pause Button ----
-    glPushMatrix();
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        pauseButton.update();
-        pauseButton.draw();
-
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
-    glPopMatrix();
-
-    if(paused)
-    {
-        SetCursor(menuCursor);
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_TEXTURE_2D);
-        glColor4f(1,1,1,1);
-
-        // gray overlay
-        glDisable(GL_TEXTURE_2D);
-        glColor4f(0,0,0,0.6f);
-
-        glBegin(GL_QUADS);
-            glVertex2f(0,0);
-            glVertex2f(width,0);
-            glVertex2f(width,height);
-            glVertex2f(0,height);
-        glEnd();
-
-        // pause panel
-        glEnable(GL_TEXTURE_2D);
-        pausePanel.bindTexture();
-
-        float w = 400;
-        float h = 300;
-
-        float cx = width/2 - w/2;
-        float cy = height/2 - h/2;
-
-        glColor4f(1,1,1,1);
-
-        glBegin(GL_QUADS);
-            glTexCoord2f(0,0); glVertex2f(cx,cy);
-            glTexCoord2f(1,0); glVertex2f(cx+w,cy);
-            glTexCoord2f(1,1); glVertex2f(cx+w,cy+h);
-            glTexCoord2f(0,1); glVertex2f(cx,cy+h);
-        glEnd();
-
-        resumeButton.update();
-        resumeButton.draw();
-
-        quitPauseButton.update();
-        quitPauseButton.draw();
-    }
     enemies.erase(
         std::remove_if(enemies.begin(), enemies.end(),
             [](_enemies* e) { return e->health <= 0; }),
@@ -1786,10 +1729,82 @@ void _Scene::drawScene() {
     //===========================================================================
 
 
-
-
     // ---- Fade after level ends ----
     myFade->draw(width, height);
+
+    if (isPauseAllowed() && paused)
+    {
+        drawPauseUI();
+    }
+}
+
+void _Scene::drawPauseUI()
+{
+    SetCursor(menuCursor);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, height, 0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // ---- Dark overlay ----
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(0,0,0,0.6f);
+
+    glBegin(GL_QUADS);
+        glVertex2f(0,0);
+        glVertex2f(width,0);
+        glVertex2f(width,height);
+        glVertex2f(0,height);
+    glEnd();
+
+    // ---- Pause panel ----
+    glEnable(GL_TEXTURE_2D);
+    pausePanel.bindTexture();
+
+    float w = 400;
+    float h = 300;
+    float x = width/2 - w/2;
+    float y = height/2 - h/2;
+
+    glColor4f(1,1,1,1);
+
+    glBegin(GL_QUADS);
+        glTexCoord2f(0,0); glVertex2f(x,y);
+        glTexCoord2f(1,0); glVertex2f(x+w,y);
+        glTexCoord2f(1,1); glVertex2f(x+w,y+h);
+        glTexCoord2f(0,1); glVertex2f(x,y+h);
+    glEnd();
+
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(1,1,1,1);
+
+    // ---- Buttons ----
+    resumeButton.update();
+    resumeButton.draw();
+
+    quitPauseButton.update();
+    quitPauseButton.draw();
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+}
+
+bool _Scene::isPauseAllowed()
+{
+    return (currentScene == GAME_SCENE || currentScene == SHOP_SCENE);
 }
 
 int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1801,7 +1816,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             // ---- GLOBAL ESC HANDLER ----
         if (wParam == VK_ESCAPE)
         {
-            if (currentScene == GAME_SCENE || currentScene == SHOP_SCENE)
+            if (isPauseAllowed())
             {
                 paused = !paused;
                 ShowCursor(TRUE);

@@ -25,7 +25,11 @@ void _button::setButton(float x, float y, float w, float h, char* textureFile, B
 
 void _button::draw()
 {
-     glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(1,1,1,1);
+    glPushMatrix();
 
     glTranslatef(x + width / 2, y + height / 2, 0);
     glScalef(scale, scale, 1.0f);
