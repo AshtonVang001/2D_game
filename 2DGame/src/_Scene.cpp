@@ -62,6 +62,10 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/newFloor.png");
     myTex2->loadTexture("images/newWalls.png");
+    level2F->loadTexture("images/map Layer 1.png");
+    level2W->loadTexture("images/map Layer 2.png");
+    level3F->loadTexture("images/newFloor.png");
+    level3W->loadTexture("images/newWalls.png");
     shopF->loadTexture("images/shopFloor.png");
     shopW->loadTexture("images/shopWall.png");
 
@@ -93,6 +97,20 @@ void _Scene::initGL() {
         shopW->width,
         shopW->height,
         shopW->channels
+    );
+
+    myCollider3->loadFromTexture(
+        level2W->image,
+        level2W->width,
+        level2W->height,
+        level2W->channels
+    );
+
+    myCollider4->loadFromTexture(
+        level3W->image,
+        level3W->width,
+        level3W->height,
+        level3W->channels
     );
 
     SOIL_free_image_data(myTex2->image);
@@ -494,6 +512,8 @@ void _Scene::drawScene() {
 
                 lastScene = SHOP_SCENE;
                 currentScene = GAME_SCENE;
+
+                levelModifier += 1;
             }
         }
 
@@ -715,7 +735,9 @@ void _Scene::drawScene() {
     if(!paused)
     {
     SetCursor(gameCursor);
-    myInput->keyPressed(mySprite, smoothDT, myCollider);
+
+    if ((levelModifier-1) %3 >= 0)
+        myInput->keyPressed(mySprite, smoothDT, colliders[(levelModifier-1) %3]);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
 
@@ -813,7 +835,10 @@ void _Scene::drawScene() {
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        myTex->bindTexture();
+        if ((levelModifier-1) %3 >= 0)
+        {
+            texturesF[(levelModifier-1) %3]->bindTexture();
+        }
         glColor3f(1,1,1);
         glScalef(worldScale,-worldScale,1);
         glBegin(GL_QUADS);
@@ -838,7 +863,10 @@ void _Scene::drawScene() {
         glDepthMask(GL_TRUE);
         glEnable(GL_DEPTH_TEST);
 
-        myTex2->bindTexture();
+        if ((levelModifier-1) %3 >= 0)
+        {
+            texturesW[(levelModifier-1) %3]->bindTexture();
+        }
         glColor3f(1,1,1);
         glScalef(worldScale,-worldScale,1);
         glBegin(GL_QUADS);
@@ -856,6 +884,7 @@ void _Scene::drawScene() {
 
 
     // ---- Layer 3 (torch sprites) ----
+    if (levelModifier%3 == 1) {
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
@@ -986,6 +1015,7 @@ void _Scene::drawScene() {
         glDisable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
+    }
     //===========================================================================
     //===========================================================================
     //===========================================================================
@@ -1422,6 +1452,7 @@ void _Scene::drawScene() {
     float alphaFlicker  = 0.5f + flicker * 0.4f;
 
 
+    if (levelModifier%3 == 1) {
     //---- light circle ----
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     float offset = 0.1;
@@ -1621,7 +1652,7 @@ void _Scene::drawScene() {
     }
     glEnd();
 
-
+    }
 
 
     glDisable(GL_BLEND);

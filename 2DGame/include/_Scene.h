@@ -44,26 +44,53 @@ class _Scene
         _textureLoader *myTexture = new _textureLoader();
         _parallax *myPrlx = new _parallax();
         _skyBox *mySkyBox = new _skyBox();
-        _sprite *mySprite = new _sprite();
-        _sprite *myShopKeeper = new _sprite();
         _enemies *enemySprite = new _enemies();
         _timer *myTime = new _timer();
         _timer *myWorldTime = new _timer();
         _camera *myCam = new _camera();
-        _collisionCheck *myCollider = new _collisionCheck();
-        _collisionCheck *myCollider2 = new _collisionCheck();
         _menu *menu = new _menu();
         _page *help = new _page();
         _page *settings = new _page();
         _sounds *theSound = new _sounds();
 
+        _sprite *mySprite = new _sprite();
         _sprite *myTorch = new _sprite();
+        _sprite *myShopKeeper = new _sprite();
+
         _textureLoader *myTex = new _textureLoader();
         _textureLoader *myTex2 = new _textureLoader();
+        _textureLoader *level2F = new _textureLoader();
+        _textureLoader *level2W = new _textureLoader();
+        _textureLoader *level3F = new _textureLoader();
+        _textureLoader *level3W = new _textureLoader();
         _textureLoader *shopF = new _textureLoader();
         _textureLoader *shopW = new _textureLoader();
+
         _textureLoader *shopUI = new _textureLoader();
         _textureLoader *myArrowTexture = new _textureLoader();
+
+        _collisionCheck *myCollider = new _collisionCheck();
+        _collisionCheck *myCollider2 = new _collisionCheck();
+        _collisionCheck *myCollider3 = new _collisionCheck();
+        _collisionCheck *myCollider4 = new _collisionCheck();
+
+
+        _textureLoader* texturesF[3] = {
+            myTex,
+            level2F,
+            level3F
+        };
+        _textureLoader* texturesW[3] = {
+            myTex2,
+            level2W,
+            level3W
+        };
+
+        _collisionCheck* colliders[3] = {
+            myCollider,
+            myCollider3,
+            myCollider4
+        };
 
         _particleSystem* ashes = new _particleSystem();
         _fadeInOut* myFade = new _fadeInOut();
