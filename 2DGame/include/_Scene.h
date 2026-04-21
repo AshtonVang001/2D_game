@@ -104,6 +104,8 @@ class _Scene
         void drawScene();
         int winMsg(HWND, UINT, WPARAM, LPARAM);
         void drawGrid(float step, float range);
+        void triggerLevelText();
+        void resetLevel();
 
         int width, height;
 
@@ -191,6 +193,10 @@ class _Scene
 
         void drawPauseUI();
         bool isPauseAllowed();
+
+        bool showLevelText = false;
+        float levelTextTimer = 0.0f;
+        float levelTextDuration = 2.0f;
 
     private:
 };

@@ -22,7 +22,7 @@ class _enemies : public _sprite
         void updateDamage(float deltaTime);
         void drawDamageText();
 
-        float health = 30;
+        float health = 30 * pow(1.1f, levelModifier);;
         float moveSpeed;
         float radius;
         float footOffset;

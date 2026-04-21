@@ -62,10 +62,10 @@ void _Scene::initGL() {
 
     myTex->loadTexture("images/newFloor.png");
     myTex2->loadTexture("images/newWalls.png");
-    level2F->loadTexture("images/map Layer 1.png");
-    level2W->loadTexture("images/map Layer 2.png");
-    level3F->loadTexture("images/newFloor.png");
-    level3W->loadTexture("images/newWalls.png");
+    level2F->loadTexture("images/level2F.png");
+    level2W->loadTexture("images/level2W.png");
+    level3F->loadTexture("images/level3F.png");
+    level3W->loadTexture("images/level3W.png");
     shopF->loadTexture("images/shopFloor.png");
     shopW->loadTexture("images/shopWall.png");
 
@@ -514,6 +514,8 @@ void _Scene::drawScene() {
                 currentScene = GAME_SCENE;
 
                 levelModifier += 1;
+                triggerLevelText();
+                resetLevel();
             }
         }
 
@@ -740,6 +742,17 @@ void _Scene::drawScene() {
         myInput->keyPressed(mySprite, smoothDT, colliders[(levelModifier-1) %3]);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
+
+
+    if (showLevelText)
+    {
+        levelTextTimer += myTime->deltaTime;
+
+        if (levelTextTimer >= levelTextDuration)
+        {
+            showLevelText = false;
+        }
+    }
 
     for (auto& e : enemies)
     {
@@ -1692,6 +1705,47 @@ void _Scene::drawScene() {
     glRasterPos2i(20, height - 40);
 
     // ---- Draw Text ----
+    if (showLevelText) {
+        float t = levelTextTimer / levelTextDuration;
+        if (t > 1.0f) t = 1.0f;
+
+        float alpha = 1.0f - t;
+
+        char text[64];
+        sprintf(text, "LEVEL %d", levelModifier);
+
+        glPushAttrib(GL_ENABLE_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
+
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glLineWidth(2.5f);
+
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glTranslatef(width / 2.0f, height / 2.0f, 0);
+
+        // center text
+        float textWidth = 0;
+        for (const char* c = text; *c; ++c)
+            textWidth += glutStrokeWidth(GLUT_STROKE_ROMAN, *c);
+
+        glTranslatef(-textWidth / 2.0f, 0, 0);
+
+        glColor4f(1, 1, 1, alpha);
+
+        for (const char* c = text; *c; ++c)
+            glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+
+        glPopMatrix();
+        glPopAttrib();
+    }
+
+
     if (myInput->showHitboxes) {
         char text[64];
         sprintf(text, "FPS: %.0f", fps);
@@ -1936,6 +1990,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             if (action == ACTION_PLAY)
             {
                 currentScene = lastScene;   // switch to last scene
+                triggerLevelText();
             }
             else if (action == ACTION_HELP)
             {
@@ -2011,4 +2066,52 @@ void _Scene::drawGrid(float step, float range)
     }
 
     glEnd();
+}
+
+
+void _Scene::triggerLevelText()
+{
+    showLevelText = true;
+    levelTextTimer = 0.0f;
+}
+
+
+void _Scene::resetLevel()
+{
+    levelComplete = false;
+    currentWave = 0;
+
+    for (auto e : enemies)
+        delete e;
+
+    enemies.clear();
+
+    for (auto s : spawners)
+        delete s;
+
+    spawners.clear();
+    spawners.push_back(new _spawner(
+        (int)(5 * levelModifier),
+        0.5f,
+        0.0f,
+        5.0f
+    ));
+
+    spawners.push_back(new _spawner(
+        (int)(8 * levelModifier),
+        0.3f,
+        0.0f,
+        -5.0f
+    ));
+
+
+    doorActivated = false;
+    doorTriggerActive = false;
+    playerInsideDoor = false;
+    shopActivated = false;
+    shopDoorActivated = false;
+    playerInsideShop = false;
+    returnToGame = false;
+    arrowHeightOffset = 0.0f;
+    currentWave = 0;
 }
