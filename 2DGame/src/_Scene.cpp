@@ -1907,6 +1907,11 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 ShowCursor(TRUE);
                 return 0;
             }
+            else if (currentScene == HELP_SCENE || currentScene == SETTINGS_SCENE)
+            {
+                currentScene = MENU_SCENE;
+                ShowCursor(TRUE);
+            }
             else if(currentScene == MENU_SCENE){
                 PostQuitMessage(0);
             }
