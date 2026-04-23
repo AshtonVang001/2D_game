@@ -12,7 +12,8 @@ enum ButtonAction
     ACTION_HELP,
     ACTION_SETTINGS,
     ACTION_PAUSE,
-    ACTION_RESUME
+    ACTION_RESUME,
+    ACTION_HEALTHBOOST
 };
 
 class _button
