@@ -153,14 +153,50 @@ void _Scene::initGL() {
         ACTION_QUIT
     );
 
-    heartButton.setButton(
-        (width/2) + 30,
-        (height/2) + 50,
-        160,
-        160,
-        "images/heart.png",
-        ACTION_HEALTHBOOST
-        );
+    //----------SHOP BUTTONS-----------------//
+    shopButtons.clear();
+
+    // ---- Grid config ----
+    int cols = 4;
+    int rows = 2;
+
+    float btnW = 160;
+    float btnH = 160;
+    float spacingX = 65;        //adjust to space outward from middle
+    float spacingY = 120;
+
+    // total grid size (important for centering)
+    float totalWidth  = cols * btnW + (cols - 1) * spacingX;
+    float totalHeight = rows * btnH + (rows - 1) * spacingY;
+
+    // start position (top-left of grid)
+    float startX = (width  / 2.0f) - (totalWidth  / 2.0f);
+    float startY = (height / 2.0f) - (totalHeight / 2.0f);
+
+    // ---- Create buttons ----
+    for (int r = 0; r < rows; r++)
+    {
+        for (int c = 0; c < cols; c++)
+        {
+            float x = startX + c * (btnW + spacingX);
+            float y = startY + r * (btnH + spacingY);
+
+            _button btn;
+
+            // TEMP: assign textures/actions
+            if (r == 0 && c == 2) // your heart position (adjust if needed)
+            {
+                btn.setButton(x, y, btnW, btnH, "images/heart.png", ACTION_HEALTHBOOST);
+            }
+            else
+            {
+                btn.setButton(x, y, btnW, btnH, "images/tex2.jpg", ACTION_HEALTHBOOST);
+            }
+
+            shopButtons.push_back(btn);
+        }
+    }
+
 
     ashes->init(150, mySprite->pos.x, mySprite->pos.y);
 
@@ -638,7 +674,14 @@ void _Scene::drawScene() {
         myShop->drawShopUI2(width, height);
 
         if (!heartPurchased)
+            heartButton.update();
             heartButton.draw();
+
+        for (auto& btn : shopButtons)
+        {
+            btn.update();
+            btn.draw();
+        }
 
         glEnable(GL_DEPTH_TEST);
 
@@ -2126,6 +2169,16 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 myVideo->play(false);
                 heartPurchased = true;
             }
+            for (auto& btn : shopButtons)
+            {
+                if (btn.checkClick(mouseX, mouseY))
+                {
+                    // TEMP: reuse heart behavior
+                    playHeartVideo = true;
+                    myVideo->reset();
+                    myVideo->play(false);
+                }
+            }
         }
         }
         break;
@@ -2144,10 +2197,31 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     quitPauseButton.checkHover(mouseX, mouseY);
                 }
             }
+            // ---- SHOP UI ----
+            if(currentScene == SHOP_SCENE && isShopping)
+            {
+                int mouseX = LOWORD(lParam);
+                int mouseY = HIWORD(lParam);
+                heartButton.checkHover(mouseX, mouseY);
+
+                // your placeholder buttons
+                for (auto& btn : shopButtons)
+                {
+                    btn.checkHover(mouseX, mouseY);
+                }
+            }
         int mouseX = LOWORD(lParam);
         int mouseY = HIWORD(lParam);
 
         menu->mouseMove(mouseX, mouseY);
+
+        if (currentScene == SHOP_SCENE)
+        {
+            for (auto& btn : shopButtons)
+            {
+                btn.checkHover(mouseX, mouseY);
+            }
+        }
         }
         break;
     }

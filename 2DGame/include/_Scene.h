@@ -63,6 +63,7 @@ class _Scene
         _button quitPauseButton;
 
         _button heartButton;
+        _button testButton;
 
         _textureLoader pausePanel;
         _textureLoader *myTex = new _textureLoader();
@@ -167,6 +168,8 @@ class _Scene
 
         std::vector<_enemies*> enemies;
         std::vector<_spawner*> spawners;
+
+        std::vector<_button> shopButtons;
 
         int currentWave = 0;
         bool levelComplete = false;
