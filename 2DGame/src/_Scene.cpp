@@ -69,6 +69,8 @@ void _Scene::initGL() {
     shopF->loadTexture("images/shopFloor.png");
     shopW->loadTexture("images/shopWall.png");
 
+    myVideo->loadFrames("videos/heart", 40, 24.0f); // 60 frames @ 24fps
+
     myShop->initShop();
 
     myArrowTexture->loadTexture("images/arrow.png");
@@ -150,6 +152,15 @@ void _Scene::initGL() {
         "images/tex2.jpg",
         ACTION_QUIT
     );
+
+    heartButton.setButton(
+        (width/2) + 30,
+        (height/2) + 50,
+        160,
+        160,
+        "images/heart.png",
+        ACTION_HEALTHBOOST
+        );
 
     ashes->init(150, mySprite->pos.x, mySprite->pos.y);
 
@@ -279,6 +290,7 @@ void _Scene::drawScene() {
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
+    myVideo->update(myTime->deltaTime);
 
     if(!paused){
     myInput->keyPressed(mySprite, smoothDT, myCollider2);
@@ -609,6 +621,70 @@ void _Scene::drawScene() {
 
         glMatrixMode(GL_MODELVIEW);
     }
+
+    if (isShopping)
+    {
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, width, height, 0);
+
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glDisable(GL_DEPTH_TEST);
+
+        myShop->drawShopUI2(width, height);
+
+        if (!heartPurchased)
+            heartButton.draw();
+
+        glEnable(GL_DEPTH_TEST);
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+
+        glMatrixMode(GL_MODELVIEW);
+    }
+
+
+    if (playHeartVideo)
+    {
+        glDisable(GL_DEPTH_TEST);
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, width, height, 0);
+
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        float w = 1920;
+        float h = 1080;
+
+        float x = width/2 - w/2;
+        float y = height/2 - h/2;
+
+        myVideo->draw(x, y, w, h);
+
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+
+        glEnable(GL_DEPTH_TEST);
+    }
     //===========================================================================
     //===========================================================================
     //===========================================================================
@@ -651,6 +727,7 @@ void _Scene::drawScene() {
     float alphaFlicker  = 0.5f + flicker * 0.4f;
 
 
+    if (!isShopping) {
     //---- light circle ----
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     float offset = 0.1;
@@ -693,6 +770,7 @@ void _Scene::drawScene() {
         glVertex3f(x, y, 0);
     }
     glEnd();
+    }
     //===========================================================================
     //===========================================================================
     //===========================================================================
@@ -1899,6 +1977,9 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_KEYDOWN:
         {
             // ---- GLOBAL ESC HANDLER ----
+
+        if (!shopActivated && !isShopping) {
+
         if (wParam == VK_ESCAPE)
         {
             if (isPauseAllowed())
@@ -1916,8 +1997,34 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 PostQuitMessage(0);
             }
         }
+        }
+        else if (wParam == VK_ESCAPE && shopActivated) {
+            if (currentScene == SHOP_SCENE) {
+                myInput->canMove = true;
+                shopActivated = false;
+            }
+        }
+        else if (wParam == VK_ESCAPE && isShopping) {
+            if (currentScene == SHOP_SCENE) {
+                myInput->canMove = true;
+                isShopping = false;
+            }
+        }
 
-        if (wParam == 'Y') {
+
+        if (shopActivated) {
+            if (wParam == 'Y') {
+                isShopping = true;
+                shopActivated = false;
+            }
+
+            if (wParam == 'N') {
+                myInput->canMove = true;
+                shopActivated = false;
+            }
+        }
+
+        if (wParam == 'Y' && !shopActivated) {
 
             if (currentScene == SHOP_SCENE && shopDoorActivated) {
                 myInput->canMove = true;
@@ -1925,19 +2032,12 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
         }
 
-        if (wParam == 'N') {
+        if (wParam == 'N' && !shopActivated) {
 
             if (currentScene == SHOP_SCENE && shopDoorActivated) {
                 myInput->canMove = true;
                 returnToGame = false;
                 shopDoorActivated = false;
-            }
-        }
-
-        if (wParam == VK_TAB) {
-            if (currentScene == SHOP_SCENE && shopActivated) {
-                myInput->canMove = true;
-                shopActivated = false;
             }
         }
 
@@ -1947,6 +2047,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             myInput->wParam = wParam;
             myInput->keys[wParam] = true;
         }
+
         }
         break;
     case WM_KEYUP:
@@ -1984,6 +2085,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     }
                 }
             }
+
         if (currentScene == MENU_SCENE)
         {
             int mouseX = LOWORD(lParam);
@@ -2008,6 +2110,21 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             else if (action == ACTION_QUIT)
             {
                 PostQuitMessage(0);
+            }
+        }
+        else if (currentScene == SHOP_SCENE)
+        {
+            int mouseX = LOWORD(lParam);
+            int mouseY = HIWORD(lParam);
+
+            ButtonAction action = menu->mouseClick(mouseX, mouseY);
+
+            if (heartButton.checkClick(mouseX, mouseY))
+            {
+                playHeartVideo = true;
+                myVideo->reset();
+                myVideo->play(false);
+                heartPurchased = true;
             }
         }
         }

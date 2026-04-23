@@ -11,10 +11,12 @@ class _shop
         virtual ~_shop();
 
         _textureLoader* shopUI = new _textureLoader();
+        _textureLoader* shopUI2 = new _textureLoader();
         _textureLoader* exitPrompt = new _textureLoader();
 
         void initShop();
         void drawShopUI(float camX, float camY);
+        void drawShopUI2(float camX, float camY);
         void drawExitPrompt(float camX, float camY);
 
     protected:

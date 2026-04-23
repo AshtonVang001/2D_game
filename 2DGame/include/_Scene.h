@@ -22,6 +22,7 @@
 #include <_spawner.h>
 #include <_fadeInOut.h>
 #include <_shop.h>
+#include <_videoLoader.h>
 
 #include <algorithm>
 
@@ -57,6 +58,13 @@ class _Scene
         _sprite *myTorch = new _sprite();
         _sprite *myShopKeeper = new _sprite();
 
+        _button pauseButton;
+        _button resumeButton;
+        _button quitPauseButton;
+
+        _button heartButton;
+
+        _textureLoader pausePanel;
         _textureLoader *myTex = new _textureLoader();
         _textureLoader *myTex2 = new _textureLoader();
         _textureLoader *level2F = new _textureLoader();
@@ -95,6 +103,8 @@ class _Scene
         _particleSystem* ashes = new _particleSystem();
         _fadeInOut* myFade = new _fadeInOut();
         _shop* myShop = new _shop();
+
+        _videoLoader* myVideo = new _videoLoader();
 
         SceneState currentScene;
         SceneState lastScene;
@@ -141,11 +151,6 @@ class _Scene
 
         bool paused = false;
 
-        _button pauseButton;
-        _button resumeButton;
-        _button quitPauseButton;
-
-        _textureLoader pausePanel;
 
         // ---- Hitbox stuff ----
         bool enemyInside = false;
@@ -184,6 +189,7 @@ class _Scene
         bool shopActivated = false;
         bool playerInsideShop = false;
         bool returnToGame = false;
+        bool isShopping = false;
 
         float arrowX = 0.0f;
         float arrowY = 0.0f;
@@ -197,6 +203,9 @@ class _Scene
         bool showLevelText = false;
         float levelTextTimer = 0.0f;
         float levelTextDuration = 2.0f;
+
+        bool playHeartVideo = false;
+        bool heartPurchased = false;
 
     private:
 };
