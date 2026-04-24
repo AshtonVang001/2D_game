@@ -76,6 +76,7 @@ void _Scene::initGL() {
     myArrowTexture->loadTexture("images/arrow.png");
 
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
+    UICoin->spriteInit("images/coin.png", 8, 1);
 
     myShopKeeper->spriteInit("images/shopKeeper.png", 8, 1);
     myShopKeeper->forceIdle = true;
@@ -202,6 +203,9 @@ void _Scene::initGL() {
 
     spawners.push_back(new _spawner(5, 0.5f, 0.0f, 5.0f));   // wave 1
     spawners.push_back(new _spawner(8, 0.3f, 0.0f, -5.0f));  // wave 2
+
+    _coin* c = new _coin();
+    c->init();
 
     myCam->camInit();
     currentScene = MENU_SCENE;
@@ -818,6 +822,67 @@ void _Scene::drawScene() {
     //===========================================================================
     //===========================================================================
 
+
+    //===========================================================================
+    //---- TEXT ----
+    //===========================================================================
+
+
+    // ---- COIN UI ----
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, 0, height);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    // ---- Clean state ----
+    glDisable(GL_LIGHTING);
+    glDisable(GL_ALPHA_TEST);
+    glDisable(GL_DEPTH_TEST);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // ---- DRAW COIN ----
+    glEnable(GL_TEXTURE_2D);
+    glColor4f(1,1,1,1);
+
+    glPushMatrix();
+        glTranslatef(50, height - 50, 0);
+        glScalef(32, 32, 1);
+        UICoin->drawSprite(0, 0, 0);
+    glPopMatrix();
+
+    // ---- DRAW TEXT ----
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1,1,1);
+
+    char coinText[64];
+    sprintf(coinText, "%d", coinCount);
+
+    // slightly right of coin
+    glRasterPos2i(95, height - 58);
+
+    for (const char* c = coinText; *c; ++c)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+    }
+
+    // ---- Restore ----
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+    glMatrixMode(GL_MODELVIEW);
+
     }
     //===========================================================================
     //===========================================================================
@@ -841,6 +906,15 @@ void _Scene::drawScene() {
     flickerTimer += myTime->deltaTime * 5.5f;   // speed of flicker
     //SetCursor(gameCursor);
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
+
+    for (auto& c : coins)
+    {
+        c->update(
+            smoothDT,
+            mySprite->pos.x,
+            mySprite->pos.y
+        );
+    }
 
     if (myFade->fadeInOnEnter)
     {
@@ -1033,6 +1107,7 @@ void _Scene::drawScene() {
         if (myWorldTime->getTicks() > 100)
         {
             myTorch->spriteActions();
+            UICoin->spriteActions();
             myWorldTime->reset();
         }
 
@@ -1153,6 +1228,42 @@ void _Scene::drawScene() {
     //===========================================================================
     //===========================================================================
     //===========================================================================
+
+
+
+
+    //===========================================================================
+    //---- COINS ----
+    //===========================================================================
+    for (auto& c : coins)
+    {
+        c->draw();
+    }
+
+    for (auto it = coins.begin(); it != coins.end(); )
+    {
+        _coin* c = *it;
+
+        float dx = c->pos.x - mySprite->pos.x;
+        float dy = c->pos.y - mySprite->pos.y;
+
+        float distSq = dx*dx + dy*dy;
+
+        if (distSq < 0.5f * 0.5f) // pickup radius
+        {
+            coinCount += 1;
+            delete c;
+            it = coins.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    //===========================================================================
+    //===========================================================================
+    //===========================================================================
+
 
 
     //===========================================================================
@@ -1821,8 +1932,8 @@ void _Scene::drawScene() {
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
 
-    // ---- Color & Position ----
     glColor3f(1.0f, 1.0f, 1.0f);
+    // ---- Color & Position ----
     glRasterPos2i(20, height - 40);
 
     // ---- Draw Text ----
@@ -1892,6 +2003,38 @@ void _Scene::drawScene() {
         }
     }
 
+    // ---- COIN UI ----
+
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+
+    glColor3f(1,1,1);
+
+    glPushMatrix();
+        glTranslatef(50, height - 50, 0);
+        glScalef(32, 32, 1);
+        UICoin->drawSprite(0, 0, 0);
+    glPopMatrix();
+
+    glDisable(GL_TEXTURE_2D);
+    char coinText[64];
+    sprintf(coinText, "%d", coinCount);
+    glRasterPos2i(90, height - 50);
+
+    for (const char* c = coinText; *c; ++c)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+
     // ---- UI Projection (top-left origin like Windows mouse) ----
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -1904,11 +2047,44 @@ void _Scene::drawScene() {
 
     glDisable(GL_DEPTH_TEST);
 
+    /*
     enemies.erase(
         std::remove_if(enemies.begin(), enemies.end(),
             [](_enemies* e) { return e->health <= 0; }),
         enemies.end()
     );
+    */
+    for (auto it = enemies.begin(); it != enemies.end(); )
+    {
+        _enemies* e = *it;
+
+        if (e->health <= 0)
+        {
+            // ---- SPAWN COINS ----
+            int dropCount = rand() % 3 + 1; // 1–3 coins
+
+            for (int i = 0; i < dropCount; i++)
+            {
+                _coin* c = new _coin();
+
+                float offsetX = ((rand() % 100) / 100.0f - 0.5f) * 0.5f;
+                float offsetY = ((rand() % 100) / 100.0f - 0.5f) * 0.5f;
+
+                c->pos.x = e->pos.x + offsetX;
+                c->pos.y = e->pos.y + offsetY;
+
+                coins.push_back(c);
+            }
+
+            delete e;
+            it = enemies.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
 
     // ---- Restore matrices ----
     glMatrixMode(GL_PROJECTION);
@@ -2171,12 +2347,13 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             for (auto& btn : shopButtons)
             {
-                if (btn.checkClick(mouseX, mouseY))
+                if (btn.checkClick(mouseX, mouseY) && coinCount >= 20)
                 {
                     // TEMP: reuse heart behavior
                     playHeartVideo = true;
                     myVideo->reset();
                     myVideo->play(false);
+                    coinCount -= 20;
                 }
             }
         }

@@ -53,5 +53,6 @@ const float imgRatioY = 5.015;      //1824
 const float worldScale = 4.5;
 
 static int levelModifier = 1;
+static int coinCount = 0;
 
 #endif // _COMMON_H

@@ -23,6 +23,7 @@
 #include <_fadeInOut.h>
 #include <_shop.h>
 #include <_videoLoader.h>
+#include <_coin.h>
 
 #include <algorithm>
 
@@ -57,6 +58,7 @@ class _Scene
         _sprite *mySprite = new _sprite();
         _sprite *myTorch = new _sprite();
         _sprite *myShopKeeper = new _sprite();
+        _sprite *UICoin = new _sprite();
 
         _button pauseButton;
         _button resumeButton;
@@ -170,6 +172,8 @@ class _Scene
         std::vector<_spawner*> spawners;
 
         std::vector<_button> shopButtons;
+
+        vector<_coin*> coins;
 
         int currentWave = 0;
         bool levelComplete = false;
