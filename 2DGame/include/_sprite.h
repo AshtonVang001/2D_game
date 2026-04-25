@@ -56,6 +56,8 @@ class _sprite
         bool forceIdle = false;
         int idleRow = 0;
 
+        float scale = 1.0f;
+
 
         void setLoop(bool shouldLoop) { loop = shouldLoop; }
         bool isFinished() const { return animationFinished; }

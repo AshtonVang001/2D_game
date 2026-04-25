@@ -3,12 +3,13 @@
 
 #include <vector>
 #include <_enemies.h>
+#include <_boss.h>
 
 class _spawner
 {
     public:
         _spawner();
-        _spawner(int count, float delay, float x, float y);
+        _spawner(int count, float delay, float x, float y, bool boss);
         virtual ~_spawner();
 
         void update(float dt, std::vector<_enemies*>& enemies, _collisionCheck* map);
@@ -27,6 +28,8 @@ class _spawner
         float delay;
         float x;
         float y;
+
+        bool spawnBoss;
 
 
     protected:

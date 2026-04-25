@@ -43,6 +43,7 @@ void _sprite::drawSprite(float x, float y, float z)
 
     glPushMatrix();
         glTranslatef(x, y + pivotOffsetY, z);
+        glScalef(scale, scale, 1.0f);
         myTex->bindTexture();
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

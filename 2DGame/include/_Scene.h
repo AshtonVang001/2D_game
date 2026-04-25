@@ -24,6 +24,7 @@
 #include <_shop.h>
 #include <_videoLoader.h>
 #include <_coin.h>
+#include <_boss.h>
 
 #include <algorithm>
 
@@ -59,6 +60,8 @@ class _Scene
         _sprite *myTorch = new _sprite();
         _sprite *myShopKeeper = new _sprite();
         _sprite *UICoin = new _sprite();
+
+        _boss *myBoss = new _boss();
 
         _button pauseButton;
         _button resumeButton;

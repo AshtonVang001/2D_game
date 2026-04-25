@@ -201,11 +201,16 @@ void _Scene::initGL() {
 
     ashes->init(150, mySprite->pos.x, mySprite->pos.y);
 
-    spawners.push_back(new _spawner(5, 0.5f, 0.0f, 5.0f));   // wave 1
-    spawners.push_back(new _spawner(8, 0.3f, 0.0f, -5.0f));  // wave 2
+    spawners.push_back(new _spawner(5, 0.5f, 0.0f, 5.0f, false));   // wave 1
+    spawners.push_back(new _spawner(8, 0.3f, 0.0f, -5.0f, false));  // wave 2
+
+    if ((levelModifier % 3) == 0)
+        spawners.push_back(new _spawner(1, 0.5f, 0.0f, 5.0f, true));
 
     _coin* c = new _coin();
     c->init();
+
+    //myBoss->init();
 
     myCam->camInit();
     currentScene = MENU_SCENE;
@@ -434,16 +439,6 @@ void _Scene::drawScene() {
             glScalef(1.0f, 1.0f, 1.0f);
             myShopKeeper->drawSprite(0, 0, 0);
         glPopMatrix();
-
-
-        for (auto& e : enemies)
-        {
-            if (e->health > 0)
-            {
-                e->drawSprite(e->pos.x, e->pos.y, 0);
-                e->drawDamageText();
-            }
-        }
 
         ashes->draw();
 
@@ -1621,7 +1616,7 @@ void _Scene::drawScene() {
     {
         if (currentWave < spawners.size())
         {
-            spawners[currentWave]->update(myTime->deltaTime, enemies, myCollider);
+            spawners[currentWave]->update(myTime->deltaTime, enemies, colliders[(levelModifier-1) %3]);
 
             bool allDead = true;
 
@@ -1907,6 +1902,7 @@ void _Scene::drawScene() {
     //===========================================================================
 
 
+
     //===========================================================================
     // ---- Text ----
     //===========================================================================
@@ -2060,8 +2056,13 @@ void _Scene::drawScene() {
 
         if (e->health <= 0)
         {
+            int dropCount;
+
             // ---- SPAWN COINS ----
-            int dropCount = rand() % 3 + 1; // 1–3 coins
+            if ((levelModifier % 3) != 0)
+                dropCount = rand() % 3 + 1; // 1–3 coins
+            else if ((levelModifier % 3) == 0)
+                dropCount = rand() % 20 + 10; // 10–20 coins
 
             for (int i = 0; i < dropCount; i++)
             {
@@ -2463,19 +2464,27 @@ void _Scene::resetLevel()
         delete s;
 
     spawners.clear();
+
+    if ((levelModifier % 3) != 0) {
     spawners.push_back(new _spawner(
         (int)(5 * levelModifier),
         0.5f,
         0.0f,
-        5.0f
+        5.0f,
+        false
     ));
 
     spawners.push_back(new _spawner(
         (int)(8 * levelModifier),
         0.3f,
         0.0f,
-        -5.0f
+        -5.0f,
+        false
     ));
+    }
+    else if ((levelModifier % 3) == 0) {
+        spawners.push_back(new _spawner(1, 0.5f, 0.0f, 5.0f, true));
+    }
 
 
     doorActivated = false;

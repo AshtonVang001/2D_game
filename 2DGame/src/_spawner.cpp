@@ -11,12 +11,13 @@ _spawner::_spawner()
     spawned = 0;
     timer = 0.0f;
 }
-_spawner::_spawner(int count, float delay, float x, float y)
+_spawner::_spawner(int count, float delay, float x, float y, bool boss = false)
 {
     totalToSpawn = count;
     spawnDelay = delay;
     spawnX = x;
     spawnY = y;
+    spawnBoss = boss;
 
     spawned = 0;
     timer = 0.0f;
@@ -37,8 +38,17 @@ void _spawner::update(float dt, std::vector<_enemies*>& enemies, _collisionCheck
     {
         timer = 0.0f;
 
-        _enemies* e = new _enemies();
-        e->spriteInit("images/characterRotate.png", 7, 4);
+        _enemies* e;
+
+        if (spawnBoss) {
+            e = new _boss();
+            e->scale = 3.0f;
+            e->spriteInit("images/characterRotate.png", 7, 4);
+        }
+        else {
+            e = new _enemies();
+            e->spriteInit("images/characterRotate.png", 7, 4);
+        }
 
         e->collisionMap = map;
 
