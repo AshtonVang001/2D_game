@@ -123,6 +123,7 @@ void _Scene::initGL() {
     menu->init(width, height);
     help->init(width, height, "images/prlx.jpg");
     settings->init(width, height, "images/tex2.jpg");
+
     theSound->playSound("sounds/untitled.mp3");
 
     pausePanel.loadTexture("images/tex.jpg");
@@ -1247,6 +1248,7 @@ void _Scene::drawScene() {
         if (distSq < 0.5f * 0.5f) // pickup radius
         {
             coinCount += 1;
+            coinSnd->playSound("sounds/stud.mp3");
             delete c;
             it = coins.erase(it);
         }
@@ -1383,11 +1385,15 @@ void _Scene::drawScene() {
                 anyEnemyHit = true;
 
             // APPLY DAMAGE HERE
-            if (myInput->attackPressed && hit)
+            if (myInput->attackPressed && hit){
                 e->takeDamage(10);
+                hitSnd->playSound("sounds/sword.mp3");
+            }
 
-            if (myInput->dashAttack && distSq <= (radius * 0.4f))
+            if (myInput->dashAttack && distSq <= (radius * 0.4f)){
                 e->takeDamage(1);
+                swipeSnd->playSound("sounds/untitled.mp3");
+            }
         }
 
         currentlyInside = anyEnemyHit;

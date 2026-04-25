@@ -54,7 +54,11 @@ class _Scene
         _menu *menu = new _menu();
         _page *help = new _page();
         _page *settings = new _page();
+
         _sounds *theSound = new _sounds();
+        _sounds *hitSnd = new _sounds();
+        _sounds *swipeSnd = new _sounds();
+        _sounds *coinSnd = new _sounds();
 
         _sprite *mySprite = new _sprite();
         _sprite *myTorch = new _sprite();
