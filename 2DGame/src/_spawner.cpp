@@ -43,11 +43,11 @@ void _spawner::update(float dt, std::vector<_enemies*>& enemies, _collisionCheck
         if (spawnBoss) {
             e = new _boss();
             e->scale = 3.0f;
-            e->spriteInit("images/characterRotate.png", 7, 4);
+            e->spriteInit("images/skeleton.png", 7, 8);
         }
         else {
             e = new _enemies();
-            e->spriteInit("images/characterRotate.png", 7, 4);
+            e->spriteInit("images/skeleton.png", 7, 8);
         }
 
         e->collisionMap = map;

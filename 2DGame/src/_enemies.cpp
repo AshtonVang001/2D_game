@@ -75,9 +75,9 @@ void _enemies::enemyMovement(vec3 playerPos, float deltaTime)
 
             // update facing
             if (abs(dir.x) > abs(dir.y))
-                actionTrigger = (dir.x > 0) ? IDLE_R : IDLE_L;
+                actionTrigger = (dir.x > 0) ? WALK_L : WALK_R;
             else
-                actionTrigger = (dir.y > 0) ? IDLE_F : IDLE_B;
+                actionTrigger = (dir.y > 0) ? WALK_B : WALK_F;
 
             break;
         }
