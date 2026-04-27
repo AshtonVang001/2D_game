@@ -86,6 +86,7 @@ class _Scene
 
         _textureLoader *shopUI = new _textureLoader();
         _textureLoader *myArrowTexture = new _textureLoader();
+        _textureLoader *heartTex = new _textureLoader();
 
         _collisionCheck *myCollider = new _collisionCheck();
         _collisionCheck *myCollider2 = new _collisionCheck();
@@ -220,6 +221,9 @@ class _Scene
 
         bool playHeartVideo = false;
         bool heartPurchased = false;
+
+        float playerHealth = 10.0f;
+        float playerDamageCooldown = 0.0f;
 
     private:
 };
