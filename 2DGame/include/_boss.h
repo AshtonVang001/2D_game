@@ -1,6 +1,7 @@
 #pragma once
 #include "_enemies.h"
 #include <_sprite.h>
+#include <_common.h>
 
 class _boss : public _enemies
 {

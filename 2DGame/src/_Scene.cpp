@@ -203,11 +203,11 @@ void _Scene::initGL() {
 
     ashes->init(150, mySprite->pos.x, mySprite->pos.y);
 
-    spawners.push_back(new _spawner(5, 0.5f, 0.0f, 5.0f, false));   // wave 1
-    spawners.push_back(new _spawner(8, 0.3f, 0.0f, -5.0f, false));  // wave 2
+    spawners.push_back(new _spawner(5, 0.5f, 0.0f, 5.0f, false, levelModifier));   // wave 1
+    spawners.push_back(new _spawner(8, 0.3f, 0.0f, -5.0f, false, levelModifier));  // wave 2
 
     if ((levelModifier % 3) == 0)
-        spawners.push_back(new _spawner(1, 0.5f, 0.0f, 5.0f, true));
+        spawners.push_back(new _spawner(1, 0.5f, 0.0f, 5.0f, true, levelModifier));
 
     _coin* c = new _coin();
     c->init();
@@ -2554,7 +2554,8 @@ void _Scene::resetLevel()
         0.5f,
         0.0f,
         5.0f,
-        false
+        false,
+        levelModifier
     ));
 
     spawners.push_back(new _spawner(
@@ -2562,11 +2563,12 @@ void _Scene::resetLevel()
         0.3f,
         0.0f,
         -5.0f,
-        false
+        false,
+        levelModifier
     ));
     }
     else if ((levelModifier % 3) == 0) {
-        spawners.push_back(new _spawner(1, 0.5f, 0.0f, 5.0f, true));
+        spawners.push_back(new _spawner(1, 0.5f, 0.0f, 5.0f, true, levelModifier));
     }
 
 
