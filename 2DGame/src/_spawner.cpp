@@ -47,7 +47,7 @@ void _spawner::update(float dt, std::vector<_enemies*>& enemies, _collisionCheck
         }
         else {
             e = new _enemies();
-            e->spriteInit("images/skeleton.png", 7, 8);
+            e->spriteInit("images/phantoms.png", 6, 8);
         }
 
         e->collisionMap = map;
