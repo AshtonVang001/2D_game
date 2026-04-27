@@ -2533,7 +2533,7 @@ void _Scene::resetLevel()
 {
     playerHealth = 10.0f;
     playerDamageCooldown = 0.0f;
-    mySprite->pos = {0.0f, 0.0f, 0.0f};
+    mySprite->pos = {0.0f, -3.0f, 0.0f};
 
     levelComplete = false;
     currentWave = 0;
