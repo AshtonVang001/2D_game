@@ -74,6 +74,7 @@ void _Scene::initGL() {
     myShop->initShop();
 
     myArrowTexture->loadTexture("images/arrow.png");
+    heartTex->loadTexture("images/heart.png");
 
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
     UICoin->spriteInit("images/coin.png", 8, 1);
@@ -1557,6 +1558,7 @@ void _Scene::drawScene() {
 
 
         // ---- Enemy / Player Collision ----
+        bool enemyTouchingPlayer = false;
         for (auto& e : enemies)
         {
             float colDx = e->pos.x - mySprite->pos.x;
@@ -1567,6 +1569,7 @@ void _Scene::drawScene() {
 
             if (distanceSq < combinedRadius * combinedRadius)
             {
+                enemyTouchingPlayer = true;
                 float distance = sqrt(distanceSq);
 
                 if (distance > 0.0001f)
@@ -1579,6 +1582,19 @@ void _Scene::drawScene() {
                     e->pos.x += colDx * overlap;
                     e->pos.y += colDy * overlap;
                 }
+            }
+        }
+
+        playerDamageCooldown -= smoothDT;
+
+        if (enemyTouchingPlayer && playerDamageCooldown <= 0.0f)
+        {
+            playerHealth -= 0.5f;
+            playerDamageCooldown = 1.0f;
+
+            if (playerHealth <= 0.0f)
+            {
+                resetLevel();
             }
         }
 
@@ -2030,6 +2046,63 @@ void _Scene::drawScene() {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
     }
 
+    // ---- HEART HUD (top right) ----
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    heartTex->bindTexture();
+
+    const float heartSize  = 30.0f;
+    const float heartStep  = 32.0f;
+    float hStartX = (float)width  - 15.0f - 10.0f * heartStep;
+    float hY1     = (float)height - 65.0f;
+    float hY2     = (float)height - 35.0f;
+
+    for (int i = 0; i < 10; i++)
+    {
+        float hx = hStartX + i * heartStep;
+
+        float fill = playerHealth - (float)i;
+        if (fill < 0.0f) fill = 0.0f;
+        if (fill > 1.0f) fill = 1.0f;
+
+        // Empty / dark background heart
+        glColor4f(0.25f, 0.0f, 0.0f, 1.0f);
+        glBegin(GL_QUADS);
+            glTexCoord2f(0, 1); glVertex2f(hx,            hY1);
+            glTexCoord2f(1, 1); glVertex2f(hx + heartSize, hY1);
+            glTexCoord2f(1, 0); glVertex2f(hx + heartSize, hY2);
+            glTexCoord2f(0, 0); glVertex2f(hx,            hY2);
+        glEnd();
+
+        if (fill >= 1.0f)
+        {
+            // Full heart
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            glBegin(GL_QUADS);
+                glTexCoord2f(0, 1); glVertex2f(hx,            hY1);
+                glTexCoord2f(1, 1); glVertex2f(hx + heartSize, hY1);
+                glTexCoord2f(1, 0); glVertex2f(hx + heartSize, hY2);
+                glTexCoord2f(0, 0); glVertex2f(hx,            hY2);
+            glEnd();
+        }
+        else if (fill >= 0.5f)
+        {
+            // Half heart â€” draw left half of texture only
+            float halfW = heartSize * 0.5f;
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            glBegin(GL_QUADS);
+                glTexCoord2f(0,    1); glVertex2f(hx,          hY1);
+                glTexCoord2f(0.5f, 1); glVertex2f(hx + halfW,  hY1);
+                glTexCoord2f(0.5f, 0); glVertex2f(hx + halfW,  hY2);
+                glTexCoord2f(0,    0); glVertex2f(hx,          hY2);
+            glEnd();
+        }
+    }
+
+    glDisable(GL_TEXTURE_2D);
+
     glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
@@ -2066,9 +2139,9 @@ void _Scene::drawScene() {
 
             // ---- SPAWN COINS ----
             if ((levelModifier % 3) != 0)
-                dropCount = rand() % 3 + 1; // 1–3 coins
+                dropCount = rand() % 3 + 1; // 1ï¿½3 coins
             else if ((levelModifier % 3) == 0)
-                dropCount = rand() % 20 + 10; // 10–20 coins
+                dropCount = rand() % 20 + 10; // 10ï¿½20 coins
 
             for (int i = 0; i < dropCount; i++)
             {
@@ -2458,6 +2531,10 @@ void _Scene::triggerLevelText()
 
 void _Scene::resetLevel()
 {
+    playerHealth = 10.0f;
+    playerDamageCooldown = 0.0f;
+    mySprite->pos = {0.0f, 0.0f, 0.0f};
+
     levelComplete = false;
     currentWave = 0;
 
