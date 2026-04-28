@@ -191,11 +191,17 @@ void _Scene::initGL() {
             {
                 btn.setButton(x, y, btnW, btnH, "images/heart.png", ACTION_HEALTHBOOST);
             }
-            else if (r == 1 && c == 1)
+            else if (r == 1 && c == 1) //attack upgrage
             {
                 btn.setButton(x, y, btnW, btnH,
                               "images/attackIncrease.png",
                               ACTION_HEALTHBOOST);  //temp
+            }
+            else if (r == 1 && c == 2) // Armor Upgrade
+            {
+                btn.setButton(x, y, btnW, btnH,
+                              "images/armorIncrease.png",
+                              ACTION_HEALTHBOOST);
             }
             else
             {
