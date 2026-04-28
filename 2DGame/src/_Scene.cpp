@@ -1604,7 +1604,14 @@ void _Scene::drawScene() {
             {
                 playerHealth -= e->damage;//0.5f;
                 playerDamageCooldown = 1.0f;
-                myCam->startShake(0.1f, 0.1f);
+                if ((levelModifier %3) == 0) {
+                    myCam->startShake(0.3f, 0.3);
+                    damageFlashDuration = 0.5;
+                }
+                else {
+                    myCam->startShake(0.1f, 0.1f);
+                    damageFlashDuration = 0.2;
+                }
                 triggerDamageFlash();
                 break;
             }
