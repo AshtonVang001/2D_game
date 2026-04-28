@@ -5,6 +5,7 @@ _boss::_boss()
     moveSpeed = 1.0f;     // slower, heavier
     radius = 0.5f;        // bigger hitbox
     health = 200 + (25 * levelModifier);         // tanky
+    damage = 3;
 
     // different sprite
     spriteInit("images/CharacterRotate.png", 7, 4);

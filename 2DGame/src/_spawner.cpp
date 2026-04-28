@@ -11,6 +11,7 @@ _spawner::_spawner()
     spawned = 0;
     timer = 0.0f;
 
+    phantomSpawned = 0;
     waveInitialized = false;
 }
 _spawner::_spawner(int count, float delay, float x, float y, bool boss, int level)
@@ -35,18 +36,7 @@ void _spawner::update(float dt, std::vector<_enemies*>& enemies, _collisionCheck
     if (spawned >= totalToSpawn)
         return;
 
-    // Initialize wave once
-    if (!waveInitialized)
-    {
-        // +1 phantom every 2 levels starting from level 3
-        phantomCount = std::max(0, (localLevelModifier - 1) / 2);
-
-        // cap so it never dominates the wave
-        phantomCount = std::min(phantomCount, totalToSpawn / 2);
-
-        phantomSpawned = 0;
-        waveInitialized = true;
-    }
+    phantomCount = (int)(localLevelModifier/2);
 
     timer += dt;
 

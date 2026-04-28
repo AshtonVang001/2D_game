@@ -93,6 +93,8 @@ class _Scene
         _collisionCheck *myCollider3 = new _collisionCheck();
         _collisionCheck *myCollider4 = new _collisionCheck();
 
+        _spawner *mySpawner = new _spawner();
+
 
         _textureLoader* texturesF[3] = {
             myTex,
@@ -127,6 +129,8 @@ class _Scene
         void drawGrid(float step, float range);
         void triggerLevelText();
         void resetLevel();
+        void triggerDamageFlash();
+        void drawDamageFlash(int width, int height);
 
         int width, height;
 
@@ -224,6 +228,9 @@ class _Scene
 
         float playerHealth = 10.0f;
         float playerDamageCooldown = 0.0f;
+
+        float damageFlashTime = 0.0f;
+        float damageFlashDuration = 0.2f;
 
     private:
 };

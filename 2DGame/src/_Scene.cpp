@@ -903,6 +903,7 @@ void _Scene::drawScene() {
     flickerTimer += myTime->deltaTime * 5.5f;   // speed of flicker
     //SetCursor(gameCursor);
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
+    myCam->update(smoothDT);
 
     for (auto& c : coins)
     {
@@ -1585,17 +1586,33 @@ void _Scene::drawScene() {
             }
         }
 
+        if (damageFlashTime > 0.0f)
+        {
+            damageFlashTime -= smoothDT;
+
+            if (damageFlashTime < 0.0f)
+                damageFlashTime = 0.0f;
+        }
+
+        drawDamageFlash(width, height);
+
+
         playerDamageCooldown -= smoothDT;
 
-        if (enemyTouchingPlayer && playerDamageCooldown <= 0.0f)
-        {
-            playerHealth -= 0.5f;
-            playerDamageCooldown = 1.0f;
-
-            if (playerHealth <= 0.0f)
+        for (auto& e : enemies) {
+            if (enemyTouchingPlayer && playerDamageCooldown <= 0.0f)
             {
-                resetLevel();
+                playerHealth -= e->damage;//0.5f;
+                playerDamageCooldown = 1.0f;
+                myCam->startShake(0.1f, 0.1f);
+                triggerDamageFlash();
+                break;
             }
+        }
+
+        if (playerHealth <= 0.0f)
+        {
+            resetLevel();
         }
 
 
@@ -2534,6 +2551,7 @@ void _Scene::resetLevel()
     playerHealth = 10.0f;
     playerDamageCooldown = 0.0f;
     mySprite->pos = {0.0f, -3.0f, 0.0f};
+    mySpawner->phantomSpawned = 0;
 
     levelComplete = false;
     currentWave = 0;
@@ -2581,4 +2599,49 @@ void _Scene::resetLevel()
     returnToGame = false;
     arrowHeightOffset = 0.0f;
     currentWave = 0;
+}
+
+void _Scene::triggerDamageFlash()
+{
+    damageFlashTime = damageFlashDuration;
+}
+
+void _Scene::drawDamageFlash(int width, int height)
+{
+    if (damageFlashTime <= 0.0f)
+        return;
+
+    float alpha = damageFlashTime / damageFlashDuration; // fades out
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, height, 0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glColor4f(1.0f, 0.0f, 0.0f, alpha * 0.2f); // red, semi-transparent
+
+    glBegin(GL_QUADS);
+        glVertex2f(0, 0);
+        glVertex2f(width, 0);
+        glVertex2f(width, height);
+        glVertex2f(0, height);
+    glEnd();
+
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+    glMatrixMode(GL_MODELVIEW);
+
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
 }

@@ -70,5 +70,29 @@ void _camera::camMoveLtRt(int dir)
 
 void _camera::setUpCamera()
 {
-    gluLookAt(eye.x, eye.y, eye.z, des.x, des.y, des.z, up.x, up.y, up.z);
+    float offsetX = 0.0f;
+    float offsetY = 0.0f;
+
+    if (shakeTime > 0.0f)
+    {
+        offsetX = ((rand() % 100) / 100.0f - 0.5f) * shakeIntensity;
+        offsetY = ((rand() % 100) / 100.0f - 0.5f) * shakeIntensity;
+    }
+
+    gluLookAt(eye.x + offsetX, eye.y + offsetY, eye.z, des.x, des.y, des.z, up.x, up.y, up.z);
+}
+
+void _camera::startShake(float duration, float intensity)
+{
+    shakeDuration = duration;
+    shakeTime = duration;
+    shakeIntensity = intensity;
+}
+
+void _camera::update(float deltaTime)
+{
+    if (shakeTime > 0.0f)
+    {
+        shakeTime -= deltaTime;
+    }
 }

@@ -30,6 +30,13 @@ class _camera
 
         void setUpCamera();         //set camera using glulookat
 
+        void startShake(float duration, float intensity);
+        void update(float deltaTime);
+
+        float shakeTime = 0.0f;
+        float shakeDuration = 0.0f;
+        float shakeIntensity = 0.0f;
+
     protected:
 
     private:

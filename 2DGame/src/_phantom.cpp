@@ -2,13 +2,10 @@
 
 _phantom::_phantom()
 {
-    // Override base stats
-    moveSpeed = 2.5f;   // faster than normal enemy
-    health    = 60;     // weaker
-
-    radius = 0.18f;     // slightly smaller hitbox if you want
-
-    // sprite setup (you can also do this in spawner if you prefer)
+    moveSpeed = 2.5f;
+    health    = 20 * pow(1.1f, levelModifier);
+    radius = 0.18f;
+    damage = 0.5f;
     spriteInit("images/phantoms.png", 6, 8);
 }
 
