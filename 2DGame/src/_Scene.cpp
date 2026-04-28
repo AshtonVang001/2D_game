@@ -191,6 +191,12 @@ void _Scene::initGL() {
             {
                 btn.setButton(x, y, btnW, btnH, "images/heart.png", ACTION_HEALTHBOOST);
             }
+            else if (r == 1 && c == 1)
+            {
+                btn.setButton(x, y, btnW, btnH,
+                              "images/attackIncrease.png",
+                              ACTION_HEALTHBOOST);  //temp
+            }
             else
             {
                 btn.setButton(x, y, btnW, btnH, "images/tex2.jpg", ACTION_HEALTHBOOST);
