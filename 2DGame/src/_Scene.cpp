@@ -189,7 +189,19 @@ void _Scene::initGL() {
             // TEMP: assign textures/actions
             if (r == 0 && c == 2) // your heart position (adjust if needed)
             {
-                btn.setButton(x, y, btnW, btnH, "images/heart.png", ACTION_HEALTHBOOST);
+                btn.setButton(x, y, btnW, btnH, "images/heartIncrease.png", ACTION_HEALTHBOOST);
+            }
+            else if (r == 0 && c == 1) // Golden Heart
+            {
+                btn.setButton(x, y, btnW, btnH,
+                              "images/goldenHeart.png",
+                              ACTION_HEALTHBOOST); // placeholder
+            }
+            else if (r == 0 && c == 3) // Coin Increase
+            {
+                btn.setButton(x, y, btnW, btnH,
+                              "images/coinIncrease.png",
+                              ACTION_HEALTHBOOST);
             }
             else if (r == 1 && c == 1) //attack upgrage
             {
