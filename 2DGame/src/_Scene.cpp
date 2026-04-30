@@ -325,6 +325,11 @@ void _Scene::drawScene() {
 
 
     else if (currentScene == SETTINGS_SCENE){
+
+        if (!settingsMusicStarted) {
+            easterEgg->playSound("sounds/easterEgg.mp3");
+            settingsMusicStarted = true;
+        }
         //ShowCursor(TRUE);
         SetCursor(menuCursor);
         glDisable(GL_DEPTH_TEST);
@@ -2337,6 +2342,9 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             else if (currentScene == HELP_SCENE || currentScene == SETTINGS_SCENE)
             {
+                easterEgg->pauseSound("sounds/easterEgg.mp3");
+                settingsMusicStarted = false;
+
                 currentScene = MENU_SCENE;
                 ShowCursor(TRUE);
             }

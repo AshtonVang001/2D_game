@@ -43,8 +43,8 @@ void _menu::init(int screenWidth, int screenHeight)
                    "images/helpButton.png", ACTION_HELP);
 
 
-    settings.setButton(centerX + 700, centerY - 350, buttonWidth - 270, buttonHeight - 50,
-                   "images/settings.png", ACTION_SETTINGS);
+    settings.setButton(centerX + 790, centerY + 330, buttonWidth - 290, buttonHeight - 70,
+                   "images/tex2.jpg", ACTION_SETTINGS);
 
     buttons.clear();
     buttons.push_back(&play);

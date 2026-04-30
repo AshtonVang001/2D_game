@@ -56,6 +56,7 @@ class _Scene
         _page *settings = new _page();
 
         _sounds *theSound = new _sounds();
+        _sounds *easterEgg = new _sounds();
         _sounds *hitSnd = new _sounds();
         _sounds *swipeSnd = new _sounds();
         _sounds *coinSnd = new _sounds();
@@ -166,6 +167,8 @@ class _Scene
 
         bool paused = false;
 
+
+        bool settingsMusicStarted = false;
 
         // ---- Hitbox stuff ----
         bool enemyInside = false;
