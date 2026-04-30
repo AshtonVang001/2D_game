@@ -32,15 +32,15 @@ void _menu::init(int screenWidth, int screenHeight)
 
 
     play.setButton(centerX - 480, centerY - 110, buttonWidth, buttonHeight,
-                   "images/tex2.jpg", ACTION_PLAY);
+                   "images/playButton.png", ACTION_PLAY);
 
 
     quit.setButton(centerX - 480, centerY + 110, buttonWidth, buttonHeight,
-                   "images/tex2.jpg", ACTION_QUIT);
+                   "images/quitButton.png", ACTION_QUIT);
 
 
     help.setButton(centerX - 480, centerY , buttonWidth, buttonHeight,
-                   "images/tex2.jpg", ACTION_HELP);
+                   "images/helpButton.png", ACTION_HELP);
 
 
     settings.setButton(centerX + 700, centerY - 350, buttonWidth - 260, buttonHeight - 50,

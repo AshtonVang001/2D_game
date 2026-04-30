@@ -143,7 +143,7 @@ void _Scene::initGL() {
         height/2 - 40,
         200,
         60,
-        "images/tex2.jpg",
+        "images/resumeButton.png",
         ACTION_RESUME
     );
 
@@ -152,7 +152,7 @@ void _Scene::initGL() {
         height/2 + 40,
         200,
         60,
-        "images/tex2.jpg",
+        "images/menuButton.png",
         ACTION_QUIT
     );
 
@@ -2187,9 +2187,9 @@ void _Scene::drawScene() {
 
             // ---- SPAWN COINS ----
             if ((levelModifier % 3) != 0)
-                dropCount = rand() % 3 + 1; // 1�3 coins
+                dropCount = rand() % 3 + 1; // 1 3 coins
             else if ((levelModifier % 3) == 0)
-                dropCount = rand() % 20 + 10; // 10�20 coins
+                dropCount = rand() % 20 + 10; // 10 20 coins
 
             for (int i = 0; i < dropCount; i++)
             {
