@@ -127,7 +127,7 @@ void _Scene::initGL() {
 
     theSound->playSound("sounds/untitled.mp3");
 
-    pausePanel.loadTexture("images/tex.jpg");
+    pausePanel.loadTexture("images/pauseSplash.png");
 
     pauseButton.setButton(
         width - 90,   // top right corner
