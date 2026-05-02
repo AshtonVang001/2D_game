@@ -237,6 +237,24 @@ class _Scene
         float damageFlashTime = 0.0f;
         float damageFlashDuration = 0.2f;
 
+        //=========================================================
+        // player upgrade
+        void purchaseUpgrade(ButtonAction action);
+
+
+        int   healthLevel      = 0;
+        int   goldenHeartLevel = 0;
+        int   coinLevel        = 0;
+        int   vampireLevel     = 0;
+        int   attackLevel      = 0;
+        int   armorLevel       = 0;
+
+        float playerMaxHealth  = 10.0f;
+        float playerArmor      = 0.0f;
+        float playerAttack     = 10.0f;
+        float vampireHeal      = 0.0f;
+        float coinMultiplier   = 1.0f;
+
     private:
 };
 

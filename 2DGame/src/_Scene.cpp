@@ -196,31 +196,31 @@ void _Scene::initGL() {
             {
                 btn.setButton(x, y, btnW, btnH,
                               "images/goldenHeart.png",
-                              ACTION_HEALTHBOOST); // placeholder
+                              ACTION_GOLDENHEART); // placeholder
             }
             else if (r == 0 && c == 3) // Coin Increase
             {
                 btn.setButton(x, y, btnW, btnH,
                               "images/coinIncrease.png",
-                              ACTION_HEALTHBOOST);
+                              ACTION_COINBOOST);
             }
             else if (r == 1 && c == 0) // Vampire
             {
                 btn.setButton(x, y, btnW, btnH,
                               "images/blood.png",
-                              ACTION_HEALTHBOOST);
+                              ACTION_VAMPIRE);
             }
             else if (r == 1 && c == 1) //attack upgrage
             {
                 btn.setButton(x, y, btnW, btnH,
                               "images/attackIncrease.png",
-                              ACTION_HEALTHBOOST);  //temp
+                              ACTION_ATTACKBOOST);  //temp
             }
             else if (r == 1 && c == 2) // Armor Upgrade
             {
                 btn.setButton(x, y, btnW, btnH,
                               "images/armorIncrease.png",
-                              ACTION_HEALTHBOOST);
+                              ACTION_ARMORBOOST);
             }
             else
             {
@@ -1443,9 +1443,12 @@ void _Scene::drawScene() {
 
             // APPLY DAMAGE HERE
             if (myInput->attackPressed && hit){
-                e->takeDamage(10);
+                e->takeDamage(playerAttack);
                 hitSnd->playSound("sounds/sword.mp3");
             }
+            playerHealth += vampireHeal;
+            if (playerHealth > playerMaxHealth)
+                playerHealth = playerMaxHealth;
 
             if (myInput->dashAttack && distSq <= (radius * 0.4f)){
                 e->takeDamage(1);
@@ -1657,7 +1660,11 @@ void _Scene::drawScene() {
         for (auto& e : enemies) {
             if (enemyTouchingPlayer && playerDamageCooldown <= 0.0f)
             {
-                playerHealth -= e->damage;//0.5f;
+                float reducedDamage = e->damage - playerArmor;
+                if (reducedDamage < 0.0f)
+                    reducedDamage = 0.0f;
+
+                playerHealth -= reducedDamage;
                 playerDamageCooldown = 1.0f;
                 if ((levelModifier %3) == 0) {
                     myCam->startShake(0.3f, 0.3);
@@ -2134,11 +2141,15 @@ void _Scene::drawScene() {
 
     const float heartSize  = 30.0f;
     const float heartStep  = 32.0f;
-    float hStartX = (float)width  - 15.0f - 10.0f * heartStep;
+    int hearts = (int)playerMaxHealth;
+    float totalWidth = hearts * heartStep;
+
+    float hStartX = (float)width - 15.0f - totalWidth;
     float hY1     = (float)height - 65.0f;
     float hY2     = (float)height - 35.0f;
 
-    for (int i = 0; i < 10; i++)
+    int heartsToDraw = (int)playerMaxHealth;
+    for (int i = 0; i < heartsToDraw; i++)
     {
         float hx = hStartX + i * heartStep;
 
@@ -2218,9 +2229,10 @@ void _Scene::drawScene() {
 
             // ---- SPAWN COINS ----
             if ((levelModifier % 3) != 0)
-                dropCount = rand() % 3 + 1; // 1 3 coins
+                dropCount = (int)((rand() % 3 + 1) * coinMultiplier);
+                if (dropCount < 1) dropCount = 1; // 1 3 coins
             else if ((levelModifier % 3) == 0)
-                dropCount = rand() % 20 + 10; // 10 20 coins
+                dropCount = (int)((rand() % 20 + 10) * coinMultiplier); // 10 20 coins
 
             for (int i = 0; i < dropCount; i++)
             {
@@ -2502,22 +2514,19 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
             ButtonAction action = menu->mouseClick(mouseX, mouseY);
 
-            if (heartButton.checkClick(mouseX, mouseY))
+            /*if (heartButton.checkClick(mouseX, mouseY))
             {
                 playHeartVideo = true;
                 myVideo->reset();
                 myVideo->play(false);
                 heartPurchased = true;
-            }
+            }*/
             for (auto& btn : shopButtons)
             {
-                if (btn.checkClick(mouseX, mouseY) && coinCount >= 20)
+                if (btn.checkClick(mouseX, mouseY))
                 {
-                    // TEMP: reuse heart behavior
-                    playHeartVideo = true;
-                    myVideo->reset();
-                    myVideo->play(false);
-                    coinCount -= 20;
+                    purchaseUpgrade(btn.getAction());
+                    break; // Only allow one purchase per click
                 }
             }
         }
@@ -2572,6 +2581,62 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+// Add helper function
+//=========================================================
+void _Scene::purchaseUpgrade(ButtonAction action)
+{
+    const int COST = 20;
+
+    if (coinCount < COST)
+        return;
+
+    coinCount -= COST;
+
+    switch(action)
+    {
+        case ACTION_HEALTHBOOST:
+            healthLevel++;
+            playerHealth = std::min(playerHealth + 3.0f, playerMaxHealth);
+
+            break;
+
+        case ACTION_GOLDENHEART:
+            goldenHeartLevel++;
+             // Permanently increase max health by 1 heart
+            playerMaxHealth += 1.0f;
+
+            // Fully restore health
+            playerHealth = playerMaxHealth;
+            break;
+
+        case ACTION_COINBOOST:
+            coinLevel++;
+            coinMultiplier += 0.25f;
+            break;
+
+        case ACTION_VAMPIRE:
+            vampireLevel++;
+            vampireHeal += 1.0f;
+            break;
+
+        case ACTION_ATTACKBOOST:
+            attackLevel++;
+            playerAttack += 1.0f;
+            break;
+
+        case ACTION_ARMORBOOST:
+            armorLevel++;
+            playerArmor += 1.0f;
+            break;
+
+        default:
+            break;
+    }
+
+    playHeartVideo = true;
+    myVideo->reset();
+    myVideo->play(false);
+}
 
 void _Scene::drawGrid(float step, float range)
 {
