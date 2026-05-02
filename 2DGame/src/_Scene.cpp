@@ -87,6 +87,7 @@ void _Scene::initGL() {
     myShopKeeper->idleRow = 0;
 
     myTorch->spriteInit("images/torchDemo.png", 4, 1);
+    mainMenu->spriteInit("images/knightIDLE.png", 7, 1);
 
 
     myCollider->loadFromTexture(
@@ -241,6 +242,8 @@ void _Scene::initGL() {
     myCam->camInit();
     currentScene = MENU_SCENE;
     lastScene = GAME_SCENE;
+
+    menuMusic->playMusic("sounds/2D Game Intro.wav");
 }
 
 void _Scene::drawScene() {
@@ -282,6 +285,21 @@ void _Scene::drawScene() {
 
         menu->update(myTime->deltaTime);
         menu->draw();
+
+
+        glPushMatrix();
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glTranslatef(width/2, height/2, 0);
+            glScalef(400, -400, 1);
+            mainMenu->drawSprite(0, 0, 0);
+            if (myWorldTime->getTicks() > 100)
+            {
+                mainMenu->spriteActions();
+                myWorldTime->reset();
+            }
+        glDisable(GL_BLEND);
+        glPopMatrix();
 
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
@@ -925,6 +943,8 @@ void _Scene::drawScene() {
     //===========================================================================
     else if (currentScene == GAME_SCENE)
     {
+
+    menuMusic->pauseSound("sounds/2D Game Intro.wav");
 
     // ---- DRAW GAME ----
     static float smoothDT = 0.16f;

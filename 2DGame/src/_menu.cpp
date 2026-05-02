@@ -25,7 +25,7 @@ void _menu::init(int screenWidth, int screenHeight)
     float buttonHeight = 80;
 
     //bg->loadTexture("images/prlx.jpg");
-    bg->loadTexture("images/map Layer 1 ALT.png");
+    bg->loadTexture("images/menuSprite.png");
 
     float centerX = (screenWidth - buttonWidth) / 2;
     float centerY = screenHeight / 2;
@@ -75,7 +75,8 @@ void _menu::draw()
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     glPushMatrix();
-    glScalef(5, 5, 1);
+    glScalef(20, 20, 1);
+    glTranslatef(-912, -305, 0);
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex2f(0, 0);
         glTexCoord2f(1, 0); glVertex2f(screenWidth, 0);
@@ -83,6 +84,7 @@ void _menu::draw()
         glTexCoord2f(0, 1); glVertex2f(0, screenHeight);
     glEnd();
     glPopMatrix();
+
 
     glColor4f(1.0f, 1.0f, 1.0f, buttonAlpha);
     for (auto& b : buttons)

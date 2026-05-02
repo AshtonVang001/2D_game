@@ -5,6 +5,7 @@
 #include <vector>
 #include <_textureLoader.h>
 #include <_timer.h>
+#include <_sprite.h>
 
 class _menu
 {

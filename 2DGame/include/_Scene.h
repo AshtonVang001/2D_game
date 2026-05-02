@@ -60,11 +60,13 @@ class _Scene
         _sounds *hitSnd = new _sounds();
         _sounds *swipeSnd = new _sounds();
         _sounds *coinSnd = new _sounds();
+        _sounds *menuMusic = new _sounds();
 
         _sprite *mySprite = new _sprite();
         _sprite *myTorch = new _sprite();
         _sprite *myShopKeeper = new _sprite();
         _sprite *UICoin = new _sprite();
+        _sprite *mainMenu = new _sprite();
 
         _boss *myBoss = new _boss();
 
