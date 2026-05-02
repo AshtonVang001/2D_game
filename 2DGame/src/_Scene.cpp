@@ -2411,6 +2411,8 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
         {
+            myInput->keys[VK_LBUTTON] = true;
+
             if(currentScene == GAME_SCENE || currentScene == SHOP_SCENE)
             {
                 int mouseX = LOWORD(lParam);
@@ -2494,6 +2496,9 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
         }
         }
+        break;
+    case WM_LBUTTONUP:
+            myInput->keys[VK_LBUTTON] = false;
         break;
     case WM_MOUSEMOVE:
         {

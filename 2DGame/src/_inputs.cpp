@@ -54,7 +54,7 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
             isMoving = true;
         }
 
-        bool attackDown = keys['F'];
+        bool attackDown = keys[VK_LBUTTON];
         if (attackDown && !attackWasDown) {
             attackPressed = true;
         }
