@@ -204,6 +204,12 @@ void _Scene::initGL() {
                               "images/coinIncrease.png",
                               ACTION_HEALTHBOOST);
             }
+            else if (r == 1 && c == 0) // Vampire
+            {
+                btn.setButton(x, y, btnW, btnH,
+                              "images/blood.png",
+                              ACTION_HEALTHBOOST);
+            }
             else if (r == 1 && c == 1) //attack upgrage
             {
                 btn.setButton(x, y, btnW, btnH,
