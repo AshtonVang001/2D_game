@@ -13,11 +13,17 @@ _sounds::~_sounds()
 
 void _sounds::playMusic(char* filename)
 {
-    eng->play2D(filename, true);
+    eng->setAllSoundsPaused(false);
+
+    if (!eng->isCurrentlyPlaying(filename))
+    {
+        eng->play2D(filename, true, false);
+    }
 }
 
 void _sounds::playSound(char* filename)
 {
+    eng->setAllSoundsPaused(false);
     if (!eng->isCurrentlyPlaying(filename)) {
         eng->play2D(filename, false, false);
     }

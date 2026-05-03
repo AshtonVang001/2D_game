@@ -277,6 +277,8 @@ void _Scene::drawScene() {
 
     if (currentScene == MENU_SCENE)
     {
+        menuMusic->playMusic("sounds/2D Game Intro.wav");
+        settingsMusicStarted = false;
         // ---- DRAW MENU ----
         //ShowCursor(TRUE);
         SetCursor(menuCursor);
@@ -351,6 +353,7 @@ void _Scene::drawScene() {
     else if (currentScene == SETTINGS_SCENE){
 
         if (!settingsMusicStarted) {
+            menuMusic->pauseSound("sounds/2D Game Intro.wav");
             easterEgg->playSound("sounds/easterEgg.mp3");
             settingsMusicStarted = true;
         }
