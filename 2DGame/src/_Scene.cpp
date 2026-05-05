@@ -5,6 +5,7 @@
 _Scene::_Scene() {
     myTime->startTime = clock();
     myWorldTime->startTime = clock();
+    myAttackTime->startTime = clock();
 }
 
 _Scene::~_Scene() {}
@@ -51,6 +52,15 @@ void _Scene::initGL() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+    videos[VIDEO_HEALTH]       = new _videoLoader();
+    videos[VIDEO_GOLDEN_HEART] = new _videoLoader();
+    videos[VIDEO_COIN]         = new _videoLoader();
+    videos[VIDEO_VAMPIRE]      = new _videoLoader();
+    videos[VIDEO_ATTACK]       = new _videoLoader();
+    videos[VIDEO_ARMOR]        = new _videoLoader();
+
+    VideoType currentVideo = VIDEO_NONE;
+
     gameCursor = LoadCursorFromFileA("cursors/GAME.cur");
     menuCursor = LoadCursorFromFileA("cursors/MENU.ani");
     attackCursor = LoadCursorFromFileA("cursors/ENEMY.cur");
@@ -69,7 +79,15 @@ void _Scene::initGL() {
     shopF->loadTexture("images/shopFloor.png");
     shopW->loadTexture("images/shopWall.png");
 
-    myVideo->loadFrames("videos/heart", 40, 24.0f); // 60 frames @ 24fps
+
+    healthIcon->loadTexture("images/goldenHeart.png ");
+    coinIcon->loadTexture("images/coinIncrease.png");
+    vampIcon->loadTexture("images/blood.png");
+    attackIcon->loadTexture("images/attackIncrease.png");
+    armorIcon->loadTexture("images/armorIncrease.png");
+
+
+    //videos[VIDEO_HEALTH]->loadFrames("videos/heart", 40, 24.0f); // 60 frames @ 24fps
 
     myShop->initShop();
 
@@ -77,6 +95,7 @@ void _Scene::initGL() {
     heartTex->loadTexture("images/heart.png");
 
     mySprite->spriteInit("images/knightAnimations3.png", 6, 12);
+    attackSprite->spriteInit("images/attack.png", 6, 4);
     UICoin->spriteInit("images/coin.png", 8, 1);
 
     myShopKeeper->spriteInit("images/shopKeeper.png", 8, 1);
@@ -268,10 +287,31 @@ void _Scene::drawScene() {
 
     myTime->updateDeltaTime();
     myWorldTime->updateDeltaTime();
-    //ShowCursor(FALSE);
+    myAttackTime->updateDeltaTime();
 
+    const float iconSize = 40.0f;
+    const float spacing  = 60.0f;
 
+    float baseX   = (float)width - 80.0f;
+    float centerY = (float)height * 0.77f;
+    float totalH  = 5 * spacing;
+    float startY  = centerY - totalH * 0.5f + spacing * 0.5f;
 
+    int values[5] = {
+        goldenHeartLevel,
+        coinLevel,
+        vampireLevel,
+        attackLevel,
+        armorLevel
+    };
+
+    _textureLoader* icons[5] = {
+        healthIcon,
+        coinIcon,
+        vampIcon,
+        attackIcon,
+        armorIcon
+    };
 
 
 
@@ -390,10 +430,10 @@ void _Scene::drawScene() {
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
-    myVideo->update(myTime->deltaTime);
+    //videos[currentVideo]->update(myTime->deltaTime);
 
     if(!paused){
-    myInput->keyPressed(mySprite, smoothDT, myCollider2);
+    myInput->keyPressed(mySprite, smoothDT, myCollider2, attackSprite);
     myInput->keyPressed(myCam, smoothDT);
     }
     myCam->setUpCamera();
@@ -727,10 +767,6 @@ void _Scene::drawScene() {
 
         myShop->drawShopUI2(width, height);
 
-        if (!heartPurchased)
-            heartButton.update();
-            heartButton.draw();
-
         for (auto& btn : shopButtons)
         {
             btn.update();
@@ -747,8 +783,10 @@ void _Scene::drawScene() {
     }
 
 
-    if (playHeartVideo)
+    if (currentVideo != VIDEO_NONE)
     {
+        _videoLoader* vid = videos[currentVideo];
+
         glDisable(GL_DEPTH_TEST);
 
         glMatrixMode(GL_PROJECTION);
@@ -770,7 +808,7 @@ void _Scene::drawScene() {
         float x = width/2 - w/2;
         float y = height/2 - h/2;
 
-        myVideo->draw(x, y, w, h);
+        vid->draw(x, y, w, h);
 
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
@@ -921,6 +959,127 @@ void _Scene::drawScene() {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
     }
 
+
+
+
+    // ---- HEART HUD (top right) ----
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    heartTex->bindTexture();
+
+    const float heartSize  = 30.0f;
+    const float heartStep  = 32.0f;
+    int hearts = (int)playerMaxHealth;
+    float totalWidth = hearts * heartStep;
+
+    float hStartX = (float)width - 15.0f - totalWidth;
+    float hY1     = (float)height - 65.0f;
+    float hY2     = (float)height - 35.0f;
+
+    int heartsToDraw = (int)playerMaxHealth;
+    for (int i = 0; i < heartsToDraw; i++)
+    {
+        float hx = hStartX + i * heartStep;
+
+        float fill = playerHealth - (float)i;
+        if (fill < 0.0f) fill = 0.0f;
+        if (fill > 1.0f) fill = 1.0f;
+
+        // Empty / dark background heart
+        glColor4f(0.25f, 0.0f, 0.0f, 1.0f);
+        glBegin(GL_QUADS);
+            glTexCoord2f(0, 1); glVertex2f(hx,            hY1);
+            glTexCoord2f(1, 1); glVertex2f(hx + heartSize, hY1);
+            glTexCoord2f(1, 0); glVertex2f(hx + heartSize, hY2);
+            glTexCoord2f(0, 0); glVertex2f(hx,            hY2);
+        glEnd();
+
+        if (fill >= 1.0f)
+        {
+            // Full heart
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            glBegin(GL_QUADS);
+                glTexCoord2f(0, 1); glVertex2f(hx,            hY1);
+                glTexCoord2f(1, 1); glVertex2f(hx + heartSize, hY1);
+                glTexCoord2f(1, 0); glVertex2f(hx + heartSize, hY2);
+                glTexCoord2f(0, 0); glVertex2f(hx,            hY2);
+            glEnd();
+        }
+        else if (fill >= 0.5f)
+        {
+            // Half heart — draw left half of texture only
+            float halfW = heartSize * 0.5f;
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            glBegin(GL_QUADS);
+                glTexCoord2f(0,    1); glVertex2f(hx,          hY1);
+                glTexCoord2f(0.5f, 1); glVertex2f(hx + halfW,  hY1);
+                glTexCoord2f(0.5f, 0); glVertex2f(hx + halfW,  hY2);
+                glTexCoord2f(0,    0); glVertex2f(hx,          hY2);
+            glEnd();
+        }
+    }
+
+
+
+    // ---- PowerUps HUD ----
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (!icons[i]) continue;
+
+        float y1 = startY + i * spacing;
+        float y2 = y1 + iconSize;
+        float x1 = baseX;
+        float x2 = baseX + iconSize;
+
+        icons[i]->bindTexture();
+
+        glColor4f(1, 1, 1, 1);
+        glBegin(GL_QUADS);
+            glTexCoord2f(0, 1); glVertex2f(x1, y1);
+            glTexCoord2f(1, 1); glVertex2f(x2, y1);
+            glTexCoord2f(1, 0); glVertex2f(x2, y2);
+            glTexCoord2f(0, 0); glVertex2f(x1, y2);
+        glEnd();
+    }
+
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1, 1, 1);
+
+    char text[32];
+
+    for (int i = 0; i < 5; i++)
+    {
+        float y = startY + i * spacing;
+
+        sprintf(text, "%d", values[i]);
+
+        glRasterPos2f(baseX + iconSize + 10.0f, y + 8.0f);
+
+        for (const char* c = text; *c; ++c)
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+    }
+
+
+    glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_DEPTH_TEST);
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+
+
+
+
+
     // ---- Restore ----
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
@@ -987,7 +1146,7 @@ void _Scene::drawScene() {
     SetCursor(gameCursor);
 
     if ((levelModifier-1) %3 >= 0)
-        myInput->keyPressed(mySprite, smoothDT, colliders[(levelModifier-1) %3]);
+        myInput->keyPressed(mySprite, smoothDT, colliders[(levelModifier-1) %3], attackSprite);
     myInput->keyPressed(myCam, smoothDT);
     myCam->setUpCamera();
 
@@ -1145,7 +1304,7 @@ void _Scene::drawScene() {
 
 
     // ---- Layer 3 (torch sprites) ----
-    if (levelModifier%3 == 1) {
+    if ((levelModifier%3) == 1) {
     glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
@@ -1278,6 +1437,145 @@ void _Scene::drawScene() {
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
     }
+
+
+
+
+
+    // ---- Second Level Torches ----
+    if ((levelModifier%3) == 2) {
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(5.8f, -3.0f, -1.0f);
+            glScalef(0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            UICoin->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Second Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(-14.9f, 4.5f, -1.0f);
+            glScalef(-0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Third Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(14.9f, -6.0f, -1.0f);
+            glScalef(0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Fourth Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(-5.8f, 3.0f, -1.0f);
+            glScalef(-0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Fifth Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(14.9f, -0.7f, -1.0f);
+            glScalef(0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    // ---- Sixth Torch ----
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glTranslatef(-14.9f, -0.7f, -1.0f);
+            glScalef(-0.65f, 0.65f, 1.0f);
+            myTorch->drawSprite(0, 0, 0);
+        glPopMatrix();
+
+        if (myWorldTime->getTicks() > 100)
+        {
+            myTorch->spriteActions();
+            myWorldTime->reset();
+        }
+
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+    }
     //===========================================================================
     //===========================================================================
     //===========================================================================
@@ -1341,12 +1639,18 @@ void _Scene::drawScene() {
             }
         }
 
-        ashes->draw();
+
+        if ((levelModifier % 3) == 0) {
+            ashes->drawBoss();
+        }
+        else
+            ashes->draw();
 
 
         // ---- Level Complete Arrow ----
         if (levelComplete)
         {
+
             float targetX = 0.0f;
             float targetY = 10.0f;
 
@@ -1385,6 +1689,8 @@ void _Scene::drawScene() {
 
                 glDisable(GL_TEXTURE_2D);
                 glDisable(GL_BLEND);
+
+                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
             glPopMatrix();
         }
@@ -1442,6 +1748,18 @@ void _Scene::drawScene() {
                 anyEnemyHit = true;
 
             // APPLY DAMAGE HERE
+            if (myInput->isAttacking) {
+                glPushMatrix();
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glColor3f(1, 1, 1);
+                attackSprite->drawSprite(mySprite->pos.x + myInput->attackOffsetX, mySprite->pos.y + myInput->attackOffsetY, 2);
+                glPopMatrix();
+
+                if (attackSprite->animationFinished)
+                    myInput->isAttacking = false;
+            }
+
             if (myInput->attackPressed && hit){
                 e->takeDamage(playerAttack);
                 hitSnd->playSound("sounds/sword.mp3");
@@ -1472,6 +1790,7 @@ void _Scene::drawScene() {
             ) <= (radius * 0.4);
 
         enemyInside = currentlyInsideDash;
+        //enemySprite->setLevelModifier(levelModifier);
         //--------
 
 
@@ -1681,6 +2000,7 @@ void _Scene::drawScene() {
 
         if (playerHealth <= 0.0f)
         {
+            playerHealth = playerMaxHealth;
             resetLevel();
         }
 
@@ -1705,6 +2025,16 @@ void _Scene::drawScene() {
                 e->spriteActions();
             }
             myTime->reset();
+        }
+
+
+        if (myInput->isAttacking)
+        {
+            if (myAttackTime->getTicks() > 20)
+            {
+                attackSprite->spriteActions();
+                myAttackTime->reset();
+            }
         }
 
         glDepthMask(GL_TRUE);
@@ -1920,6 +2250,137 @@ void _Scene::drawScene() {
     }
     glEnd();
 
+    }
+
+
+
+    // ---- Level 2 Light Circles ----
+    if (levelModifier%3 == 2) {
+    //---- light circle ----
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    float offset = 0.1;
+
+
+    cx = 5.8f;
+    cy = -3.0f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+
+    // ---- Second Light ----
+    cx = -5.8f;
+    cy = 3.0f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Third Light ----
+    cx = 14.9f;
+    cy = -6.0f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Fourth Light ----
+    cx = -14.9f;
+    cy = 4.5f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Fifth Light ----
+    cx = 14.9f;
+    cy = -0.7f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    // ---- Sixth Light ----
+    cx = -14.9f;
+    cy = -0.7f + offset;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(r, g, b, alphaFlicker);
+    glVertex3f(cx, cy, 0);
+
+    for(int i = 0; i <= 360; i++)
+    {
+        angle = i * 3.14159f / 180.0f;
+        x = cx + cos(angle) * radiusFlicker;
+        y = cy + sin(angle) * radiusFlicker;
+
+        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glVertex3f(x, y, 0);
+    }
+    glEnd();
+
+    }
+
+
+
+
+
 
 
 
@@ -1928,7 +2389,10 @@ void _Scene::drawScene() {
     cy = 10.15;
 
     glBegin(GL_TRIANGLE_FAN);
-    glColor4f(r, g, b, alphaFlicker/2);
+    if ((levelModifier % 3) == 0)
+        glColor4f(1.0, 0.0, 0.0, alphaFlicker/2);
+    else
+        glColor4f(r, g, b, alphaFlicker/2);
     glVertex3f(cx, cy, 0);
 
     for(int i = 0; i <= 360; i++)
@@ -1937,7 +2401,7 @@ void _Scene::drawScene() {
         x = cx + cos(angle) * radiusFlicker/3;
         y = cy + sin(angle) * radiusFlicker/3;
 
-        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glColor4f(1.0, g * 0.5f, b * 0.3f, 0.0f);
         glVertex3f(x, y, 0);
     }
     glEnd();
@@ -1947,7 +2411,11 @@ void _Scene::drawScene() {
     cy = 10.15;
 
     glBegin(GL_TRIANGLE_FAN);
-    glColor4f(r, g, b, alphaFlicker/2);
+    if ((levelModifier % 3) == 0)
+        glColor4f(1.0, 0.0, 0.0, alphaFlicker/2);
+    else
+        glColor4f(r, g, b, alphaFlicker/2);
+    glVertex3f(cx, cy, 0);
     glVertex3f(cx, cy, 0);
 
     for(int i = 0; i <= 360; i++)
@@ -1956,12 +2424,12 @@ void _Scene::drawScene() {
         x = cx + cos(angle) * radiusFlicker/3;
         y = cy + sin(angle) * radiusFlicker/3;
 
-        glColor4f(r, g * 0.5f, b * 0.3f, 0.0f);
+        glColor4f(1.0, g * 0.5f, b * 0.3f, 0.0f);
         glVertex3f(x, y, 0);
     }
     glEnd();
 
-
+    if (levelModifier % 3 != 0) {
     // ---- Third Gargoyle light ----
     cx = 8.3;
     cy = 3.63;
@@ -1980,7 +2448,9 @@ void _Scene::drawScene() {
         glVertex3f(x, y, 0);
     }
     glEnd();
+    }
 
+    if (levelModifier % 3 == 1) {
     // ---- Fourth Gargoyle light ----
     cx = -8.3;
     cy = 3.63;
@@ -1999,7 +2469,6 @@ void _Scene::drawScene() {
         glVertex3f(x, y, 0);
     }
     glEnd();
-
     }
 
 
@@ -2191,6 +2660,51 @@ void _Scene::drawScene() {
         }
     }
 
+
+    // ---- PowerUps HUD ----
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (!icons[i]) continue;
+
+        float y1 = startY + i * spacing;
+        float y2 = y1 + iconSize;
+        float x1 = baseX;
+        float x2 = baseX + iconSize;
+
+        icons[i]->bindTexture();
+
+        glColor4f(1, 1, 1, 1);
+        glBegin(GL_QUADS);
+            glTexCoord2f(0, 1); glVertex2f(x1, y1);
+            glTexCoord2f(1, 1); glVertex2f(x2, y1);
+            glTexCoord2f(1, 0); glVertex2f(x2, y2);
+            glTexCoord2f(0, 0); glVertex2f(x1, y2);
+        glEnd();
+    }
+
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1, 1, 1);
+
+    char text[32];
+
+    for (int i = 0; i < 5; i++)
+    {
+        float y = startY + i * spacing;
+
+        sprintf(text, "%d", values[i]);
+
+        glRasterPos2f(baseX + iconSize + 10.0f, y + 8.0f);
+
+        for (const char* c = text; *c; ++c)
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+    }
+
+
     glDisable(GL_TEXTURE_2D);
 
     glEnable(GL_DEPTH_TEST);
@@ -2228,11 +2742,13 @@ void _Scene::drawScene() {
             int dropCount;
 
             // ---- SPAWN COINS ----
-            if ((levelModifier % 3) != 0)
+            if ((levelModifier % 3) != 0) {
                 dropCount = (int)((rand() % 3 + 1) * coinMultiplier);
-                if (dropCount < 1) dropCount = 1; // 1 3 coins
-            else if ((levelModifier % 3) == 0)
+                //if (dropCount < 1) dropCount = 1; // 1 3 coins
+            }
+            else if ((levelModifier % 3) == 0) {
                 dropCount = (int)((rand() % 20 + 10) * coinMultiplier); // 10 20 coins
+            }
 
             for (int i = 0; i < dropCount; i++)
             {
@@ -2514,13 +3030,6 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
             ButtonAction action = menu->mouseClick(mouseX, mouseY);
 
-            /*if (heartButton.checkClick(mouseX, mouseY))
-            {
-                playHeartVideo = true;
-                myVideo->reset();
-                myVideo->play(false);
-                heartPurchased = true;
-            }*/
             for (auto& btn : shopButtons)
             {
                 if (btn.checkClick(mouseX, mouseY))
@@ -2581,61 +3090,92 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// Add helper function
-//=========================================================
 void _Scene::purchaseUpgrade(ButtonAction action)
 {
-    const int COST = 20;
+    int* costPtr = nullptr;
 
-    if (coinCount < COST)
+    switch(action)
+    {
+        case ACTION_HEALTHBOOST: costPtr = &costHealthBoost; break;
+        case ACTION_GOLDENHEART: costPtr = &costGoldenHeart; break;
+        case ACTION_COINBOOST:   costPtr = &costCoinBoost;   break;
+        case ACTION_VAMPIRE:     costPtr = &costVampire;     break;
+        case ACTION_ATTACKBOOST: costPtr = &costAttackBoost; break;
+        case ACTION_ARMORBOOST:  costPtr = &costArmorBoost;  break;
+        default: return;
+    }
+
+    int cost = *costPtr;
+
+    if (coinCount < cost)
         return;
 
-    coinCount -= COST;
+    coinCount -= cost;
 
     switch(action)
     {
         case ACTION_HEALTHBOOST:
             healthLevel++;
-            playerHealth = std::min(playerHealth + 3.0f, playerMaxHealth);
+            playerHealth = playerMaxHealth;
 
+            currentVideo = VIDEO_HEALTH;
             break;
 
         case ACTION_GOLDENHEART:
             goldenHeartLevel++;
-             // Permanently increase max health by 1 heart
             playerMaxHealth += 1.0f;
+            playerHealth = std::min(playerHealth + 3.0f, playerMaxHealth);
 
-            // Fully restore health
-            playerHealth = playerMaxHealth;
+            currentVideo = VIDEO_GOLDEN_HEART;
             break;
 
         case ACTION_COINBOOST:
             coinLevel++;
-            coinMultiplier += 0.25f;
+            coinMultiplier += 0.05f;
+
+            currentVideo = VIDEO_COIN;
             break;
 
         case ACTION_VAMPIRE:
             vampireLevel++;
             vampireHeal += 1.0f;
+
+            currentVideo = VIDEO_VAMPIRE;
             break;
 
         case ACTION_ATTACKBOOST:
             attackLevel++;
             playerAttack += 1.0f;
+
+            currentVideo = VIDEO_ATTACK;
             break;
 
         case ACTION_ARMORBOOST:
             armorLevel++;
             playerArmor += 1.0f;
+
+            currentVideo = VIDEO_ARMOR;
             break;
 
         default:
             break;
     }
 
-    playHeartVideo = true;
-    myVideo->reset();
-    myVideo->play(false);
+    // Start video if one was selected
+    if (currentVideo != VIDEO_NONE)
+    {
+        //videos[currentVideo]->reset();
+        //videos[currentVideo]->play(false);
+    }
+
+    if (action != ACTION_HEALTHBOOST)
+    {
+        *costPtr += 5;
+    }
+
+    //playHeartVideo = true;
+    //myVideo->reset();
+    //myVideo->play(false);
 }
 
 void _Scene::drawGrid(float step, float range)
@@ -2683,7 +3223,7 @@ void _Scene::triggerLevelText()
 
 void _Scene::resetLevel()
 {
-    playerHealth = 10.0f;
+    //playerHealth = playerMaxHealth;
     playerDamageCooldown = 0.0f;
     mySprite->pos = {0.0f, -3.0f, 0.0f};
     mySpawner->phantomSpawned = 0;

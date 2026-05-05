@@ -24,6 +24,7 @@ public:
     void init(int maxParticles, float playerX, float playerY);
     void update(float dt, float playerX, float playerY);
     void draw();
+    void drawBoss();
 
     std::vector<Particle> particles;
     int maxCount;

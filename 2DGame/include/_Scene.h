@@ -36,6 +36,19 @@ enum SceneState
     SETTINGS_SCENE,
     SHOP_SCENE
 };
+
+enum VideoType
+{
+    VIDEO_NONE,
+    VIDEO_HEALTH,
+    VIDEO_GOLDEN_HEART,
+    VIDEO_COIN,
+    VIDEO_VAMPIRE,
+    VIDEO_ATTACK,
+    VIDEO_ARMOR
+};
+
+
 class _Scene
 {
     public:
@@ -50,6 +63,7 @@ class _Scene
         _enemies *enemySprite = new _enemies();
         _timer *myTime = new _timer();
         _timer *myWorldTime = new _timer();
+        _timer *myAttackTime = new _timer();
         _camera *myCam = new _camera();
         _menu *menu = new _menu();
         _page *help = new _page();
@@ -67,6 +81,7 @@ class _Scene
         _sprite *myShopKeeper = new _sprite();
         _sprite *UICoin = new _sprite();
         _sprite *mainMenu = new _sprite();
+        _sprite *attackSprite = new _sprite();
 
         _boss *myBoss = new _boss();
 
@@ -120,7 +135,7 @@ class _Scene
         _fadeInOut* myFade = new _fadeInOut();
         _shop* myShop = new _shop();
 
-        _videoLoader* myVideo = new _videoLoader();
+        _videoLoader* videos[7];
 
         SceneState currentScene;
         SceneState lastScene;
@@ -228,8 +243,7 @@ class _Scene
         float levelTextTimer = 0.0f;
         float levelTextDuration = 2.0f;
 
-        bool playHeartVideo = false;
-        bool heartPurchased = false;
+        VideoType currentVideo = VIDEO_NONE;
 
         float playerHealth = 10.0f;
         float playerDamageCooldown = 0.0f;
@@ -254,6 +268,20 @@ class _Scene
         float playerAttack     = 10.0f;
         float vampireHeal      = 0.0f;
         float coinMultiplier   = 1.0f;
+
+        _textureLoader* healthIcon = new _textureLoader();
+        _textureLoader* coinIcon   = new _textureLoader();
+        _textureLoader* vampIcon   = new _textureLoader();
+        _textureLoader* attackIcon = new _textureLoader();
+        _textureLoader* armorIcon  = new _textureLoader();
+
+        int costHealthBoost = 0;
+        int costGoldenHeart = 20;
+        int costCoinBoost   = 20;
+        int costVampire     = 20;
+        int costAttackBoost = 20;
+        int costArmorBoost  = 20;
+
 
     private:
 };

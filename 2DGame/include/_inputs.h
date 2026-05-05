@@ -22,7 +22,7 @@ class _inputs
 
         void keyPressed(_parallax *);
         void keyPressed(_skyBox *);
-        void keyPressed(_sprite *, float deltaTime, _collisionCheck *);
+        void keyPressed(_sprite *, float deltaTime, _collisionCheck *, _sprite *);
         void keyPressed(_camera *, float);
 
         void mouseEventUp();                                //mouse button released     (blank because not in use)
@@ -55,6 +55,10 @@ class _inputs
 
         bool attackPressed = false;
         bool attackWasDown = false;
+
+        bool isAttacking = false;
+        float attackOffsetX = 0;
+        float attackOffsetY = 0;
 
         bool showHitboxes = false;
         bool bWasDown = false;

@@ -93,6 +93,12 @@ void _sprite::spriteActions()
             case DASH_B: row = 9;  break;
             case DASH_L: row = 11; break;
             case DASH_R: row = 10; break;
+
+            case ATTACK_F: row = 0;  break;
+            case ATTACK_B: row = 1;  break;
+            case ATTACK_L: row = 3;  break;
+            case ATTACK_R: row = 2;  break;
+
             default: return;
         }
     }

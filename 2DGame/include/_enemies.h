@@ -21,13 +21,14 @@ class _enemies : public _sprite
         void takeDamage(int dmg);
         void updateDamage(float deltaTime);
         void drawDamageText();
+        void setLevelModifier(int levelModifier);
 
-        float health = 30 * pow(1.1f, levelModifier);
+        float health = 30;// = 30 * pow(1.1f, levelModifier);
         float moveSpeed;
         float radius;
         float footOffset;
         float playerRadius = 0.25f;
-        float damage = 0.1f;
+        float damage = 1.0f;
 
         bool showDamage = false;
         int damageValue = 0;

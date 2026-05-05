@@ -19,7 +19,7 @@ _inputs::~_inputs()
 }
 
 
-void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* myCollider)
+void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* myCollider, _sprite* attackSprite)
 {
     moveSpeed = 2.5f;
     dx = 0.0f;
@@ -53,7 +53,7 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
             lastDirection = mySprite->IDLE_R;
             isMoving = true;
         }
-
+/*
         bool attackDown = keys[VK_LBUTTON];
         if (attackDown && !attackWasDown) {
             attackPressed = true;
@@ -62,6 +62,37 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
             attackPressed = false;
         }
         attackWasDown = attackDown;
+*/
+
+        bool attackDown = keys[VK_LBUTTON];
+        if (attackDown && !attackWasDown)
+        {
+            attackPressed = true;
+            isAttacking = true;
+
+            attackSprite->setLoop(false);
+
+            switch (lastDirection)
+            {
+            case _sprite::IDLE_F: attackSprite->actionTrigger = attackSprite->ATTACK_F; attackOffsetY = -0.2; attackOffsetX = 0; break;
+            case _sprite::IDLE_B: attackSprite->actionTrigger = attackSprite->ATTACK_B; attackOffsetY = 0; attackOffsetX = 0; break;
+            case _sprite::IDLE_L: attackSprite->actionTrigger = attackSprite->ATTACK_L; attackOffsetY = 0; attackOffsetX = 0; break;
+            case _sprite::IDLE_R: attackSprite->actionTrigger = attackSprite->ATTACK_R; attackOffsetY = 0; attackOffsetX = 0; break;
+            }
+
+            attackSprite->resetAnimation();
+        }
+        else
+        {
+            attackPressed = false;
+        }
+        attackWasDown = attackDown;
+
+
+
+
+
+
 
         bool bDown = keys['B'];
         if (bDown && !bWasDown) {

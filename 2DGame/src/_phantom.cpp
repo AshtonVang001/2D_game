@@ -5,7 +5,7 @@ _phantom::_phantom()
     moveSpeed = 2.5f;
     health    = 20 * pow(1.1f, levelModifier);
     radius = 0.18f;
-    damage = 0.5f;
+    damage = 3 * pow(1.1f, levelModifier);;
     spriteInit("images/phantoms.png", 6, 8);
 }
 

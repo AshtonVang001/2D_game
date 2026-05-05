@@ -44,6 +44,11 @@ class _sprite
             DASH_L,
             DASH_R,
 
+            ATTACK_F,
+            ATTACK_B,
+            ATTACK_L,
+            ATTACK_R,
+
             // ---- Environment Animations ----
             TORCH
         };

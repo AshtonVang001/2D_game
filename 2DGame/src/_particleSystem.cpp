@@ -98,3 +98,32 @@ void _particleSystem::draw()
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
 }
+
+void _particleSystem::drawBoss()
+{
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_FALSE);
+
+    glBegin(GL_QUADS);
+
+    for(auto &p : particles)
+    {
+        float alpha = p.life;
+
+        glColor4f(1.0f, 0.482f, 0.0f, alpha * 0.3f);
+
+        float s = p.size;
+
+        glVertex3f(p.x - s, p.y - s, -0.5f);
+        glVertex3f(p.x + s, p.y - s, -0.5f);
+        glVertex3f(p.x + s, p.y + s, -0.5f);
+        glVertex3f(p.x - s, p.y + s, -0.5f);
+    }
+
+    glEnd();
+
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
+}
