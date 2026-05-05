@@ -1778,9 +1778,6 @@ void _Scene::drawScene() {
                 e->takeDamage(playerAttack);
                 hitSnd->playSound("sounds/sword.mp3");
             }
-            playerHealth += vampireHeal;
-            if (playerHealth > playerMaxHealth)
-                playerHealth = playerMaxHealth;
 
             if (myInput->dashAttack && distSq <= (radius * 0.4f)){
                 e->takeDamage(1);
@@ -2753,6 +2750,14 @@ void _Scene::drawScene() {
 
         if (e->health <= 0)
         {
+            // ---- VAMPIRE HEAL ON KILL ----
+            if (vampireLevel > 0)
+            {
+                playerHealth += vampireHeal;
+
+                if (playerHealth > playerMaxHealth)
+                    playerHealth = playerMaxHealth;
+            }
             int dropCount;
 
             // ---- SPAWN COINS ----
@@ -3194,7 +3199,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
 
         case ACTION_VAMPIRE:
             vampireLevel++;
-            vampireHeal += 1.0f;
+            vampireHeal += 0.25f;
 
             currentVideo = VIDEO_VAMPIRE;
             break;
@@ -3208,7 +3213,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
 
         case ACTION_ARMORBOOST:
             armorLevel++;
-            playerArmor += 1.0f;
+            playerArmor += 0.25f;
 
             currentVideo = VIDEO_ARMOR;
             break;
