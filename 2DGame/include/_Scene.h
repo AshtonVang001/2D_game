@@ -265,12 +265,16 @@ class _Scene
         int   vampireLevel     = 0;
         int   attackLevel      = 0;
         int   armorLevel       = 0;
+        int   speedLevel       = 0;
+        int   dashLevel        = 0;
 
         float playerMaxHealth  = 10.0f;
         float playerArmor      = 0.0f;
         float playerAttack     = 10.0f;
         float vampireHeal      = 0.0f;
         float coinMultiplier   = 1.0f;
+        float playerSpeed      = 0.1f;
+        int dashDamage         = 1.0f;
 
         _textureLoader* healthIcon = new _textureLoader();
         _textureLoader* coinIcon   = new _textureLoader();
@@ -284,6 +288,8 @@ class _Scene
         int costVampire     = 20;
         int costAttackBoost = 20;
         int costArmorBoost  = 20;
+        int costSpeedBoost  = 20;
+        int costDashBoost   = 20;
 
 
     private:

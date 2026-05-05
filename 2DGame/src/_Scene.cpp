@@ -241,6 +241,18 @@ void _Scene::initGL() {
                               "images/armorIncrease.png",
                               ACTION_ARMORBOOST);
             }
+            else if (r == 1 && c == 3) // Speed Upgrade
+            {
+                btn.setButton(x, y, btnW, btnH,
+                              "images/speedIncrease.png",
+                              ACTION_SPEEDBOOST);
+            }
+            else if (r == 0 && c == 0) // Dash Upgrade
+            {
+                btn.setButton(x, y, btnW, btnH,
+                              "images/dashIncrease.png",
+                              ACTION_DASHBOOST);
+            }
             else
             {
                 btn.setButton(x, y, btnW, btnH, "images/tex2.jpg", ACTION_HEALTHBOOST);
@@ -1162,6 +1174,7 @@ void _Scene::drawScene() {
     if ((levelModifier-1) %3 >= 0)
         myInput->keyPressed(mySprite, smoothDT, colliders[(levelModifier-1) %3], attackSprite);
     myInput->keyPressed(myCam, smoothDT);
+    myInput->speedBonus = playerSpeed;
     myCam->setUpCamera();
 
 
@@ -1780,7 +1793,7 @@ void _Scene::drawScene() {
             }
 
             if (myInput->dashAttack && distSq <= (radius * 0.4f)){
-                e->takeDamage(1);
+                e->takeDamage(dashDamage);
                 swipeSnd->playSound("sounds/untitled.mp3");
             }
         }
@@ -3163,6 +3176,8 @@ void _Scene::purchaseUpgrade(ButtonAction action)
         case ACTION_VAMPIRE:     costPtr = &costVampire;     break;
         case ACTION_ATTACKBOOST: costPtr = &costAttackBoost; break;
         case ACTION_ARMORBOOST:  costPtr = &costArmorBoost;  break;
+        case ACTION_SPEEDBOOST:  costPtr = &costSpeedBoost;  break;
+        case ACTION_DASHBOOST:   costPtr = &costDashBoost;   break;
         default: return;
     }
 
@@ -3216,6 +3231,19 @@ void _Scene::purchaseUpgrade(ButtonAction action)
             playerArmor += 0.25f;
 
             currentVideo = VIDEO_ARMOR;
+            break;
+        case ACTION_SPEEDBOOST:
+            speedLevel++;
+            playerSpeed += 0.01f;   // small increase (tweak as needed)
+
+            //currentVideo = VIDEO_SPEED;
+            break;
+
+        case ACTION_DASHBOOST:
+            dashLevel++;
+            dashDamage += 1.0f;
+
+            //currentVideo = VIDEO_DASH;
             break;
 
         default:

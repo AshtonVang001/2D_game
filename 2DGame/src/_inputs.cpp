@@ -21,7 +21,7 @@ _inputs::~_inputs()
 
 void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* myCollider, _sprite* attackSprite)
 {
-    moveSpeed = 2.5f;
+    moveSpeed = 2.5f + speedBonus;
     dx = 0.0f;
     dy = 0.0f;
     isMoving = false;

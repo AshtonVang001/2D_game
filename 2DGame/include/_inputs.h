@@ -72,6 +72,8 @@ class _inputs
         float colliderX;
         float colliderY;
 
+        float speedBonus = 0.0f;
+
     protected:
 
     private:
