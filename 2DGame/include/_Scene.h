@@ -75,6 +75,9 @@ class _Scene
         _sounds *swipeSnd = new _sounds();
         _sounds *coinSnd = new _sounds();
         _sounds *menuMusic = new _sounds();
+        _sounds *shopMusic = new _sounds();
+        _sounds *gameMusic = new _sounds();
+
 
         _sprite *mySprite = new _sprite();
         _sprite *myTorch = new _sprite();

@@ -317,6 +317,10 @@ void _Scene::drawScene() {
 
     if (currentScene == MENU_SCENE)
     {
+        shopMusic->pauseSound("sounds/shopMusic.mp3");
+        gameMusic->pauseSound("sounds/easterEgg.mp3");
+        menuMusic->playMusic("sounds/2D Game Intro.wav");
+        settingsMusicStarted = false;
         // ---- DRAW MENU ----
         //ShowCursor(TRUE);
         SetCursor(menuCursor);
@@ -391,6 +395,7 @@ void _Scene::drawScene() {
     else if (currentScene == SETTINGS_SCENE){
 
         if (!settingsMusicStarted) {
+            menuMusic->pauseSound("sounds/2D Game Intro.wav");
             easterEgg->playSound("sounds/easterEgg.mp3");
             settingsMusicStarted = true;
         }
@@ -425,6 +430,10 @@ void _Scene::drawScene() {
     // ---- SHOP SCENE ----
     //===========================================================================
     else if (currentScene == SHOP_SCENE) {
+    menuMusic->pauseSound("sounds/2D Game Intro.wav");
+    gameMusic->pauseSound("sounds/easterEgg.mp3");
+    shopMusic->playMusic("sounds/shopMusic.mp3");
+
     SetCursor(gameCursor);
     static float smoothDT = 0.16f;
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
@@ -1110,6 +1119,11 @@ void _Scene::drawScene() {
     {
 
     menuMusic->pauseSound("sounds/2D Game Intro.wav");
+    shopMusic->pauseSound("sounds/shopMusic.mp3");
+    if (!paused)
+        gameMusic->playMusic("sounds/gameMusic.mp3");
+    else
+        gameMusic->pauseSound("");
 
     // ---- DRAW GAME ----
     static float smoothDT = 0.16f;
@@ -2891,6 +2905,34 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             if (isPauseAllowed())
             {
                 paused = !paused;
+                if (paused)
+                {
+                    menuMusic->pauseSound("sounds/2D Game Intro.wav");
+                    gameMusic->pauseSound("sounds/easterEgg.mp3");
+                    shopMusic->pauseSound("sounds/shopMusic.mp3");
+                    easterEgg->pauseSound("sounds/easterEgg.mp3");
+                }
+                else
+                {
+                    switch (currentScene)
+                    {
+                        case GAME_SCENE:
+                            gameMusic->playMusic("sounds/easterEgg.mp3");
+                            break;
+
+                        case SHOP_SCENE:
+                            shopMusic->playMusic("sounds/shopMusic.mp3");
+                            break;
+
+                        case MENU_SCENE:
+                            menuMusic->playMusic("sounds/2D Game Intro.wav");
+                            break;
+
+                        case SETTINGS_SCENE:
+                            easterEgg->playMusic("sounds/easterEgg.mp3");
+                            break;
+                    }
+                }
                 ShowCursor(TRUE);
                 return 0;
             }
@@ -2977,6 +3019,10 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     if(pauseButton.checkClick(mouseX, mouseY))
                     {
                         paused = true;
+                        menuMusic->pauseSound("");
+                        gameMusic->pauseSound("");
+                        shopMusic->pauseSound("");
+                        easterEgg->pauseSound("");
                         ShowCursor(TRUE);
                     }
                 }
@@ -2985,6 +3031,16 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     if(resumeButton.checkClick(mouseX, mouseY))
                     {
                         paused = false;
+                        switch (currentScene)
+                        {
+                            case GAME_SCENE:
+                                gameMusic->playMusic("sounds/easterEgg.mp3");
+                                break;
+
+                            case SHOP_SCENE:
+                                shopMusic->playMusic("sounds/shopMusic.mp3");
+                                break;
+                        }
                         ShowCursor(FALSE);
                     }
 
