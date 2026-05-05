@@ -45,7 +45,9 @@ enum VideoType
     VIDEO_COIN,
     VIDEO_VAMPIRE,
     VIDEO_ATTACK,
-    VIDEO_ARMOR
+    VIDEO_ARMOR,
+    VIDEO_SPEED,
+    VIDEO_DASH
 };
 
 
@@ -138,7 +140,7 @@ class _Scene
         _fadeInOut* myFade = new _fadeInOut();
         _shop* myShop = new _shop();
 
-        _videoLoader* videos[7];
+        _videoLoader* videos[9] = { nullptr };
 
         SceneState currentScene;
         SceneState lastScene;
@@ -254,6 +256,13 @@ class _Scene
         float damageFlashTime = 0.0f;
         float damageFlashDuration = 0.2f;
 
+        float parallaxX = 0.0f;
+        float parallaxY = 0.0f;
+
+        float targetParallaxX = 0.0f;
+        float targetParallaxY = 0.0f;
+
+
         //=========================================================
         // player upgrade
         void purchaseUpgrade(ButtonAction action);
@@ -281,6 +290,8 @@ class _Scene
         _textureLoader* vampIcon   = new _textureLoader();
         _textureLoader* attackIcon = new _textureLoader();
         _textureLoader* armorIcon  = new _textureLoader();
+        _textureLoader* speedIcon  = new _textureLoader();
+        _textureLoader* dashIcon   = new _textureLoader();
 
         int costHealthBoost = 0;
         int costGoldenHeart = 20;

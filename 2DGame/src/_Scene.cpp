@@ -58,8 +58,10 @@ void _Scene::initGL() {
     videos[VIDEO_VAMPIRE]      = new _videoLoader();
     videos[VIDEO_ATTACK]       = new _videoLoader();
     videos[VIDEO_ARMOR]        = new _videoLoader();
+    videos[VIDEO_SPEED]        = new _videoLoader();
+    videos[VIDEO_DASH]         = new _videoLoader();
 
-    VideoType currentVideo = VIDEO_NONE;
+    currentVideo = VIDEO_NONE;
 
     gameCursor = LoadCursorFromFileA("cursors/GAME.cur");
     menuCursor = LoadCursorFromFileA("cursors/MENU.ani");
@@ -85,9 +87,18 @@ void _Scene::initGL() {
     vampIcon->loadTexture("images/blood.png");
     attackIcon->loadTexture("images/attackIncrease.png");
     armorIcon->loadTexture("images/armorIncrease.png");
+    speedIcon->loadTexture("images/speedIncrease.png");
+    dashIcon->loadTexture("images/dashIncrease.png");
 
 
-    //videos[VIDEO_HEALTH]->loadFrames("videos/heart", 40, 24.0f); // 60 frames @ 24fps
+    videos[VIDEO_HEALTH]->loadFrames("videos/heart", 40, 24.0f);
+    videos[VIDEO_GOLDEN_HEART]->loadFrames("videos/heart", 40, 24.0f);
+    videos[VIDEO_COIN]->loadFrames("videos/heart", 40, 24.0f);
+    videos[VIDEO_VAMPIRE]->loadFrames("videos/heart", 40, 24.0f);
+    videos[VIDEO_ATTACK]->loadFrames("videos/heart", 40, 24.0f);
+    videos[VIDEO_ARMOR]->loadFrames("videos/heart", 40, 24.0f);
+    videos[VIDEO_SPEED]->loadFrames("videos/heart", 40, 24.0f);
+    videos[VIDEO_DASH]->loadFrames("videos/heart", 40, 24.0f);
 
     myShop->initShop();
 
@@ -305,30 +316,40 @@ void _Scene::drawScene() {
     const float spacing  = 60.0f;
 
     float baseX   = (float)width - 80.0f;
-    float centerY = (float)height * 0.77f;
-    float totalH  = 5 * spacing;
+    float centerY = (float)height * 0.71f;
+    float totalH  = 7 * spacing;
     float startY  = centerY - totalH * 0.5f + spacing * 0.5f;
 
-    int values[5] = {
+    int values[7] = {
         goldenHeartLevel,
         coinLevel,
         vampireLevel,
         attackLevel,
-        armorLevel
+        armorLevel,
+        speedLevel,
+        dashLevel
     };
 
-    _textureLoader* icons[5] = {
+    _textureLoader* icons[7] = {
         healthIcon,
         coinIcon,
         vampIcon,
         attackIcon,
-        armorIcon
+        armorIcon,
+        speedIcon,
+        dashIcon
     };
 
 
 
     if (currentScene == MENU_SCENE)
     {
+        float smoothSpeed = 5.0f * myTime->deltaTime;
+
+        parallaxX += (targetParallaxX - parallaxX) * smoothSpeed;
+        parallaxY += (targetParallaxY - parallaxY) * smoothSpeed;
+
+
         shopMusic->pauseSound("sounds/shopMusic.mp3");
         gameMusic->pauseSound("sounds/easterEgg.mp3");
         menuMusic->playMusic("sounds/2D Game Intro.wav");
@@ -353,6 +374,7 @@ void _Scene::drawScene() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glTranslatef(width/2, height/2, 0);
+            //glTranslatef(width/2 + parallaxX, height/2 + parallaxY, 0);
             glScalef(400, -400, 1);
             mainMenu->drawSprite(0, 0, 0);
             if (myWorldTime->getTicks() > 100)
@@ -451,7 +473,11 @@ void _Scene::drawScene() {
     smoothDT = (smoothDT * 0.9f) + (myTime->deltaTime * 0.1f);
 
     ashes->update(myTime->deltaTime, mySprite->pos.x, mySprite->pos.y);
-    //videos[currentVideo]->update(myTime->deltaTime);
+
+    if (currentVideo != VIDEO_NONE && videos[currentVideo])
+    {
+        videos[currentVideo]->update(myTime->deltaTime);
+    }
 
     if(!paused){
     myInput->keyPressed(mySprite, smoothDT, myCollider2, attackSprite);
@@ -1050,7 +1076,7 @@ void _Scene::drawScene() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 7; i++)
     {
         if (!icons[i]) continue;
 
@@ -1075,7 +1101,7 @@ void _Scene::drawScene() {
 
     char text[32];
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 7; i++)
     {
         float y = startY + i * spacing;
 
@@ -1132,10 +1158,12 @@ void _Scene::drawScene() {
 
     menuMusic->pauseSound("sounds/2D Game Intro.wav");
     shopMusic->pauseSound("sounds/shopMusic.mp3");
+    /*
     if (!paused)
         gameMusic->playMusic("sounds/gameMusic.mp3");
     else
         gameMusic->pauseSound("");
+    */
 
     // ---- DRAW GAME ----
     static float smoothDT = 0.16f;
@@ -2691,7 +2719,7 @@ void _Scene::drawScene() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 7; i++)
     {
         if (!icons[i]) continue;
 
@@ -2716,7 +2744,7 @@ void _Scene::drawScene() {
 
     char text[32];
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 7; i++)
     {
         float y = startY + i * spacing;
 
@@ -3151,6 +3179,23 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         menu->mouseMove(mouseX, mouseY);
 
+
+
+        // Normalize to range [-1, 1]
+        float normX = (mouseX / (float)width) * 2.0f - 1.0f;
+        float normY = (mouseY / (float)height) * 2.0f - 1.0f;
+
+        // Small bounds (tweak this!)
+        float maxOffset = 20.0f;
+
+        targetParallaxX = normX * maxOffset;
+        targetParallaxY = normY * maxOffset;
+
+
+
+
+
+
         if (currentScene == SHOP_SCENE)
         {
             for (auto& btn : shopButtons)
@@ -3207,14 +3252,14 @@ void _Scene::purchaseUpgrade(ButtonAction action)
 
         case ACTION_COINBOOST:
             coinLevel++;
-            coinMultiplier += 0.05f;
+            coinMultiplier += 0.1f;
 
             currentVideo = VIDEO_COIN;
             break;
 
         case ACTION_VAMPIRE:
             vampireLevel++;
-            vampireHeal += 0.25f;
+            vampireHeal += 0.15f;
 
             currentVideo = VIDEO_VAMPIRE;
             break;
@@ -3236,14 +3281,14 @@ void _Scene::purchaseUpgrade(ButtonAction action)
             speedLevel++;
             playerSpeed += 0.01f;   // small increase (tweak as needed)
 
-            //currentVideo = VIDEO_SPEED;
+            currentVideo = VIDEO_SPEED;
             break;
 
         case ACTION_DASHBOOST:
             dashLevel++;
             dashDamage += 1.0f;
 
-            //currentVideo = VIDEO_DASH;
+            currentVideo = VIDEO_DASH;
             break;
 
         default:
@@ -3253,8 +3298,8 @@ void _Scene::purchaseUpgrade(ButtonAction action)
     // Start video if one was selected
     if (currentVideo != VIDEO_NONE)
     {
-        //videos[currentVideo]->reset();
-        //videos[currentVideo]->play(false);
+        videos[currentVideo]->reset();
+        videos[currentVideo]->play(false);
     }
 
     if (action != ACTION_HEALTHBOOST)
