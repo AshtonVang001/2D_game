@@ -70,6 +70,20 @@ void _inputs::keyPressed(_sprite* mySprite, float deltaTime, _collisionCheck* my
             attackPressed = true;
             isAttacking = true;
 
+
+            // ---- Mouse Aim Override ----
+            if (fabs(dy) < 0.01f)
+            {
+                if (mouseScreenX < screenWidth * 0.5f)
+                {
+                    lastDirection = mySprite->IDLE_L;
+                }
+                else
+                {
+                    lastDirection = mySprite->IDLE_R;
+                }
+            }
+
             attackSprite->setLoop(false);
 
             switch (lastDirection)

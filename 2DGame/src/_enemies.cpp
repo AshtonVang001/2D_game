@@ -6,8 +6,8 @@ _enemies::_enemies()
     moveSpeed = 1.5f;
     radius = 0.2f;
     footOffset = 0.1f;
-    health = 30 * pow(1.1f, levelModifier);
-    damage = 1 * pow(1.1f, levelModifier);
+    //health = 30 * pow(1.1f, levelModifier);
+    //damage = 1 * pow(1.1f, levelModifier);
 
     colliderX = imgRatioX * worldScale;
     colliderY = imgRatioY * worldScale;
@@ -192,7 +192,10 @@ void _enemies::drawDamageText()
     glPopAttrib();
 }
 
-void _enemies::setLevelModifier(int levelModifier)
+void _enemies::setLevelModifier(int lvl)
 {
+    levelModifier = lvl;
+
     health = 30.0f * pow(1.1f, levelModifier);
+    damage = 1 * pow(1.1f, levelModifier);
 }

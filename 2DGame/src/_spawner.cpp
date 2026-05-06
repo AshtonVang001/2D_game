@@ -53,6 +53,7 @@ void _spawner::update(float dt, std::vector<_enemies*>& enemies, _collisionCheck
         e = new _boss();
         e->scale = 3.0f;
         e->spriteInit("images/skeleton.png", 7, 8);
+        e->health = 200.0f + (25 * levelModifier);
     }
     else
     {
@@ -67,6 +68,7 @@ void _spawner::update(float dt, std::vector<_enemies*>& enemies, _collisionCheck
         {
             e = new _enemies();
             e->spriteInit("images/skeleton.png", 7, 8);
+            e->setLevelModifier(localLevelModifier);
         }
     }
 

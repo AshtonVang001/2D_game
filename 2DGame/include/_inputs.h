@@ -73,6 +73,8 @@ class _inputs
         float colliderY;
 
         float speedBonus = 0.0f;
+        float screenWidth = 800.0f;
+        float mouseScreenX = 0.0f;
 
     protected:
 

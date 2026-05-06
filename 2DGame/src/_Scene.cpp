@@ -92,13 +92,13 @@ void _Scene::initGL() {
 
 
     videos[VIDEO_HEALTH]->loadFrames("videos/heart", 40, 24.0f);
-    videos[VIDEO_GOLDEN_HEART]->loadFrames("videos/heart", 40, 24.0f);
-    videos[VIDEO_COIN]->loadFrames("videos/heart", 40, 24.0f);
-    videos[VIDEO_VAMPIRE]->loadFrames("videos/heart", 40, 24.0f);
-    videos[VIDEO_ATTACK]->loadFrames("videos/heart", 40, 24.0f);
-    videos[VIDEO_ARMOR]->loadFrames("videos/heart", 40, 24.0f);
-    videos[VIDEO_SPEED]->loadFrames("videos/heart", 40, 24.0f);
-    videos[VIDEO_DASH]->loadFrames("videos/heart", 40, 24.0f);
+    videos[VIDEO_GOLDEN_HEART]->loadFrames("videos/goldHeart", 40, 24.0f);
+    videos[VIDEO_COIN]->loadFrames("videos/coin", 40, 24.0f);
+    videos[VIDEO_VAMPIRE]->loadFrames("videos/blood", 40, 24.0f);
+    videos[VIDEO_ATTACK]->loadFrames("videos/attack", 40, 24.0f);
+    videos[VIDEO_ARMOR]->loadFrames("videos/armor", 40, 24.0f);
+    videos[VIDEO_SPEED]->loadFrames("videos/speed", 40, 24.0f);
+    videos[VIDEO_DASH]->loadFrames("videos/dash", 40, 24.0f);
 
     myShop->initShop();
 
@@ -2602,6 +2602,41 @@ void _Scene::drawScene() {
         glPopAttrib();
     }
 
+    if (!showLevelText) {
+        char text[64];
+        sprintf(text, "LEVEL %d", levelModifier);
+
+        glPushAttrib(GL_ENABLE_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
+
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glLineWidth(2.0f);
+
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        // ---- Position (bottom-left) ----
+        float marginX = 20.0f;
+        float marginY = 20.0f;
+        glTranslatef(marginX, marginY, 0);
+
+        // ---- Scale down text ----
+        float scale = 0.4f;
+        glScalef(scale, scale, 1.0f);
+
+        glColor3f(1, 1, 1);
+
+        for (const char* c = text; *c; ++c)
+            glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+
+        glPopMatrix();
+        glPopAttrib();
+    }
+
 
     if (myInput->showHitboxes) {
         char text[64];
@@ -3059,6 +3094,9 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
                 int mouseX = LOWORD(lParam);
                 int mouseY = HIWORD(lParam);
+
+                myInput->mouseScreenX = (float)mouseX;
+                myInput->screenWidth = width;
 
                 if(!paused)
                 {
