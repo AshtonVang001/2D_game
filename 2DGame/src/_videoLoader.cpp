@@ -49,11 +49,11 @@ void _videoLoader::loadFrames(const std::string& folder, int frameCount, float f
 
         if (tex == 0)
         {
-            printf("Failed to load: %s\n", path.c_str());
+            //printf("Failed to load: %s\n", path.c_str());
         }
         else
         {
-            printf("Loaded: %s\n", path.c_str());
+            //printf("Loaded: %s\n", path.c_str());
         }
 
         frames.push_back(tex);

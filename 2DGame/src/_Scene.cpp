@@ -187,6 +187,53 @@ void _Scene::initGL() {
         ACTION_QUIT
     );
 
+
+    yesButton.setButton(
+        width/2 - 260,
+        height * 0.81,
+        160,
+        80,
+        "images/yesbtn.png",
+        ACTION_YES
+    );
+
+    noButton.setButton(
+        width/2 + 100,
+        height * 0.81,
+        160,
+        80,
+        "images/nobtn.png",
+        ACTION_NO
+    );
+
+    winButton.setButton(
+        width/2 - 80,
+        height * 0.81,
+        160,
+        80,
+        "images/winbtn.png",
+        ACTION_WIN
+    );
+
+    returnButton.setButton(
+        width/2 - 160,
+        height * 0.7,
+        320,
+        160,
+        "images/menuButton.png",
+        ACTION_RETURN
+    );
+
+    exitButton.setButton(
+        (width/2 - 620) + 32,
+        (height/2 - 380) + 32,
+        64,
+        64,
+        "images/exit.png",
+        ACTION_EXIT
+    );
+
+
     //----------SHOP BUTTONS-----------------//
     shopButtons.clear();
 
@@ -342,6 +389,238 @@ void _Scene::drawScene() {
 
 
 
+    if (currentScene == WIN_SCENE)
+    {
+
+    if (myFade->fadeInOnEnter)
+        myFade->fadeIn(myTime->deltaTime);
+
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        myTex->bindTexture();
+        glColor3f(1,1,1);
+        glScalef(worldScale,-worldScale,1);
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f, 0.0f, 1.0f);
+            glTexCoord2f(0,0); glVertex3f(-8, -5.15, -8);
+            glTexCoord2f(1,0); glVertex3f( 8, -5.15, -8);
+            glTexCoord2f(1,1); glVertex3f( 8,  5.15, -8);
+            glTexCoord2f(0,1); glVertex3f(-8,  5.15, -8);
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, height, 0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    returnButton.update();
+    returnButton.draw();
+
+    glEnable(GL_DEPTH_TEST);
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+
+
+
+    // ===== WIN TEXT =====
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, 0, height);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glLineWidth(2.5f);
+
+    float cx = width / 2.0f;
+    float cy = height / 2.0f;
+
+    const char* deathText = "YOU WON";
+
+    float deathWidth = 0;
+    for (const char* c = deathText; *c; ++c)
+        deathWidth += glutStrokeWidth(GLUT_STROKE_ROMAN, *c);
+
+    glPushMatrix();
+    glTranslatef(cx - deathWidth / 2.0f, cy, 0);
+
+    glColor3f(1.0f, 0.84f, 0.0f);
+
+    for (const char* c = deathText; *c; ++c)
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+
+    glPopMatrix();
+
+
+
+    char statsText[128];
+    sprintf(statsText, "survived for: %d rounds!", localLevel-1);
+
+    float statsWidth = 0;
+    for (const char* c = statsText; *c; ++c)
+        statsWidth += glutStrokeWidth(GLUT_STROKE_ROMAN, *c);
+
+    glPushMatrix();
+    glTranslatef(cx - statsWidth / 2.0f, cy - 120.0f, 0);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    for (const char* c = statsText; *c; ++c)
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+
+    glPopMatrix();
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    glPopAttrib();
+
+
+    }
+
+
+
+    if (currentScene == DEATH_SCENE)
+    {
+
+    if (myFade->fadeInOnEnter)
+        myFade->fadeIn(myTime->deltaTime);
+
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        myTex->bindTexture();
+        glColor3f(1,1,1);
+        glScalef(worldScale,-worldScale,1);
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f, 0.0f, 1.0f);
+            glTexCoord2f(0,0); glVertex3f(-8, -5.15, -8);
+            glTexCoord2f(1,0); glVertex3f( 8, -5.15, -8);
+            glTexCoord2f(1,1); glVertex3f( 8,  5.15, -8);
+            glTexCoord2f(0,1); glVertex3f(-8,  5.15, -8);
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, height, 0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    returnButton.update();
+    returnButton.draw();
+
+    glEnable(GL_DEPTH_TEST);
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+
+
+
+    // ===== DEATH TEXT =====
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, 0, height);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glLineWidth(2.5f);
+
+    float cx = width / 2.0f;
+    float cy = height / 2.0f;
+
+    const char* deathText = "YOU DIED";
+
+    float deathWidth = 0;
+    for (const char* c = deathText; *c; ++c)
+        deathWidth += glutStrokeWidth(GLUT_STROKE_ROMAN, *c);
+
+    glPushMatrix();
+    glTranslatef(cx - deathWidth / 2.0f, cy, 0);
+
+    glColor3f(1.0f, 0.2f, 0.2f);
+
+    for (const char* c = deathText; *c; ++c)
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+
+    glPopMatrix();
+
+
+
+    char statsText[128];
+    sprintf(statsText, "survived for: %d rounds!", localLevel-1);
+
+    float statsWidth = 0;
+    for (const char* c = statsText; *c; ++c)
+        statsWidth += glutStrokeWidth(GLUT_STROKE_ROMAN, *c);
+
+    glPushMatrix();
+    glTranslatef(cx - statsWidth / 2.0f, cy - 120.0f, 0);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    for (const char* c = statsText; *c; ++c)
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+
+    glPopMatrix();
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    glPopAttrib();
+    }
+
+
+
+
+
     if (currentScene == MENU_SCENE)
     {
         float smoothSpeed = 5.0f * myTime->deltaTime;
@@ -350,8 +629,9 @@ void _Scene::drawScene() {
         parallaxY += (targetParallaxY - parallaxY) * smoothSpeed;
 
 
-        shopMusic->pauseSound("sounds/shopMusic.mp3");
-        gameMusic->pauseSound("sounds/easterEgg.mp3");
+        shopMusic->pauseSound("sounds/shopMusic.wav");
+        gameMusic->pauseSound("sounds/maingamemusic.wav");
+        bossMusic->pauseSound("sounds/bossTheme.wav");
         menuMusic->playMusic("sounds/2D Game Intro.wav");
         settingsMusicStarted = false;
         // ---- DRAW MENU ----
@@ -398,25 +678,129 @@ void _Scene::drawScene() {
 
 
     else if (currentScene == HELP_SCENE){
-        //ShowCursor(TRUE);
-        SetCursor(menuCursor);
-        glDisable(GL_DEPTH_TEST);
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        myTex->bindTexture();
+        glColor3f(1,1,1);
+        glScalef(worldScale,-worldScale,1);
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f, 0.0f, 1.0f);
+            glTexCoord2f(0,0); glVertex3f(-8, -5.15, -8);
+            glTexCoord2f(1,0); glVertex3f( 8, -5.15, -8);
+            glTexCoord2f(1,1); glVertex3f( 8,  5.15, -8);
+            glTexCoord2f(0,1); glVertex3f(-8,  5.15, -8);
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
 
-        glMatrixMode(GL_PROJECTION);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, height, 0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    returnButton.update();
+    returnButton.draw();
+
+    glEnable(GL_DEPTH_TEST);
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+
+
+
+    // ===== HELP MENU =====
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width, 0, height);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glLineWidth(2.5f);
+
+    float cx = width / 2.0f;
+    float cy = height / 2.0f;
+
+    // ===== TITLE =====
+    const char* titleText = "HELP MENU";
+
+    float titleWidth = 0;
+    for (const char* c = titleText; *c; ++c)
+        titleWidth += glutStrokeWidth(GLUT_STROKE_ROMAN, *c);
+
+    glPushMatrix();
+    glTranslatef(cx - titleWidth / 2.0f, cy + 160.0f, 0);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    for (const char* c = titleText; *c; ++c)
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+
+    glPopMatrix();
+
+
+    // ===== INSTRUCTIONS =====
+    const char* lines[] = {
+        "WASD - Move",
+        "SHIFT - Dash",
+        "LEFT CLICK - Attack",
+        "Y / N / ESC - Exit Menus"
+    };
+
+    float startY = cy + 40.0f;
+    float instructionScale = 0.5f;
+
+    for (int i = 0; i < 4; i++)
+    {
+        float textWidth = 0;
+
+        for (const char* c = lines[i]; *c; ++c)
+            textWidth += glutStrokeWidth(GLUT_STROKE_ROMAN, *c);
+
+        textWidth *= instructionScale; // important: account for scaling
+
         glPushMatrix();
-        glLoadIdentity();
-        gluOrtho2D(0, width, height, 0);
 
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        glTranslatef(cx - textWidth / 2.0f, startY - (i * 75.0f), 0);
 
-        help->draw();
+        glScalef(instructionScale, instructionScale, 1.0f);
 
-        glMatrixMode(GL_PROJECTION);
+        glColor3f(1.0f, 1.0f, 1.0f);
+
+        for (const char* c = lines[i]; *c; ++c)
+            glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+
         glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
+    }
 
-        glEnable(GL_DEPTH_TEST);
+
+    // ===== RESTORE MATRICES =====
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    glPopAttrib();
     }
 
 
@@ -465,8 +849,11 @@ void _Scene::drawScene() {
     //===========================================================================
     else if (currentScene == SHOP_SCENE) {
     menuMusic->pauseSound("sounds/2D Game Intro.wav");
-    gameMusic->pauseSound("sounds/easterEgg.mp3");
-    shopMusic->playMusic("sounds/shopMusic.mp3");
+    gameMusic->pauseSound("sounds/maingamemusic.wav");
+    bossMusic->pauseSound("sounds/bosstheme.wav");
+    if (!paused) {
+    shopMusic->playMusic("sounds/shopMusic.wav");
+    }
 
     SetCursor(gameCursor);
     static float smoothDT = 0.16f;
@@ -673,6 +1060,16 @@ void _Scene::drawScene() {
 
         myShop->drawExitPrompt(width, height);
 
+        yesButton.update();
+        yesButton.draw();
+        noButton.update();
+        noButton.draw();
+
+        if ((levelModifier % 3) == 0) {
+            winButton.update();
+            winButton.draw();
+        }
+
         glEnable(GL_DEPTH_TEST);
 
         glPopMatrix();
@@ -703,6 +1100,7 @@ void _Scene::drawScene() {
                 currentScene = GAME_SCENE;
 
                 levelModifier += 1;
+                localLevel = levelModifier;
                 triggerLevelText();
                 resetLevel();
             }
@@ -789,6 +1187,10 @@ void _Scene::drawScene() {
         glDisable(GL_DEPTH_TEST);
 
         myShop->drawShopUI(width, height);
+        yesButton.update();
+        yesButton.draw();
+        noButton.update();
+        noButton.draw();
 
         glEnable(GL_DEPTH_TEST);
 
@@ -819,6 +1221,8 @@ void _Scene::drawScene() {
             btn.update();
             btn.draw();
         }
+        exitButton.update();
+        exitButton.draw();
 
         glEnable(GL_DEPTH_TEST);
 
@@ -962,8 +1366,6 @@ void _Scene::drawScene() {
     //---- TEXT ----
     //===========================================================================
 
-
-    // ---- COIN UI ----
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -973,32 +1375,33 @@ void _Scene::drawScene() {
     glPushMatrix();
     glLoadIdentity();
 
-    // ---- Clean state ----
-    glDisable(GL_LIGHTING);
-    glDisable(GL_ALPHA_TEST);
+    // ============================================================
+    // GLOBAL UI STATE
+    // ============================================================
     glDisable(GL_DEPTH_TEST);
-
+    glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // ---- DRAW COIN ----
+    // ============================================================
+    // COIN ICON + TEXT
+    // ============================================================
     glEnable(GL_TEXTURE_2D);
-    glColor4f(1,1,1,1);
+    glColor4f(1, 1, 1, 1);
 
     glPushMatrix();
-        glTranslatef(50, height - 50, 0);
-        glScalef(32, 32, 1);
-        UICoin->drawSprite(0, 0, 0);
+    glTranslatef(50.0f, height - 50.0f, 0.0f);
+    glScalef(32.0f, 32.0f, 1.0f);
+    UICoin->drawSprite(0, 0, 0);
     glPopMatrix();
 
-    // ---- DRAW TEXT ----
+    // coin text
     glDisable(GL_TEXTURE_2D);
-    glColor3f(1,1,1);
+    glColor3f(1, 1, 1);
 
     char coinText[64];
     sprintf(coinText, "%d", coinCount);
 
-    // slightly right of coin
     glRasterPos2i(95, height - 58);
 
     for (const char* c = coinText; *c; ++c)
@@ -1006,75 +1409,68 @@ void _Scene::drawScene() {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
     }
 
-
-
-
-    // ---- HEART HUD (top right) ----
+    // ============================================================
+    // HEART HUD (TOP RIGHT)
+    // ============================================================
     glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     heartTex->bindTexture();
 
-    const float heartSize  = 30.0f;
-    const float heartStep  = 32.0f;
+    const float heartSize = 30.0f;
+    const float heartStep = 32.0f;
+
     int hearts = (int)playerMaxHealth;
     float totalWidth = hearts * heartStep;
 
-    float hStartX = (float)width - 15.0f - totalWidth;
-    float hY1     = (float)height - 65.0f;
-    float hY2     = (float)height - 35.0f;
+    float startX = width - 15.0f - totalWidth;
+    float yTop   = height - 35.0f;
+    float yBot   = height - 65.0f;
 
-    int heartsToDraw = (int)playerMaxHealth;
-    for (int i = 0; i < heartsToDraw; i++)
+    for (int i = 0; i < hearts; i++)
     {
-        float hx = hStartX + i * heartStep;
+        float x = startX + i * heartStep;
 
-        float fill = playerHealth - (float)i;
-        if (fill < 0.0f) fill = 0.0f;
-        if (fill > 1.0f) fill = 1.0f;
+        float fill = playerHealth - i;
+        if (fill < 0) fill = 0;
+        if (fill > 1) fill = 1;
 
-        // Empty / dark background heart
+        // empty heart
         glColor4f(0.25f, 0.0f, 0.0f, 1.0f);
         glBegin(GL_QUADS);
-            glTexCoord2f(0, 1); glVertex2f(hx,            hY1);
-            glTexCoord2f(1, 1); glVertex2f(hx + heartSize, hY1);
-            glTexCoord2f(1, 0); glVertex2f(hx + heartSize, hY2);
-            glTexCoord2f(0, 0); glVertex2f(hx,            hY2);
+            glTexCoord2f(0, 1); glVertex2f(x, yBot);
+            glTexCoord2f(1, 1); glVertex2f(x + heartSize, yBot);
+            glTexCoord2f(1, 0); glVertex2f(x + heartSize, yTop);
+            glTexCoord2f(0, 0); glVertex2f(x, yTop);
         glEnd();
 
+        // fill logic
         if (fill >= 1.0f)
         {
-            // Full heart
-            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            glColor4f(1, 1, 1, 1);
             glBegin(GL_QUADS);
-                glTexCoord2f(0, 1); glVertex2f(hx,            hY1);
-                glTexCoord2f(1, 1); glVertex2f(hx + heartSize, hY1);
-                glTexCoord2f(1, 0); glVertex2f(hx + heartSize, hY2);
-                glTexCoord2f(0, 0); glVertex2f(hx,            hY2);
+                glTexCoord2f(0, 1); glVertex2f(x, yBot);
+                glTexCoord2f(1, 1); glVertex2f(x + heartSize, yBot);
+                glTexCoord2f(1, 0); glVertex2f(x + heartSize, yTop);
+                glTexCoord2f(0, 0); glVertex2f(x, yTop);
             glEnd();
         }
         else if (fill >= 0.5f)
         {
-            // Half heart — draw left half of texture only
             float halfW = heartSize * 0.5f;
-            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+            glColor4f(1, 1, 1, 1);
             glBegin(GL_QUADS);
-                glTexCoord2f(0,    1); glVertex2f(hx,          hY1);
-                glTexCoord2f(0.5f, 1); glVertex2f(hx + halfW,  hY1);
-                glTexCoord2f(0.5f, 0); glVertex2f(hx + halfW,  hY2);
-                glTexCoord2f(0,    0); glVertex2f(hx,          hY2);
+                glTexCoord2f(0, 1);   glVertex2f(x, yBot);
+                glTexCoord2f(0.5f, 1); glVertex2f(x + halfW, yBot);
+                glTexCoord2f(0.5f, 0); glVertex2f(x + halfW, yTop);
+                glTexCoord2f(0, 0);   glVertex2f(x, yTop);
             glEnd();
         }
     }
 
-
-
-    // ---- PowerUps HUD ----
+    // ============================================================
+    // POWERUP ICONS
+    // ============================================================
     glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_DEPTH_TEST);
 
     for (int i = 0; i < 7; i++)
     {
@@ -1096,16 +1492,16 @@ void _Scene::drawScene() {
         glEnd();
     }
 
+    // powerup text
     glDisable(GL_TEXTURE_2D);
     glColor3f(1, 1, 1);
 
-    char text[32];
-
     for (int i = 0; i < 7; i++)
     {
-        float y = startY + i * spacing;
-
+        char text[32];
         sprintf(text, "%d", values[i]);
+
+        float y = startY + i * spacing;
 
         glRasterPos2f(baseX + iconSize + 10.0f, y + 8.0f);
 
@@ -1113,24 +1509,85 @@ void _Scene::drawScene() {
             glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
     }
 
+    // ============================================================
+    // SHOP PRICE TEXT (FIXED POSITION SAFE)
+    // ============================================================
+
+    // ---- Check to see if a video is playing ----
+    bool anyVideoPlaying =
+    (currentVideo != VIDEO_NONE &&
+     videos[currentVideo] &&
+     videos[currentVideo]->isPlaying);
+
+    int shopCosts[8] =
+    {
+        costDashBoost,
+        costGoldenHeart,
+        costHealthBoost,
+        costCoinBoost,
+        costVampire,
+        costAttackBoost,
+        costArmorBoost,
+        costSpeedBoost
+    };
+
+    float colSpacing = 230.0f;
+
+    float baseX = width * 0.5f;
+
+    float shopX2[8] =
+    {
+        baseX - 1.5f * colSpacing,
+        baseX - 0.5f * colSpacing,
+        baseX + 0.5f * colSpacing,
+        baseX + 1.5f * colSpacing,
+
+        baseX - 1.5f * colSpacing,
+        baseX - 0.5f * colSpacing,
+        baseX + 0.5f * colSpacing,
+        baseX + 1.5f * colSpacing
+    };
+
+    float yHeight1 = height/2 + 40;
+    float yHeight2 = height/2 - 230;
+    float shopY2[8] =
+    {
+        yHeight1, yHeight1, yHeight1, yHeight1,
+        yHeight2, yHeight2, yHeight2, yHeight2
+    };
 
     glDisable(GL_TEXTURE_2D);
+    glColor3f(1, 1, 1);
 
-    glEnable(GL_DEPTH_TEST);
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
+    if (isShopping && !anyVideoPlaying) {
+        for (int i = 0; i < 8; i++)
+        {
+            char text[32];
+            sprintf(text, "%d", shopCosts[i]);
+
+            float x = shopX2[i];
+            float y = shopY2[i] - 25.0f; // offset under button
+
+            glRasterPos2f(x, y);
+
+            for (const char* c = text; *c; ++c)
+            {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+            }
+        }
+    }
 
 
 
 
 
-
-    // ---- Restore ----
+    // ============================================================
+    // RESTORE STATE
+    // ============================================================
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 
+    // restore matrices (ONLY ONCE)
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
 
@@ -1138,6 +1595,8 @@ void _Scene::drawScene() {
     glPopMatrix();
 
     glMatrixMode(GL_MODELVIEW);
+
+
 
     }
     //===========================================================================
@@ -1157,13 +1616,20 @@ void _Scene::drawScene() {
     {
 
     menuMusic->pauseSound("sounds/2D Game Intro.wav");
-    shopMusic->pauseSound("sounds/shopMusic.mp3");
-    /*
-    if (!paused)
-        gameMusic->playMusic("sounds/gameMusic.mp3");
+    shopMusic->pauseSound("sounds/shopMusic.wav");
+
+    if (!paused) {
+        if ((levelModifier % 3) == 0) {
+            gameMusic->pauseSound("sounds/maingamemusic.wav");
+            bossMusic->playMusic("sounds/bossTheme.wav");
+        }
+        else {
+            bossMusic->pauseSound("sounds/bossTheme.wav");
+            gameMusic->playMusic("sounds/maingamemusic.wav");
+        }
+    }
     else
         gameMusic->pauseSound("");
-    */
 
     // ---- DRAW GAME ----
     static float smoothDT = 0.16f;
@@ -1822,7 +2288,7 @@ void _Scene::drawScene() {
 
             if (myInput->dashAttack && distSq <= (radius * 0.4f)){
                 e->takeDamage(dashDamage);
-                swipeSnd->playSound("sounds/untitled.mp3");
+                swipeSnd->playSound("sounds/woosh.wav");
             }
         }
 
@@ -2050,10 +2516,72 @@ void _Scene::drawScene() {
             }
         }
 
-        if (playerHealth <= 0.0f)
+        // ---- DEATH ----
+
+        /*if (playerHealth <= 0.0f)
         {
-            playerHealth = playerMaxHealth;
-            resetLevel();
+
+            showDeathText = true;
+            myFade->fadeOut(myTime->deltaTime);
+            if (myFade->fadeComplete) {
+                resetAttributes();
+                resetLevel();
+
+                myFade->fadeTimer = 1.0f;
+                myFade->fadeComplete = false;
+                myFade->fadeInOnEnter = true;
+
+                myInput->canMove = true;
+            }
+        }*/
+        if (playerHealth <= 0.0f && !playerDying)
+        {
+            playerDying = true;
+            myInput->canMove = false;
+
+            myFade->fadeTimer = 0.0f;
+            myFade->fadeComplete = false;
+            myFade->fadeInOnEnter = false;
+        }
+
+        if (playerDying)
+        {
+            myFade->fadeOut(myTime->deltaTime);
+
+            if (myFade->fadeComplete)
+            {
+                resetAttributes();
+                resetLevel();
+
+                myFade->fadeTimer = 1.0f;
+                myFade->fadeComplete = false;
+                myFade->fadeInOnEnter = true;
+
+                myInput->canMove = true;
+                playerDying = false;
+
+                currentScene = DEATH_SCENE;
+            }
+        }
+
+        if (gameWon)
+        {
+            myFade->fadeOut(myTime->deltaTime);
+
+            if (myFade->fadeComplete)
+            {
+                resetAttributes();
+                resetLevel();
+
+                myFade->fadeTimer = 1.0f;
+                myFade->fadeComplete = false;
+                myFade->fadeInOnEnter = true;
+
+                myInput->canMove = true;
+                gameWon = false;
+
+                currentScene = WIN_SCENE;
+            }
         }
 
 
@@ -2989,20 +3517,21 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 if (paused)
                 {
                     menuMusic->pauseSound("sounds/2D Game Intro.wav");
-                    gameMusic->pauseSound("sounds/easterEgg.mp3");
-                    shopMusic->pauseSound("sounds/shopMusic.mp3");
+                    gameMusic->pauseSound("sounds/maingamemusic.wav");
+                    shopMusic->pauseSound("sounds/shopMusic.wav");
                     easterEgg->pauseSound("sounds/easterEgg.mp3");
+                    bossMusic->pauseSound("sounds/bossTheme.wav");
                 }
                 else
                 {
                     switch (currentScene)
                     {
                         case GAME_SCENE:
-                            gameMusic->playMusic("sounds/easterEgg.mp3");
+                            gameMusic->playMusic("sounds/maingamemusic.wav");
                             break;
 
                         case SHOP_SCENE:
-                            shopMusic->playMusic("sounds/shopMusic.mp3");
+                            shopMusic->playMusic("sounds/shopMusic.wav");
                             break;
 
                         case MENU_SCENE:
@@ -3107,6 +3636,7 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         gameMusic->pauseSound("");
                         shopMusic->pauseSound("");
                         easterEgg->pauseSound("");
+                        bossMusic->pauseSound("");
                         ShowCursor(TRUE);
                     }
                 }
@@ -3118,11 +3648,11 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         switch (currentScene)
                         {
                             case GAME_SCENE:
-                                gameMusic->playMusic("sounds/easterEgg.mp3");
+                                gameMusic->playMusic("sounds/maingamemusic.wav");
                                 break;
 
                             case SHOP_SCENE:
-                                shopMusic->playMusic("sounds/shopMusic.mp3");
+                                shopMusic->playMusic("sounds/shopMusic.wav");
                                 break;
                         }
                         ShowCursor(FALSE);
@@ -3147,7 +3677,9 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
             if (action == ACTION_PLAY)
             {
-                currentScene = lastScene;   // switch to last scene
+                currentScene = GAME_SCENE;   // switch to last scene
+                resetAttributes();
+                resetLevel();
                 triggerLevelText();
             }
             else if (action == ACTION_HELP)
@@ -3163,22 +3695,89 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 PostQuitMessage(0);
             }
         }
-        else if (currentScene == SHOP_SCENE)
+
+        if (currentScene == WIN_SCENE || currentScene == DEATH_SCENE || currentScene == HELP_SCENE)
         {
             int mouseX = LOWORD(lParam);
             int mouseY = HIWORD(lParam);
 
-            ButtonAction action = menu->mouseClick(mouseX, mouseY);
-
-            for (auto& btn : shopButtons)
+            if (returnButton.checkClick(mouseX, mouseY))
             {
-                if (btn.checkClick(mouseX, mouseY))
+                currentScene = MENU_SCENE;
+            }
+        }
+
+
+
+        if (currentScene == SHOP_SCENE)
+        {
+            int mouseX = LOWORD(lParam);
+            int mouseY = HIWORD(lParam);
+
+            // ---- ENTER SHOP PROMPT ----
+            if (shopActivated)
+            {
+                if (yesButton.checkClick(mouseX, mouseY))
                 {
-                    purchaseUpgrade(btn.getAction());
-                    break; // Only allow one purchase per click
+                    isShopping = true;
+                    shopActivated = false;
+                }
+
+                if (noButton.checkClick(mouseX, mouseY))
+                {
+                    myInput->canMove = true;
+                    shopActivated = false;
+                }
+            }
+
+            // ---- EXIT SHOP PROMPT ----
+            if (shopDoorActivated)
+            {
+                if (yesButton.checkClick(mouseX, mouseY))
+                {
+                    myInput->canMove = true;
+                    returnToGame = true;
+                }
+
+                if (noButton.checkClick(mouseX, mouseY))
+                {
+                    myInput->canMove = true;
+                    returnToGame = false;
+                    shopDoorActivated = false;
+                }
+                if (winButton.checkClick(mouseX, mouseY))
+                {
+                    myInput->canMove = true;
+                    returnToGame = true;
+
+                    gameWon = true;
+
+                    myFade->fadeTimer = 0.0f;
+                    myFade->fadeComplete = false;
+                    myFade->fadeInOnEnter = false;
+                }
+            }
+
+            // ---- SHOP PURCHASE BUTTONS ----
+            if (isShopping)
+            {
+                for (auto& btn : shopButtons)
+                {
+                    if (btn.checkClick(mouseX, mouseY))
+                    {
+                        purchaseUpgrade(btn.getAction());
+                        break;
+                    }
+                }
+                if (exitButton.checkClick(mouseX, mouseY)) {
+                    myInput->canMove = true;
+                    isShopping = false;
                 }
             }
         }
+
+
+
         }
         break;
     case WM_LBUTTONUP:
@@ -3204,7 +3803,6 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
                 int mouseX = LOWORD(lParam);
                 int mouseY = HIWORD(lParam);
-                heartButton.checkHover(mouseX, mouseY);
 
                 // your placeholder buttons
                 for (auto& btn : shopButtons)
@@ -3229,17 +3827,19 @@ int _Scene::winMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         targetParallaxX = normX * maxOffset;
         targetParallaxY = normY * maxOffset;
 
-
-
-
-
-
         if (currentScene == SHOP_SCENE)
         {
             for (auto& btn : shopButtons)
             {
                 btn.checkHover(mouseX, mouseY);
             }
+            yesButton.checkHover(mouseX, mouseY);
+            noButton.checkHover(mouseX, mouseY);
+            winButton.checkHover(mouseX, mouseY);
+            exitButton.checkHover(mouseX, mouseY);
+        }
+        if (currentScene == WIN_SCENE || currentScene == DEATH_SCENE || currentScene == HELP_SCENE) {
+            returnButton.checkHover(mouseX, mouseY);
         }
         }
         break;
@@ -3276,6 +3876,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
         case ACTION_HEALTHBOOST:
             healthLevel++;
             playerHealth = playerMaxHealth;
+            coinSnd->playSound("sounds/stud.mp3");
 
             currentVideo = VIDEO_HEALTH;
             break;
@@ -3284,6 +3885,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
             goldenHeartLevel++;
             playerMaxHealth += 1.0f;
             playerHealth = std::min(playerHealth + 3.0f, playerMaxHealth);
+            coinSnd->playSound("sounds/stud.mp3");
 
             currentVideo = VIDEO_GOLDEN_HEART;
             break;
@@ -3291,6 +3893,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
         case ACTION_COINBOOST:
             coinLevel++;
             coinMultiplier += 0.1f;
+            coinSnd->playSound("sounds/stud.mp3");
 
             currentVideo = VIDEO_COIN;
             break;
@@ -3298,6 +3901,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
         case ACTION_VAMPIRE:
             vampireLevel++;
             vampireHeal += 0.15f;
+            coinSnd->playSound("sounds/stud.mp3");
 
             currentVideo = VIDEO_VAMPIRE;
             break;
@@ -3305,6 +3909,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
         case ACTION_ATTACKBOOST:
             attackLevel++;
             playerAttack += 1.0f;
+            coinSnd->playSound("sounds/stud.mp3");
 
             currentVideo = VIDEO_ATTACK;
             break;
@@ -3312,12 +3917,14 @@ void _Scene::purchaseUpgrade(ButtonAction action)
         case ACTION_ARMORBOOST:
             armorLevel++;
             playerArmor += 0.25f;
+            coinSnd->playSound("sounds/stud.mp3");
 
             currentVideo = VIDEO_ARMOR;
             break;
         case ACTION_SPEEDBOOST:
             speedLevel++;
             playerSpeed += 0.01f;   // small increase (tweak as needed)
+            coinSnd->playSound("sounds/stud.mp3");
 
             currentVideo = VIDEO_SPEED;
             break;
@@ -3325,6 +3932,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
         case ACTION_DASHBOOST:
             dashLevel++;
             dashDamage += 1.0f;
+            coinSnd->playSound("sounds/stud.mp3");
 
             currentVideo = VIDEO_DASH;
             break;
@@ -3342,7 +3950,7 @@ void _Scene::purchaseUpgrade(ButtonAction action)
 
     if (action != ACTION_HEALTHBOOST)
     {
-        *costPtr += 5;
+        *costPtr += 3;
     }
 
     //playHeartVideo = true;
@@ -3491,4 +4099,44 @@ void _Scene::drawDamageFlash(int width, int height)
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
+}
+
+void _Scene::resetAttributes()
+{
+    for (auto& c : coins)
+    {
+        delete c;
+    }
+    coins.clear();
+
+    levelModifier = 1;
+    coinCount = 0;
+
+    healthLevel      = 0;
+    goldenHeartLevel = 0;
+    coinLevel        = 0;
+    vampireLevel     = 0;
+    attackLevel      = 0;
+    armorLevel       = 0;
+    speedLevel       = 0;
+    dashLevel        = 0;
+
+    playerMaxHealth  = 10.0f;
+    playerArmor      = 0.0f;
+    playerAttack     = 10.0f;
+    vampireHeal      = 0.0f;
+    coinMultiplier   = 1.0f;
+    playerSpeed      = 0.1f;
+    dashDamage         = 1.0f;
+
+    costHealthBoost = 0;
+    costGoldenHeart = 20;
+    costCoinBoost   = 20;
+    costVampire     = 20;
+    costAttackBoost = 20;
+    costArmorBoost  = 20;
+    costSpeedBoost  = 20;
+    costDashBoost   = 20;
+
+    playerHealth = playerMaxHealth;
 }

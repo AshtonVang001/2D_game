@@ -34,7 +34,9 @@ enum SceneState
     GAME_SCENE,
     HELP_SCENE,
     SETTINGS_SCENE,
-    SHOP_SCENE
+    SHOP_SCENE,
+    WIN_SCENE,
+    DEATH_SCENE
 };
 
 enum VideoType
@@ -79,6 +81,7 @@ class _Scene
         _sounds *menuMusic = new _sounds();
         _sounds *shopMusic = new _sounds();
         _sounds *gameMusic = new _sounds();
+        _sounds *bossMusic = new _sounds();
 
 
         _sprite *mySprite = new _sprite();
@@ -96,6 +99,12 @@ class _Scene
 
         _button heartButton;
         _button testButton;
+
+        _button yesButton;
+        _button noButton;
+        _button winButton;
+        _button returnButton;
+        _button exitButton;
 
         _textureLoader pausePanel;
         _textureLoader *myTex = new _textureLoader();
@@ -152,6 +161,7 @@ class _Scene
         void drawGrid(float step, float range);
         void triggerLevelText();
         void resetLevel();
+        void resetAttributes();
         void triggerDamageFlash();
         void drawDamageFlash(int width, int height);
 
@@ -213,6 +223,7 @@ class _Scene
         vector<_coin*> coins;
 
         int currentWave = 0;
+        int localLevel = 0;
         bool levelComplete = false;
 
         float doorX = 0.0f;
@@ -245,6 +256,8 @@ class _Scene
         bool isPauseAllowed();
 
         bool showLevelText = false;
+        bool playerDying = false;
+        bool gameWon = false;
         float levelTextTimer = 0.0f;
         float levelTextDuration = 2.0f;
 
@@ -261,7 +274,6 @@ class _Scene
 
         float targetParallaxX = 0.0f;
         float targetParallaxY = 0.0f;
-
 
         //=========================================================
         // player upgrade
