@@ -8,7 +8,133 @@ _Scene::_Scene() {
     myAttackTime->startTime = clock();
 }
 
-_Scene::~_Scene() {}
+_Scene::~_Scene() {
+    //=========================================================
+    // Delete vectors
+    //=========================================================
+
+    for (auto e : enemies)
+    {
+        delete e;
+    }
+    enemies.clear();
+
+    for (auto s : spawners)
+    {
+        delete s;
+    }
+    spawners.clear();
+
+    for (auto c : coins)
+    {
+        delete c;
+    }
+    coins.clear();
+
+
+    //=========================================================
+    // Core systems
+    //=========================================================
+
+    delete myLight;
+    delete myInput;
+    delete myTexture;
+    delete myPrlx;
+    delete mySkyBox;
+    delete enemySprite;
+    delete myTime;
+    delete myWorldTime;
+    delete myAttackTime;
+    delete myCam;
+    delete menu;
+    delete help;
+    delete settings;
+
+
+    //=========================================================
+    // Sounds
+    //=========================================================
+
+    delete theSound;
+    delete easterEgg;
+    delete hitSnd;
+    delete swipeSnd;
+    delete coinSnd;
+    delete menuMusic;
+    delete shopMusic;
+    delete gameMusic;
+    delete bossMusic;
+
+
+    //=========================================================
+    // Sprites / entities
+    //=========================================================
+
+    delete mySprite;
+    delete myTorch;
+    delete myShopKeeper;
+    delete UICoin;
+    delete mainMenu;
+    delete attackSprite;
+    delete myBoss;
+
+
+    //=========================================================
+    // Textures
+    //=========================================================
+
+    delete myTex;
+    delete myTex2;
+    delete level2F;
+    delete level2W;
+    delete level3F;
+    delete level3W;
+    delete shopF;
+    delete shopW;
+
+    delete shopUI;
+    delete myArrowTexture;
+    delete heartTex;
+
+    delete healthIcon;
+    delete coinIcon;
+    delete vampIcon;
+    delete attackIcon;
+    delete armorIcon;
+    delete speedIcon;
+    delete dashIcon;
+
+
+    //=========================================================
+    // Collision
+    //=========================================================
+
+    delete myCollider;
+    delete myCollider2;
+    delete myCollider3;
+    delete myCollider4;
+
+
+    //=========================================================
+    // Other systems
+    //=========================================================
+
+    delete mySpawner;
+    delete ashes;
+    delete myFade;
+    delete myShop;
+
+
+    //=========================================================
+    // Videos
+    //=========================================================
+
+    for (int i = 0; i < 9; i++)
+    {
+        delete videos[i];
+        videos[i] = nullptr;
+    }
+}
 
 void _Scene::reSizeScene(int width, int height) {
     const float aspectRatio = (float)width / (float)height;

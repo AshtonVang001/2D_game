@@ -8,6 +8,7 @@ _menu::_menu()
 _menu::~_menu()
 {
     //dtor
+    delete bg;
 }
 void _menu::init(int screenWidth, int screenHeight)
 {
